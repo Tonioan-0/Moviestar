@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import java.net.*?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.shape.*?>
+<?import javafx.scene.text.*?>
+
+<AnchorPane fx:id="windowCardRoot" maxHeight="445.0" maxWidth="766.0" prefHeight="407.0" prefWidth="653.0" stylesheets="@../styles/filmCard.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.esa.moviestar.movie_view.WindowCardController">
+    <StackPane fx:id="imgContainer" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+        <ImageView fx:id="imgView" fitHeight="${imgContainer.height}" fitWidth="${imgContainer.width}" StackPane.alignment="CENTER">
+            <clip>
+                <Rectangle arcHeight="48" arcWidth="48" height="${imgView.fitHeight}" width="${imgView.fitWidth}" />
+            </clip>
+        </ImageView>
+    </StackPane>
+    <HBox fx:id="controlsContainer" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+        <VBox alignment="BOTTOM_LEFT" spacing="10" HBox.hgrow="ALWAYS">
+            <Text fx:id="titleLabel" strokeType="OUTSIDE" strokeWidth="0.0" text="Text" wrappingWidth="433.13671875">
+                <styleClass>
+                    <String fx:value="large-text" />
+                    <String fx:value="on-primary" />
+                    <String fx:value="bold-text" />
+                </styleClass></Text>
+            <Label fx:id="descriptionLabel" alignment="TOP_LEFT" maxHeight="256.0" prefWidth="422.0" text="Lorem ipsum dolor sit amet" textOverrun="WORD_ELLIPSIS" wrapText="true">
+                <styleClass>
+                    <String fx:value="on-primary" />
+                    <String fx:value="medium-text" />
+                </styleClass></Label>
+
+            <HBox spacing="10">
+                <HBox fx:id="playButton" alignment="CENTER" prefHeight="48.0" prefWidth="128.0" spacing="8.0">
+                    <SVGPath content="%play" styleClass="on-primary" />
+                    <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Play">
+                        <styleClass>
+                            <String fx:value="medium-text" />
+                            <String fx:value="on-primary" />
+                        </styleClass></Text>
+                    <padding>
+                        <Insets bottom="8.0" left="8.0" right="16.0" top="8.0" />
+                    </padding>
+                    <styleClass>
+                        <String fx:value="small-item" />
+                        <String fx:value="primary" />
+                    </styleClass>
+                </HBox>
+                <HBox fx:id="btnInfo" alignment="CENTER" prefHeight="48.0" prefWidth="128.0" spacing="8.0">
+                    <SVGPath content="%info" styleClass="on-primary" />
+                    <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Info">
+                        <styleClass>
+                            <String fx:value="medium-text" />
+                            <String fx:value="on-primary" />
+                        </styleClass></Text>
+                    <padding>
+                        <Insets bottom="8.0" left="8.0" right="16.0" top="8.0" />
+                    </padding>
+                    <styleClass>
+                        <String fx:value="small-item" />
+                        <String fx:value="primary-border" />
+                    </styleClass>
+                </HBox>
+                <Region prefWidth="200.0" HBox.hgrow="ALWAYS" />
+
+                <HBox fx:id="ratingContainer" alignment="CENTER" prefWidth="92.0" scaleShape="false" spacing="8.0" styleClass="nav-button" HBox.hgrow="NEVER">
+                    <Text fx:id="ratingLabel" text="4/5" textAlignment="CENTER">
+                        <styleClass>
+                            <String fx:value="large-text" />
+                            <String fx:value="on-primary" />
+                        </styleClass></Text>
+                    <SVGPath content="%star" styleClass="texture-gold" />
+                    <padding>
+                        <Insets bottom="8.0" left="8.0" top="8.0" />
+                    </padding>
+                </HBox>
+            </HBox>
+        </VBox>
+        <padding>
+            <Insets bottom="16.0" left="16.0" right="16.0" top="16.0" />
+        </padding>
+    </HBox>
+    <stylesheets>
+        <URL value="@../styles/filmCard.css" />
+        <URL value="@../styles/general.css" />
+    </stylesheets>
+    <styleClass>
+        <String fx:value="medium-item" />
+        <String fx:value="surface-dim" />
+    </styleClass>
+</AnchorPane>

@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import java.net.*?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.shape.*?>
+
+<StackPane fx:id="cardContainer" maxHeight="400.0" maxWidth="300.0" prefHeight="400.0" prefWidth="300.0" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.esa.moviestar.movie_view.FilmCardController">
+    <ImageView fx:id="imgView" fitHeight="400.0" fitWidth="300.0" pickOnBounds="true">         <clip>
+        <Rectangle arcHeight="48" arcWidth="48" height="${imgView.fitHeight}" width="${imgView.fitWidth}" />
+    </clip></ImageView>
+    <!-- The background image will be set programmatically -->
+
+    <!-- Gradient overlay -->
+    <Region fx:id="gradientOverlay" styleClass="medium-item" />
+
+    <!-- Metadata pane (initially visible) -->
+    <HBox fx:id="metadataPane" alignment="BOTTOM_CENTER" spacing="10" styleClass="media-metadata" StackPane.alignment="BOTTOM_LEFT">
+
+        <!-- Time/Episodes metadata -->
+        <HBox fx:id="timeMetadata" alignment="CENTER_LEFT" maxHeight="32.0" spacing="5">
+            <SVGPath fx:id="durationIcon" styleClass="on-primary">
+                <HBox.margin>
+                    <Insets bottom="8.0" left="8.0" right="4.0" top="8.0" />
+                </HBox.margin></SVGPath>
+            <Label fx:id="timeLabel" alignment="BOTTOM_LEFT">
+                <styleClass>
+                    <String fx:value="on-primary" />
+                    <String fx:value="medium-text" />
+                    <String fx:value="bold-text" />
+                </styleClass></Label>
+
+        </HBox>
+
+        <!-- Spacer -->
+        <Region HBox.hgrow="ALWAYS" />
+
+        <!-- Rating metadata -->
+        <HBox fx:id="ratingMetadata" alignment="CENTER_RIGHT" maxHeight="32.0" spacing="5">
+            <Label fx:id="ratingLabel" alignment="BOTTOM_LEFT" styleClass="on-primary">
+                <styleClass>
+                    <String fx:value="medium-text" />
+                    <String fx:value="on-primary" />
+                    <String fx:value="bold-text" />
+                </styleClass></Label>
+            <SVGPath content="%star" styleClass="texture-gold">
+                <HBox.margin>
+                    <Insets bottom="8.0" left="4.0" right="8.0" top="8.0" />
+                </HBox.margin></SVGPath>
+        </HBox>
+    </HBox>
+
+    <!-- Content pane (initially hidden) -->
+    <VBox fx:id="contentPane" alignment="BOTTOM_LEFT" opacity="0" spacing="5" styleClass="media-content" StackPane.alignment="BOTTOM_LEFT">
+
+        <Label fx:id="titleLabel" wrapText="true">
+            <styleClass>
+                <String fx:value="on-primary" />
+                <String fx:value="large-text" />
+                <String fx:value="bold-text" />
+            </styleClass></Label>
+        <Label fx:id="descriptionLabel" wrapText="true">
+            <padding>
+                <Insets right="30.0" />
+            </padding>
+            <styleClass>
+                <String fx:value="on-primary" />
+                <String fx:value="medium-text" />
+            </styleClass></Label>
+    </VBox>
+    <stylesheets>
+        <URL value="@../styles/filmCard.css" />
+        <URL value="@../styles/general.css" />
+    </stylesheets>
+    <styleClass>
+        <String fx:value="surface-dim" />
+        <String fx:value="medium-item" />
+    </styleClass>
+</StackPane>

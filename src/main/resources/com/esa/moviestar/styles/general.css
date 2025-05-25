@@ -1,0 +1,191 @@
+ /*
+    General is the main class that we have used in mostly all of owr fxml
+    In this css there are all the preset for the object
+    Resources:
+        https://docs.oracle.com/javafx/2/api/javafx/scene/doc-files/cssref.html
+        https://blog.e-zest.com/gradients-in-javafx-2/
+        https://m3.material.io/styles
+  */
+
+ /* Colors of the application all the button th*/
+.primary {
+    -fx-background-color: #7341BE;
+}
+.primary:hover{
+    -fx-background-color: #593294;
+}
+.primary:pressed{
+    -fx-background-color: #432570;
+}
+
+.primary-border{
+    -fx-border-color: #7341BE;
+}
+
+.on-primary{
+    -fx-text-fill: #F0ECFD;
+    -fx-fill: #F0ECFD;
+}
+
+.texture-gold{
+    -fx-fill: linear-gradient(
+              	to bottom right,
+              	#f6e27a 33%,
+              	#cb9b51 66%,
+              	#462523 100%
+              	);
+}
+
+ /* Backgrounds of the pages or the objects*/
+
+.surface-gradient{
+    -fx-background-color:  radial-gradient(focus-distance 0% , center 50% 50% , radius 55% , rgba(0,0,0,0.4),rgba(0,0,0,0.6),rgba(0,0,0,0.8), #101010),
+    linear-gradient(to right,#101010 0%, rgba(0,0,0,0) 5%,rgba(0,0,0,0) 35%,rgba(0,0,0,0) 50%,rgba(0,0,0,0) 65%, rgba(0,0,0,0) 5%, #101010);
+}
+
+.surface-opaque{
+    -fx-background-color:  rgba(15,15,15,0.97);
+}
+.surface-solid{
+    -fx-background-color: #101010;
+}
+
+
+.surface-dim{
+    -fx-background-color: #262626;
+}
+.surface-dim-border{
+    -fx-border-color: #262626;
+}
+.surface-dim-opaque{
+    -fx-background-color:  rgba(37,37,37,0.97);
+}
+
+.surface-danger{
+    -fx-background-color:  #9E3536 ;
+}
+
+.surface-danger:hover{
+    -fx-background-color: #802a2b;
+}
+.surface-danger:pressed{
+    -fx-background-color: #731718;
+}
+
+.surface-transparent {
+    -fx-background-color: transparent;
+}
+.surface-transparent:hover {
+    -fx-background-color: #262626;
+}
+.surface-transparent:pressed {
+    -fx-background-color: #101010;
+}
+
+
+.bg-color{
+    -fx-background-color: radial-gradient(focus-angle 254deg , focus-distance 20% , center 50% 50% , radius 55% , #7341BE, #101010);
+}
+
+/*To create smooth effect we created a based on the size of the items*/
+
+.small-item{
+    -fx-border-radius: 16px;
+    -fx-background-radius:16px;
+}
+.medium-item{
+    -fx-border-radius: 24px;
+    -fx-background-radius:24px;
+}
+.large-item{
+    -fx-border-radius: 32px;
+    -fx-background-radius:32px;
+}
+.very-large-item{
+    -fx-border-radius: 48px;
+    -fx-background-radius:48px;
+}
+
+
+.small-text{
+    -fx-font-size: 12px;
+}
+.medium-text{
+    -fx-font-size: 16px;
+}
+.large-text{
+   -fx-font-size: 24px;
+}
+.very-large-text{
+    -fx-font-size: 32px;
+}
+.bold-text{
+    -fx-font-weight: bold;
+}
+
+/*Particular structure to manage the chips, see material design guidelines*/
+
+.chips{
+     -fx-padding: 4 20 4 12;
+     -fx-spacing: 12;
+}
+
+.text-area{
+    -fx-background-color: rgba(100, 100, 100, 0.7);
+    -fx-border-width: 1px;
+    -fx-padding: 10px;
+    -fx-pref-height: 40px;
+    -fx-prompt-text-fill: #9E9E9E;
+}
+
+.text-area:focused{
+    -fx-background-color:  #262626;
+    -fx-border-color: #7341BE;
+}
+.scroll-pane {
+    -fx-background-color:transparent;
+}
+.scroll-pane > .viewport {
+   -fx-background-color: transparent;
+}
+
+.scroll-bar:horizontal, .scroll-bar:vertical{
+    -fx-background-color:transparent;
+}
+
+.increment-button, .decrement-button {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+    -fx-shape: null;
+}
+
+.scroll-bar:vertical .track{
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+    -fx-background-radius: 0em;
+}
+
+.scroll-bar:vertical .thumb {
+    -fx-background-color: #262626;
+    -fx-background-radius: 5em;
+}
+
+
+
+
+
+
+.back-button {
+    -fx-text-fill: #F0ECFD;
+    -fx-font-size: 14px;
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+    -fx-cursor: hand;
+    -fx-alignment: CENTER_LEFT;
+}
+
+.back-button:hover {
+    -fx-underline: true;
+    -fx-text-fill: white;
+}
+

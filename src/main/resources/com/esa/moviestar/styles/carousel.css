@@ -1,0 +1,37 @@
+.carousel {
+    -fx-background-color: rgba(0, 0, 0, 0.8);
+    -fx-padding: 20;
+    -fx-background-radius: 48px;
+    -fx-background-color: radial-gradient(focus-angle 54deg , focus-distance 10% , center 50% 50% , radius 250% , transparent, rgba(255,255,255,0.3));
+
+}
+
+.carousel-card {
+    -fx-background-radius: 24;
+    -fx-border-radius: 24;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.4), 10, 0, 0, 5);
+}
+
+.carousel-dot {
+    -fx-min-width: 12px;
+    -fx-min-height: 12px;
+    -fx-max-width: 12px;
+    -fx-max-height: 12px;
+    -fx-background-radius: 6px;
+    -fx-background-color: #CCCCCC;
+    -fx-border-width: 0;
+    -fx-padding: 0;
+}
+
+.carousel-dot-active {
+    -fx-background-color:  #7341BE;
+}
+
+.carousel-dot:hover {
+    -fx-effect: dropshadow(gaussian, rgba(255, 255, 255, 0.6), 5, 0, 0, 0);
+}
+
+/* Add this to your Carousel main class */
+.carousel > .viewport {
+    -fx-background-color: transparent;
+}

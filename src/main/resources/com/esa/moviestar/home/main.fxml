@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.layout.*?>
+
+<AnchorPane fx:id="root" prefHeight="652.0" prefWidth="929.0" styleClass="bg-color" stylesheets="@../styles/general.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.esa.moviestar.home.MainPagesController">
+   <AnchorPane fx:id="body" layoutX="228.0" layoutY="251.0" prefHeight="150.0" prefWidth="200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+   </AnchorPane>
+
+    <StackPane fx:id="headerContainer" prefHeight="80.0" prefWidth="200.0" AnchorPane.leftAnchor="24.0" AnchorPane.rightAnchor="24.0" AnchorPane.topAnchor="8.0">
+
+    </StackPane>
+</AnchorPane>

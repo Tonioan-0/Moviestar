@@ -1,0 +1,8 @@
+/* Root header styles */
+.root-header {
+    -fx-background-radius: 32;
+    -fx-padding: 0 8 0 8;
+    -fx-margin: 16 0 0 0;
+}
+
+

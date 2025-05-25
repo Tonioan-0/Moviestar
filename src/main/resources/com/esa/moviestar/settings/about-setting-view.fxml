@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.String?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Accordion?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TitledPane?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Text?>
+
+<StackPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.esa.moviestar.settings.AboutSettingController">
+   <children>
+      <VBox alignment="CENTER_LEFT" prefHeight="200.0" prefWidth="100.0" spacing="10.0" stylesheets="@../styles/general.css">
+         <children>
+            <Label text="About &amp; Support">
+               <styleClass>
+                  <String fx:value="bold-text" />
+                  <String fx:value="large-text" />
+               </styleClass></Label>
+            <Text strokeType="OUTSIDE" strokeWidth="0.0" styleClass="medium-text" text="Benvenuto nella sezione di supporto di MovieStar. Qui puoi trovare risposte alle domande frequenti, informazioni sull’app e su come contattarci in caso di problemi." wrappingWidth="700.0" />
+            <Label text="FAQ">
+               <styleClass>
+                  <String fx:value="large-text" />
+                  <String fx:value="bold-text" />
+               </styleClass></Label>
+            <Accordion maxHeight="200.0" maxWidth="200.0">
+              <panes>
+                  <TitledPane prefHeight="200.0" prefWidth="200.0" text="L'app è gratuita?">
+                     <content>
+                        <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Sì, puoi guardare film gratuiti. Alcuni contenuti premium richiedono un abbonamento mensile." wrappingWidth="500.0" />
+                     </content>
+                  </TitledPane>
+                <TitledPane animated="false" text="Come posso aggiungere un film ai preferiti?">
+                     <content>
+                        <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Clicca sull’icona a forma di cuore presente nella scheda del film. Lo troverai nella sezione 'Preferiti' del tuo profilo." wrappingWidth="500.0" />
+                     </content>
+                  </TitledPane>
+                <TitledPane animated="false" text="Posso usare MovieStar offline?">
+                     <content>
+                        <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Sì, i film possono essere scaricati per la visione offline se disponi di un piano attivo." wrappingWidth="500.0" />
+                     </content>
+                  </TitledPane>
+              </panes>
+            </Accordion>
+            <Label text="Contatti">
+               <styleClass>
+                  <String fx:value="large-text" />
+                  <String fx:value="bold-text" />
+               </styleClass></Label>
+            <Text strokeType="OUTSIDE" strokeWidth="0.0" styleClass="medium-text" text="Hai bisogno di aiuto? Scrivici a supporto@moviestar.com. Il nostro team ti risponderà entro 24 ore." wrappingWidth="700.0" />
+            <Label prefHeight="35.0" prefWidth="246.0" text="Informazioni sull'app">
+               <styleClass>
+                  <String fx:value="bold-text" />
+                  <String fx:value="large-text" />
+               </styleClass></Label>
+                 <Text strokeType="OUTSIDE" strokeWidth="0.0" styleClass="medium-text" text="Versione: 1.0.0 " wrappingWidth="500.0" />
+                 <Text strokeType="OUTSIDE" strokeWidth="0.0" styleClass="medium-text" text="Ultimo aggiornamento: Maggio 2025 " wrappingWidth="500.0" />
+                 <Text strokeType="OUTSIDE" strokeWidth="0.0" styleClass="medium-text" text="Sviluppato da: ESA Dev Team" wrappingWidth="500.0" />
+            <Label text="Privacy &amp; Termini">
+               <styleClass>
+                  <String fx:value="bold-text" />
+                  <String fx:value="large-text" />
+               </styleClass></Label>
+            <Text strokeType="OUTSIDE" strokeWidth="0.0" styleClass="medium-text" text="MovieStar protegge la tua privacy. Consulta i nostri Termini di Servizio e l’Informativa sulla Privacy disponibili nella sezione dedicata." wrappingWidth="700.0" />
+         </children>
+         <StackPane.margin>
+            <Insets />
+         </StackPane.margin>
+         <padding>
+            <Insets left="30.0" />
+         </padding>
+      </VBox>
+   </children>
+</StackPane>

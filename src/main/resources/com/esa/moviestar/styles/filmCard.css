@@ -1,0 +1,24 @@
+.media-card:hover {
+    -fx-transition: all 0.3s ease;
+}
+.media-metadata {
+    -fx-background-color: transparent;
+    -fx-padding: 8;
+    -fx-opacity: 1;
+    -fx-transition: opacity 0.3s ease;
+        -fx-background-radius: 24;
+}
+
+.media-content {
+    -fx-background-color: transparent;
+    -fx-padding: 8;
+    -fx-spacing: 5;
+    -fx-transition: opacity 0.3s ease;
+        -fx-background-radius: 24;
+}
+
+#btnInfo:hover {
+    -fx-background-color: rgba(115, 65, 190, 0.2);
+    -fx-border-color: derive(#7341BE, 20%);
+
+}

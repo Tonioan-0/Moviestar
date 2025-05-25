@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.shape.Line?>
+
+<AnchorPane maxHeight="1920" maxWidth="1080" minHeight="-Infinity" minWidth="-Infinity" prefHeight="851.0" prefWidth="1077.0" styleClass="bg-color" stylesheets="@../styles/access.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.esa.moviestar.home.SearchController">
+    <ScrollPane fitToWidth="true" hbarPolicy="NEVER" hmax="0.0" prefHeight="1080.0" prefWidth="1920.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" BorderPane.alignment="TOP_CENTER">
+        <VBox alignment="TOP_CENTER" spacing="16.0" style="-fx-background-color: transparent;" VBox.vgrow="ALWAYS">
+            <Pane fx:id="pnl_separator1" minHeight="90.0" prefWidth="1" />
+
+            <HBox spacing="8">
+                <Button fx:id="findout" styleClass="register-text-raccomendations-big" text="Altri titoli da scoprire:">
+                    <padding>
+                        <Insets bottom="11" />
+                    </padding>
+                    <HBox.margin>
+                        <Insets bottom="60.0" left="12.0" />
+                    </HBox.margin>
+                </Button>
+                <FlowPane fx:id="raccomendations" prefWrapLength="1500" />
+            </HBox>
+
+            <HBox spacing="15" alignment="CENTER">
+
+                <Line fx:id="separatorline" startX="0" endX="1400" strokeWidth="1.5">
+                    <HBox.margin>
+                        <Insets bottom="50" />
+                    </HBox.margin>
+                </Line>
+            </HBox>
+
+            <FlowPane fx:id="filmseriesRaccomendations" alignment="CENTER" hgap="5" vgap="30" />
+        </VBox>
+        <padding>
+            <Insets bottom="16.0" left="16.0" top="16.0" />
+        </padding>
+    </ScrollPane>
+</AnchorPane>

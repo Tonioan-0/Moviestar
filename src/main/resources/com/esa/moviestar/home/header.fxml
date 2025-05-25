@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import java.net.*?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.shape.*?>
+<?import javafx.scene.text.*?>
+
+<StackPane fx:id="rootHeader" prefHeight="88.0" prefWidth="1362.0" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.esa.moviestar.home.HeaderController">
+    <HBox alignment="CENTER_LEFT" maxHeight="1.7976931348623157E308" prefHeight="64.0" BorderPane.alignment="CENTER" StackPane.alignment="CENTER_LEFT">
+        <StackPane.margin>
+            <Insets bottom="8.0" top="8.0" />
+        </StackPane.margin>
+        <HBox fx:id="navContainer" alignment="CENTER_LEFT" prefHeight="72.0" prefWidth="512.0" spacing="5.0" styleClass="nav-container" HBox.hgrow="ALWAYS">
+            <!-- Home Button -->
+            <StackPane fx:id="homeButton" maxWidth="${homeButton.height}" minHeight="64.0" minWidth="64.0" prefHeight="64.0" prefWidth="${homeButton.height}">
+                <SVGPath fx:id="homeIcon" content="%home" styleClass="on-primary" />
+                <styleClass>
+                    <String fx:value="medium-item" />
+                    <String fx:value="surface-transparent" />
+                    <String fx:value="surface-dim-border" />
+                </styleClass>
+            </StackPane>
+
+            <!-- Film Button -->
+            <HBox fx:id="filmButton" alignment="CENTER" prefWidth="128.0" spacing="12.0">
+                <SVGPath fx:id="filmIcon" content="%film" styleClass="on-primary" />
+                <Text text="Films">
+                    <styleClass>
+                        <String fx:value="medium-text" />
+                        <String fx:value="on-primary" />
+                    </styleClass></Text>
+                <styleClass>
+                    <String fx:value="chips" />
+                    <String fx:value="surface-transparent" />
+                    <String fx:value="medium-item" />
+                    <String fx:value="surface-dim-border" />
+                </styleClass>
+            </HBox>
+
+            <!-- Series Button -->
+            <HBox fx:id="seriesButton" alignment="CENTER" prefWidth="128.0" spacing="8.0">
+                <SVGPath fx:id="tvIcon" content="%series" styleClass="on-primary" />
+                <Text text="Series">
+                    <styleClass>
+                        <String fx:value="medium-text" />
+                        <String fx:value="on-primary" />
+                    </styleClass></Text>
+                <styleClass>
+                    <String fx:value="chips" />
+                    <String fx:value="surface-transparent" />
+                    <String fx:value="medium-item" />
+                    <String fx:value="surface-dim-border" />
+                </styleClass>
+            </HBox>
+
+            <!-- Search Button -->
+            <HBox fx:id="searchButton" alignment="CENTER" prefHeight="72.0" prefWidth="305.0" spacing="8.0">
+                <SVGPath fx:id="searchIcon" content="%search" styleClass="on-primary" />
+                <TextField fx:id="tbxSearch" maxHeight="1.7976931348623157E308" HBox.hgrow="ALWAYS">
+                    <styleClass>
+                        <String fx:value="search-field" />
+                        <String fx:value="medium-text" />
+                        <String fx:value="on-primary" />
+                        <String fx:value="surface-transparent" />
+                    </styleClass>
+                </TextField>
+                <styleClass>
+                    <String fx:value="surface-dim-border" />
+                    <String fx:value="surface-transparent" />
+                    <String fx:value="chips" />
+                    <String fx:value="medium-item" />
+                </styleClass>
+            </HBox>
+        </HBox>
+        <HBox fx:id="titleImageContainer" alignment="CENTER">
+            <Group>
+                <SVGPath content="%icon-moviestar-bg" styleClass="surface-solid" />
+                <SVGPath content="%icon-moviestar-fg" fill="WHITE" styleClass="on-primary" />
+            </Group>
+        </HBox>
+        <HBox HBox.hgrow="ALWAYS">
+            <HBox alignment="CENTER_RIGHT" prefHeight="${navContainer.width}" prefWidth="512.0" HBox.hgrow="ALWAYS">
+                <children>
+                    <StackPane fx:id="profileImage" maxHeight="64.0" maxWidth="64.0" minHeight="64.0" minWidth="64.0" prefHeight="64.0" prefWidth="64.0" styleClass="medium-item">
+                        <children>
+                            <SVGPath />
+                        </children></StackPane>
+                </children></HBox>
+        </HBox>
+    </HBox>
+    <styleClass>
+        <String fx:value="root-header" />
+        <String fx:value="surface-opaque" />
+    </styleClass>
+    <stylesheets>
+        <URL value="@../styles/header.css" />
+        <URL value="@../styles/general.css" />
+    </stylesheets>
+</StackPane>

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane fx:id="background" prefHeight="400.0" prefWidth="600.0" stylesheets="@../styles/general.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.esa.moviestar.movie_view.FilmSceneController">
+    <VBox fx:id="filmdetail" maxHeight="Infinity" maxWidth="800">
+
+    </VBox>
+    <styleClass>
+        <String fx:value="surface-dim" />
+        <String fx:value="very-large-item" />
+    </styleClass>
+</AnchorPane>

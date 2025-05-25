@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane maxHeight="1920" maxWidth="1080" minHeight="-Infinity" minWidth="-Infinity" prefHeight="851.0" prefWidth="1077.0"  xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.esa.moviestar.home.HomeController">
+
+
+   <ScrollPane fx:id="root" fitToWidth="true" hbarPolicy="NEVER" hmax="0.0" prefHeight="1080.0" prefWidth="1920.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" BorderPane.alignment="TOP_CENTER">
+      <VBox fx:id="body" alignment="TOP_CENTER" spacing="16.0" VBox.vgrow="ALWAYS">
+         <padding>
+            <Insets bottom="16.0" left="16.0" top="16.0" />
+         </padding>
+         <Pane fx:id="pnl_separator" prefHeight="60.0" prefWidth="0.0" />
+
+         <VBox fx:id="scrollViewContainer" alignment="TOP_CENTER" spacing="10.0" VBox.vgrow="ALWAYS">
+            <padding>
+               <Insets bottom="16.0" left="16.0" right="16.0" top="16.0" />
+            </padding>
+            <styleClass>
+               <String fx:value="surface-gradient" />
+               <String fx:value="very-large-item" />
+            </styleClass>
+         </VBox>
+
+      </VBox>
+
+
+   </ScrollPane>
+
+
+</AnchorPane>
