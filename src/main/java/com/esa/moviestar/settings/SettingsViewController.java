@@ -13,6 +13,7 @@ import javafx.scene.control.Label;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
+import javafx.scene.shape.SVGPath;
 import javafx.stage.Stage;
 
 import java.io.IOException;
@@ -37,7 +38,7 @@ public class SettingsViewController {
     @FXML
     private HBox about;
     @FXML
-    private Button backToHomeButton;
+    private StackPane backToHome;
     @FXML
     private Label userName;
     @FXML
@@ -45,23 +46,27 @@ public class SettingsViewController {
 
     private Utente utente;
     private Account account;
-
-
     public void setAccount(Account account){
         this.account=account;
         caricaVista("/com/esa/moviestar/settings/account-setting-view.fxml");
-        System.out.println(account.getEmail());
+        System.out.println("SettingsViewController: email "+account.getEmail());
     }
 
     public void setUtente(Utente utente){
         this.utente=utente;
+        System.out.println("SettingsViewController = utente : "+utente.getNome()+" email dell'utente : "+utente.getEmail()+" id utente : "+utente.getID());
     }
 
     public final ResourceBundle resourceBundle = ResourceBundle.getBundle("com.esa.moviestar.images.svg-paths.general-svg");
 
     public void initialize() {
+        backToHome();
+        menuClick();
+    }
+
+    private void backToHome() {
         // Gestione ritorno alla home
-        backToHomeButton.setOnMouseClicked(event -> {
+        backToHome.setOnMouseClicked(event -> {
             // Controllo sicurezza per dati NULL
             if (account == null) {
                 System.err.println("Account è NULL, impossibile navigare alla home");
@@ -84,15 +89,15 @@ public class SettingsViewController {
                 System.err.println("Errore nel tornare alla home");
             }
         });
+    }
 
+    private void menuClick() {
         // Collegamenti ai pulsanti
         accountContent.setOnMouseClicked(event -> caricaVista("/com/esa/moviestar/settings/account-setting-view.fxml"));
         cronologia.setOnMouseClicked(event -> caricaVista("/com/esa/moviestar/settings/cronologia-setting-view.fxml"));
         privacy.setOnMouseClicked(event -> caricaVista("/com/esa/moviestar/settings/privacy-setting-view.fxml"));
         accessibilità.setOnMouseClicked(event -> caricaVista("/com/esa/moviestar/settings/accessibilità-setting-view.fxml"));
         about.setOnMouseClicked(event -> caricaVista("/com/esa/moviestar/settings/about-setting-view.fxml"));
-
-        // Caricamento iniziale
     }
 
     private void caricaVista(String percorsoFXML) {

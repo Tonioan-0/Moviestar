@@ -37,7 +37,7 @@
                         </StackPane>
                         <VBox alignment="CENTER_LEFT" maxWidth="300.0" spacing="10.0">
                             <children>
-                                <Label fx:id="creationTitle" prefHeight="18.0" prefWidth="169.0" stylesheets="@../styles/general.css" text="Crea il nome utente:">
+                                <Label fx:id="creationTitle" prefHeight="18.0" prefWidth="169.0" stylesheets="@../styles/general.css" text="Create your Username:">
                                     <styleClass>
                                         <String fx:value="medium-text" />
                                         <String fx:value="on-primary" />
@@ -61,14 +61,14 @@
                                     </VBox.margin></Label>
                                 <HBox fx:id="buttonContainer" alignment="CENTER" spacing="60.0">
                                     <children>
-                                        <Button fx:id="saveButton" prefHeight="34.0" prefWidth="92.0" text="Conferma">
+                                        <Button fx:id="saveButton" prefHeight="34.0" prefWidth="92.0" text="Confirm">
                                             <styleClass>
                                                 <String fx:value="primary" />
                                                 <String fx:value="on-primary" />
                                                 <String fx:value="small-item" />
                                                 <String fx:value="small-text" />
                                             </styleClass></Button>
-                                        <Button fx:id="cancelButton" prefHeight="34.0" prefWidth="92.0" style="-fx-border-color: #9E3536; -fx-border-width: 2; -fx-text-fill: #9E3536;" text="Conferma">
+                                        <Button fx:id="cancelButton" prefHeight="34.0" prefWidth="92.0" style="-fx-border-color: #9E3536; -fx-border-width: 2; -fx-text-fill: #9E3536;" text="Confirm">
                                             <styleClass>
                                                 <String fx:value="small-item" />
                                                 <String fx:value="small-text" />
@@ -101,7 +101,7 @@
                 </VBox>
                 <VBox fx:id="scrollContainer" alignment="CENTER" prefWidth="361.0" GridPane.columnIndex="1">
                     <children>
-                        <Label fx:id="avatarTextChoiche" alignment="CENTER" stylesheets="@../styles/general.css" text="Scegli il tuo Avatar">
+                        <Label fx:id="avatarTextChoiche" alignment="CENTER" stylesheets="@../styles/general.css" text="Choose Your Avatar">
                             <styleClass>
                                 <String fx:value="large-text" />
                                 <String fx:value="on-primary" />

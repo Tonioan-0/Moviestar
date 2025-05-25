@@ -1,6 +1,7 @@
 package com.esa.moviestar.login;
 
 import com.esa.moviestar.database.AccountDao;
+import com.esa.moviestar.model.Account;
 import com.esa.moviestar.settings.SettingsViewController;
 import com.esa.moviestar.model.Utente;
 import javafx.animation.PauseTransition;
@@ -54,6 +55,10 @@ public class UpdatePasswordController {
     private Utente utente;
     public void setUtente(Utente utente){
         this.utente=utente;
+    }
+    private Account account;
+    public void setAccount(Account account) {
+        this.account=account;
     }
 
 
@@ -255,9 +260,11 @@ public class UpdatePasswordController {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/esa/moviestar/settings/settings-view.fxml"),resourceBundle);
             Parent accountSettingContent = loader.load();
-            Scene currentScene = parentContainer.getScene();
             SettingsViewController settingsViewController = loader.getController();
             settingsViewController.setUtente(utente);
+            settingsViewController.setAccount(account);
+
+            Scene currentScene = parentContainer.getScene();
 
             Scene newScene = new Scene(accountSettingContent, currentScene.getWidth(), currentScene.getHeight());
 
@@ -269,4 +276,5 @@ public class UpdatePasswordController {
             updateStatus("Errore durante il caricamento della pagina");
         }
     }
+
 }

@@ -31,6 +31,7 @@ public class AccountDao {
             stmt.setString(1, account.getEmail());
             stmt.setString(2, account.getPassword());
             stmt.execute();
+            System.out.println("AccountDao : account aggiunto : "+account.getEmail());
             return true;
         }catch (SQLException e) {
             if (e.getMessage().contains("UNIQUE constraint failed")) {
@@ -53,6 +54,7 @@ public class AccountDao {
                 System.err.println("Nessun account trovato con email = " + email);
 
             }
+            System.out.println("AccountDao : account rimosso : "+email);
         } catch (SQLException e) {
             System.err.println("accountDao: errore di rimozione dell'account - " + e.getMessage());
 
@@ -73,9 +75,11 @@ public class AccountDao {
                         rs.getString("email"),
                         rs.getString("password")
                 );
-            } else {
+            }
+            else {
                 return null;
             }
+
         } catch (SQLException e) {
             System.err.println("accountDao : errore di ricerca dell'account"+e.getMessage());
         }
@@ -88,6 +92,7 @@ public class AccountDao {
             stmt.setString(1, nuovaPassword);
             stmt.setString(2, email);
             int righeModificate = stmt.executeUpdate();
+            System.out.println("AccountDao : account a cui è stata aggiornata la password : "+email);
             return righeModificate > 0;  // ritorna true se almeno una riga è stata modificata
         } catch (SQLException e) {
             System.err.println("accountDao : errore di aggiornamento della password dell'account"+e.getMessage());
@@ -107,6 +112,7 @@ public class AccountDao {
                     return storedPassword.equals(password);
                 }
             }
+            System.out.println("AccountDao : account a cui è stata verificata la password : "+email);
         }catch (SQLException e){
             System.err.println("accountDao : errore di verifica della password dell'account"+e.getMessage());
         }

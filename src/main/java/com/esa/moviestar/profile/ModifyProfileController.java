@@ -62,15 +62,12 @@ public class ModifyProfileController {
     private Account account;
     private Utente utente;
     public void setAccount(Account account) {
-        if (account == null) {
-            System.err.println("⚠️ account è NULL in setAccount() di ModifyProfileController");
-        } else {
-            System.out.println("✅ Email passata alla schermata creazione profilo: " + account.getEmail());
-        }
         this.account = account;
+        System.out.println("ModifyProfileView : email "+account.getEmail());
     }
     public void setUtente(Utente utente){
         this.utente=utente;
+        System.out.println("ModifyProfileView = utente : "+utente.getNome()+" id utente : "+utente.getID()+" email dell'utente : "+utente.getEmail());
         if (utente != null) { // da qui in poi serve per portarsi dietro le immagini e il nome da modificare
             textName.setText(utente.getNome());
             codImmagineCorrente = utente.getIDIcona();
@@ -104,17 +101,17 @@ public class ModifyProfileController {
         defaultImagine.setScaleX(10);
         defaultImagine.setScaleY(10);
 
-        creationTitle.setText("Modifica il nome utente:"); //label per sopra il textfield per farci capire che stiamo creando un nuovo utente
+        creationTitle.setText("Edit your username:"); //label per sopra il textfield per farci capire che stiamo creando un nuovo utente
 
-        textName.setPromptText("Nome");// text field dove inserire il nome, (con all'interno trasparente la scritta "inserisci nome")
+        textName.setPromptText("Name");// text field dove inserire il nome, (con all'interno trasparente la scritta "inserisci nome")
 
         //metto lo stile per ogni scroll di immagini
 
         scrollContainer.setSpacing(90);
 
-        saveButton.setText("Salva"); //setting del bottone di salvataggio
+        saveButton.setText("Save"); //setting del bottone di salvataggio
 
-        cancelButton.setText("Annulla"); //setting del bottone di annullamento
+        cancelButton.setText("Cancel"); //setting del bottone di annullamento
 
         cancelButton.setOnMouseClicked(eventCancel -> {
             textName.setText("");
@@ -161,7 +158,7 @@ public class ModifyProfileController {
             int immagine=codImmagineCorrente;
 
             if(name==null){
-                errorText.setText("Nessun nome Inserito");
+                errorText.setText("No name entered");
                 AnimationUtils.shake(errorText);
                 return;
             }
@@ -214,7 +211,7 @@ public class ModifyProfileController {
                 }
                 System.out.println("Ritorni alla pagina dei profili");
             } else {
-                errorText.setText("Nessun nome inserito"); //se non ho inserito nessun nome mi da errore perchè per forza va settato un nome , oppure potrei dare il nome di default tipo utente 1
+                errorText.setText("No name entered"); //se non ho inserito nessun nome mi da errore perchè per forza va settato un nome , oppure potrei dare il nome di default tipo utente 1
                 AnimationUtils.shake(errorText);
             }
 

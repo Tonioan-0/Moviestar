@@ -44,13 +44,13 @@ public class ProfileView {
     private Account account;
     public void setAccount(Account account) {
         this.account = account;
-        System.out.println("Email passata alla schermata creazione profilo: " + account.getEmail());
+        System.out.println("ProfileView : email "+account.getEmail());
         caricaUtenti();
     }
 
     // Metodo di inizializzazione che viene eseguito subito all'avvio
     public void initialize() {
-        testo.setText("Chi vuole guardare Moviestar ?");  // Impostazione del testo della label iniziale
+        testo.setText("Who wants to watch Moviestar?");  // Impostazione del testo della label iniziale
         griglia.setSpacing(40);  // Impostazione della spaziatura tra gli elementi nella griglia
 
 
@@ -138,7 +138,7 @@ public class ProfileView {
 
                 VBox creazioneUtente = new VBox();
                 Label plusText = new Label();
-                plusText.setText("Aggiungi");
+                plusText.setText("Add");
                 plusText.setTranslateY(-18);
                 plusText.getStyleClass().addAll("on-primary", "bold-text", "large-text");
                 creazioneUtente.getChildren().addAll(creazione,plusText);
