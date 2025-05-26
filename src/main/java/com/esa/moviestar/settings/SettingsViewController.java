@@ -26,8 +26,6 @@ public class SettingsViewController {
     @FXML
     private AnchorPane contenitore;
     @FXML
-    private Label impostazioni;
-    @FXML
     private HBox accountContent;
     @FXML
     private HBox cronologia;
@@ -110,6 +108,11 @@ public class SettingsViewController {
                 controller.setAccount(account);
                 controller.setUtente(utente);
                 controller.setContenitore(contenitore);
+            }
+
+            if (loader.getController() instanceof CronologiaSettingController controller) {
+                controller.setAccount(account);
+                controller.setUtente(utente);
             }
 
             contentArea.getChildren().setAll(view);

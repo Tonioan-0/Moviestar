@@ -51,6 +51,10 @@ public class Access {
 
     private EmailService emailService;
     private Account account;
+    public void setAccount(Account account){
+        this.account=account;
+        System.out.println("Access : email "+account.getEmail());
+    }
 
 
 
