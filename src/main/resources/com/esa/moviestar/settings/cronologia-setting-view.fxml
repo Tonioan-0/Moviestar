@@ -1,57 +1,49 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import java.lang.String?>
+<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.ColumnConstraints?>
 <?import javafx.scene.layout.GridPane?>
-<?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Text?>
 
-<GridPane fx:id="gridPaneContent" prefHeight="467.0" prefWidth="1228.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1">
-   <columnConstraints>
-      <ColumnConstraints hgrow="SOMETIMES" maxWidth="95.20001220703125" minWidth="10.0" prefWidth="59.20001220703125" />
-      <ColumnConstraints hgrow="NEVER" maxWidth="429.6000244140625" minWidth="10.0" prefWidth="429.6000244140625" />
-   </columnConstraints>
-   <rowConstraints>
-      <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
-   </rowConstraints>
-   <children>
-      <AnchorPane fx:id="anchorPane1" styleClass="surface-gradient" stylesheets="@../styles/general.css" GridPane.columnIndex="1">
-         <children>
-            <ScrollPane fx:id="scrollPane" hbarPolicy="NEVER" vbarPolicy="ALWAYS" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-              <content>
-                <AnchorPane fx:id="anchorPane2">
-                     <children>
-                        <HBox fx:id="hbox" alignment="CENTER">
-                           <children>
-                              <VBox alignment="CENTER_LEFT">
-                                 <children>
-                                    <Label fx:id="label" text="Cronologia">
-                                       <styleClass>
-                                          <String fx:value="on-primary" />
-                                          <String fx:value="bold-text" />
-                                          <String fx:value="large-text" />
-                                       </styleClass>
-                                    </Label>
-                                    <Text fx:id="text" strokeType="OUTSIDE" strokeWidth="0.0" text="Testo che riguarda la cronologia e che ci fa capire robe ">
-                                       <styleClass>
-                                          <String fx:value="on-primary" />
-                                          <String fx:value="medium-text" />
-                                       </styleClass>
-                                    </Text>
-                                 </children>
-                              </VBox>
-                           </children>
-                        </HBox>
-                     </children>
-                  </AnchorPane>
-              </content>
-            </ScrollPane>
-         </children>
-      </AnchorPane>
-   </children>
+<GridPane fx:id="accountContentSetting" prefHeight="467.0" prefWidth="1228.0" stylesheets="@../styles/general.css" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.esa.moviestar.settings.CronologiaSettingController">
+    <columnConstraints>
+        <ColumnConstraints hgrow="SOMETIMES" maxWidth="600.0" minWidth="0.0" percentWidth="10.0" prefWidth="223.5999755859375" />
+        <ColumnConstraints hgrow="SOMETIMES" maxWidth="759.0000244140625" minWidth="0.0" prefWidth="759.0000244140625" />
+        <ColumnConstraints hgrow="SOMETIMES" maxWidth="600.0" minWidth="10.0" percentWidth="10.0" prefWidth="244.80004882812494" />
+    </columnConstraints>
+    <rowConstraints>
+        <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
+    </rowConstraints>
+    <children>
+        <AnchorPane GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.hgrow="NEVER" GridPane.valignment="CENTER" GridPane.vgrow="ALWAYS">
+                <ScrollPane hbarPolicy="NEVER" hmax="0.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+            <content>
+               <VBox alignment="CENTER_LEFT" prefHeight="200.0" prefWidth="100.0" spacing="5.0">
+                  <children>
+                     <Label text="History">
+                        <styleClass>
+                           <String fx:value="bold-text" />
+                           <String fx:value="on-primary" />
+                           <String fx:value="large-text" />
+                        </styleClass>
+                     </Label>
+                     <Text strokeType="OUTSIDE" strokeWidth="0.0" text="View and manage all the videos you've watched. If you delete a video from your watch history, only this list is affected — the video will still appear when you browse MovieStar. Each profile has its own list. To view and manage titles watched with a different profile, switch to that profile." wrappingWidth="700.0">
+                        <styleClass>
+                           <String fx:value="medium-text" />
+                           <String fx:value="on-primary" />
+                        </styleClass>
+                     </Text>
+                  </children>
+                  <padding>
+                     <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                  </padding></VBox>
+            </content></ScrollPane>
+        </AnchorPane>
+    </children>
 </GridPane>

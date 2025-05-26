@@ -11,6 +11,7 @@ import javafx.scene.Node;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
+import javafx.scene.paint.Color;
 import javafx.scene.shape.SVGPath;
 import javafx.scene.text.Text;
 
@@ -148,23 +149,26 @@ public class HeaderController {
         popupMenu.addItem(settingsItem);
         popupMenu.addSeparator();
         for (Utente i : users) {
-            createProfileItem(i, i.getNome(), i.getIcona(),father);
+            if (user.getID()!=i.getID()) {
+                createProfileItem(i, i.getNome(), i.getIcona(), father);
+            }
         }
+        if(users.size()<4){createAddItem(account,father);}
         popupMenu.addSeparator();
         HBox emailButton = new HBox() {{
             setMinHeight(40.0);
             setAlignment(Pos.CENTER);
             getStyleClass().addAll("small-item", "surface-dim-border", "chips", "surface-transparent");
         }};
-        SVGPath emailIcon = new SVGPath() {{
-            setContent(resources.getString("email"));
+        SVGPath logoutIcon = new SVGPath() {{
+            setContent(resources.getString("logout"));
             getStyleClass().add("on-primary");
         }};
-        Text emailText = new Text("Change Email") {{
+        Text logoutText = new Text("Logout") {{
             getStyleClass().addAll("medium-text", "on-primary");
         }};
         emailButton.setOnMouseClicked(e -> {father.emailClick();popupMenu.close();});
-        emailButton.getChildren().addAll(emailIcon, emailText);
+        emailButton.getChildren().addAll(logoutIcon, logoutText);
         popupMenu.addItem(emailButton);
 
     }
@@ -195,4 +199,27 @@ public class HeaderController {
         icon.setScaleY(2.286);
         profileImage.getChildren().add(icon);
     }
+
+    private void createAddItem(Account account , MainPagesController father) {
+        SVGPath cross = new SVGPath(){{
+            setContent(resources.getString("plusButton"));
+            getStyleClass().add("on-primary");
+        }};
+        HBox item = new HBox() {{
+            setMinHeight(40.0);
+            setAlignment(Pos.CENTER_LEFT);
+            getStyleClass().addAll("small-item", "chips", "surface-transparent");
+        }};
+        Text text = new Text("New user") {{
+            getStyleClass().addAll("medium-text", "on-primary");
+        }};
+        item.getChildren().addAll(cross, text);
+        // Item click handling moved to controller via callback
+        item.setOnMouseClicked(e -> {father.createProfileUser(account);popupMenu.close();});
+        popupMenu.addItem(item);
+
+    }
+
+
+
 }

@@ -1,8 +1,10 @@
 package com.esa.moviestar.profile;
 
 import java.io.IOException;
+import java.util.ResourceBundle;
 
 import com.esa.moviestar.database.UtenteDao;
+import com.esa.moviestar.home.MainPagesController;
 import com.esa.moviestar.login.AnimationUtils;
 import com.esa.moviestar.model.Account;
 import com.esa.moviestar.model.Utente;
@@ -42,10 +44,28 @@ public class CreateProfileController {
     private Group originalProfileImage;
     private int codImmagineCorrente;
     private Account account;
+    private Origine origine;
+    private Utente utente;
+
+    public final ResourceBundle resourceBundle = ResourceBundle.getBundle("com.esa.moviestar.images.svg-paths.general-svg");
+
+    public enum Origine{
+        HOME,
+        PROFILE,
+    }
 
     public void setAccount(Account account) {
         this.account = account;
-        System.out.println("CreateProfileController : email : " + account.getEmail());
+        System.out.println("CreateProfileController = email : " + account.getEmail());
+    }
+
+    public void setUtente(Utente utente) {
+        this.utente = utente;
+        System.out.println("CreateProfileController = utente  : " + utente.getNome());
+    }
+
+    public void setOrigine(Origine origine) {
+        this.origine = origine;
     }
 
     private boolean validaNome(String nome) {
@@ -84,6 +104,25 @@ public class CreateProfileController {
         }catch (IOException ex){
             System.out.println("CreateProfileController : errore nel ritornare nella visualizzazione dei profili"+ex.getMessage());
             warningText.setText("Errore durante il caricamento della pagina: " + ex.getMessage());
+        }
+    }
+
+    private void tornaAllaHome(){
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/esa/moviestar/home/main.fxml"), resourceBundle);
+            Parent homeContent = loader.load();
+
+            MainPagesController mainPagesController = loader.getController();
+            mainPagesController.first_load(utente,account);
+
+            Scene currentScene = ContenitorePaginaCreazione.getScene();
+            Scene newScene = new Scene(homeContent, currentScene.getWidth(), currentScene.getHeight());
+
+            Stage stage = (Stage) ContenitorePaginaCreazione.getScene().getWindow();
+            stage.setScene(newScene);
+
+        } catch (IOException e) {
+            System.err.println("CreateProfileController : Errore nel tornare alla home"+e.getMessage());
         }
     }
 
@@ -146,7 +185,11 @@ public class CreateProfileController {
 
     private void impostaBehaviorBottoni() {
         cancelButton.setOnMouseClicked(e -> {//Se cliccato è un evento irreversibile
-            tornaAiProfili();
+            if(origine==Origine.HOME){
+                tornaAllaHome();
+            }else if (origine==Origine.PROFILE) {
+                tornaAiProfili();
+            }
         });
 
         saveButton.setOnMouseClicked(event -> {  //Se clicco sul bottone di salvataggio / dovrà poi ritornare alla pagina di scelta dei profili con il profilo creato

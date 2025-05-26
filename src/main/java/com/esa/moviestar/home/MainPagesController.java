@@ -1,5 +1,6 @@
 package com.esa.moviestar.home;
 
+import com.esa.moviestar.profile.CreateProfileController;
 import com.esa.moviestar.settings.SettingsViewController;
 import com.esa.moviestar.components.BufferAnimation;
 import com.esa.moviestar.model.Account;
@@ -598,7 +599,18 @@ public class MainPagesController {
      * Handles email click events
      */
     public void emailClick() {
-        // Implement email functionality
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/esa/moviestar/login/access.fxml"), resourceBundle);
+            Parent accessContent = loader.load();
+
+            Scene currentScene = body.getScene();
+            Scene newScene = new Scene(accessContent, currentScene.getWidth(), currentScene.getHeight());
+
+            Stage stage = (Stage) body.getScene().getWindow();
+            stage.setScene(newScene);
+        } catch (IOException ex) {
+            System.err.println("MainPagesController: Errore caricamento pagina di accesso dell'account: " + ex.getMessage());
+        }
     }
 
     /**
@@ -606,6 +618,55 @@ public class MainPagesController {
      * @param user The user to switch to
      */
     public void profileClick(Utente user) {
-        // Implement profile switching functionality
+        // Evita problemi se già in transizione
+        if (transitionInProgress) {
+            return;
+        }
+
+        // Ferma il loading se attivo
+        if (loadingSpinner != null) {
+            loadingSpinner.stopAnimation();
+        }
+
+        // Pulisci tutto
+        body.getChildren().clear();
+        headerContainer.getChildren().clear();
+
+        // Reset variabili - IMPORTANTE: resetta tutto
+        header = null;
+        savedSceneNode = null;
+        home = null;
+        filter_film = null;
+        filter_series = null;
+        currentScene = null;
+        transitionInProgress = false;
+        loadingOverlay = null;
+
+        // Aggiorna utente PRIMA di ricaricare
+        this.user = user;
+
+        // Ricostruisci tutto da zero
+        initialize(); // Ricrea il loadingOverlay
+        first_load(user, account); // Questo ricaricherà header e home per il nuovo utente
+    }
+
+    public void createProfileUser(Account account){
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/esa/moviestar/profile/create-profile-view.fxml"), resourceBundle);
+            Parent createContent = loader.load();
+
+            CreateProfileController createProfileController = loader.getController();
+            createProfileController.setOrigine(CreateProfileController.Origine.HOME);
+            createProfileController.setAccount(account);
+            createProfileController.setUtente(user);
+
+            Scene currentScene = body.getScene();
+            Scene newScene = new Scene(createContent, currentScene.getWidth(), currentScene.getHeight());
+
+            Stage stage = (Stage) body.getScene().getWindow();
+            stage.setScene(newScene);
+        }catch(IOException e){
+            System.err.println("MainPagesController : errore caricamento pagina di creazione profili"+e.getMessage());
+        }
     }
 }
