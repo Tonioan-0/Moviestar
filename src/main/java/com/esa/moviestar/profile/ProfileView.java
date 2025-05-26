@@ -238,6 +238,7 @@ public class ProfileView {
 
             CreateProfileController createProfileController = loader.getController();
             createProfileController.setAccount(account);
+            createProfileController.setOrigine(CreateProfileController.Origine.PROFILE);
 
             //Ottieni la scena corrente
             Scene currentScene = ContenitorePadre.getScene();

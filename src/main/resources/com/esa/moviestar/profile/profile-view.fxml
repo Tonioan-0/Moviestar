@@ -1,16 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import java.net.*?>
-<?import javafx.geometry.*?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
-<?import javafx.scene.text.*?>
+<?import java.net.URL?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
 
-<StackPane fx:id="ContenitorePadre" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.esa.moviestar.profile.ProfileView">
+<StackPane fx:id="ContenitorePadre" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.esa.moviestar.profile.ProfileView">
     <stylesheets>
         <URL value="@../styles/general.css" />
     </stylesheets>
-    <VBox alignment="CENTER" prefHeight="425.0" prefWidth="569.0" spacing="20.0" style="-fx-background-color: rgb(27,28,29);">
+    <VBox alignment="CENTER" prefHeight="425.0" prefWidth="569.0" spacing="20.0" styleClass="surface-solid">
 
         <padding>
             <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
@@ -29,7 +31,7 @@
          </VBox.margin>
         </Label>
 
-        <HBox fx:id="griglia" alignment="CENTER" prefHeight="100.0" prefWidth="200.0" style="-fx-background-color: rgb(27,28,29);">
+        <HBox fx:id="griglia" alignment="CENTER" prefHeight="100.0" prefWidth="200.0">
 
         </HBox>
 

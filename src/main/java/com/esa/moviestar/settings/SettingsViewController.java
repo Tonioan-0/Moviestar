@@ -84,7 +84,7 @@ public class SettingsViewController {
                 Stage stage = (Stage) currentScene.getWindow();
                 stage.setScene(newScene);
             } catch (IOException e) {
-                System.err.println("Errore nel tornare alla home");
+                System.err.println("SettingsViewController : Errore nel tornare alla home"+e.getMessage());
             }
         });
     }

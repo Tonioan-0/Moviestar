@@ -5,71 +5,142 @@
 <?import javafx.scene.control.Accordion?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.TitledPane?>
-<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Text?>
 
-<StackPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.esa.moviestar.settings.AboutSettingController">
-   <children>
-      <VBox alignment="CENTER_LEFT" prefHeight="200.0" prefWidth="100.0" spacing="10.0" stylesheets="@../styles/general.css">
-         <children>
-            <Label text="About &amp; Support">
-               <styleClass>
-                  <String fx:value="bold-text" />
-                  <String fx:value="large-text" />
-               </styleClass></Label>
-            <Text strokeType="OUTSIDE" strokeWidth="0.0" styleClass="medium-text" text="Benvenuto nella sezione di supporto di MovieStar. Qui puoi trovare risposte alle domande frequenti, informazioni sull’app e su come contattarci in caso di problemi." wrappingWidth="700.0" />
-            <Label text="FAQ">
-               <styleClass>
-                  <String fx:value="large-text" />
-                  <String fx:value="bold-text" />
-               </styleClass></Label>
-            <Accordion maxHeight="200.0" maxWidth="200.0">
-              <panes>
-                  <TitledPane prefHeight="200.0" prefWidth="200.0" text="L'app è gratuita?">
-                     <content>
-                        <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Sì, puoi guardare film gratuiti. Alcuni contenuti premium richiedono un abbonamento mensile." wrappingWidth="500.0" />
-                     </content>
-                  </TitledPane>
-                <TitledPane animated="false" text="Come posso aggiungere un film ai preferiti?">
-                     <content>
-                        <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Clicca sull’icona a forma di cuore presente nella scheda del film. Lo troverai nella sezione 'Preferiti' del tuo profilo." wrappingWidth="500.0" />
-                     </content>
-                  </TitledPane>
-                <TitledPane animated="false" text="Posso usare MovieStar offline?">
-                     <content>
-                        <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Sì, i film possono essere scaricati per la visione offline se disponi di un piano attivo." wrappingWidth="500.0" />
-                     </content>
-                  </TitledPane>
-              </panes>
-            </Accordion>
-            <Label text="Contatti">
-               <styleClass>
-                  <String fx:value="large-text" />
-                  <String fx:value="bold-text" />
-               </styleClass></Label>
-            <Text strokeType="OUTSIDE" strokeWidth="0.0" styleClass="medium-text" text="Hai bisogno di aiuto? Scrivici a supporto@moviestar.com. Il nostro team ti risponderà entro 24 ore." wrappingWidth="700.0" />
-            <Label prefHeight="35.0" prefWidth="246.0" text="Informazioni sull'app">
-               <styleClass>
-                  <String fx:value="bold-text" />
-                  <String fx:value="large-text" />
-               </styleClass></Label>
-                 <Text strokeType="OUTSIDE" strokeWidth="0.0" styleClass="medium-text" text="Versione: 1.0.0 " wrappingWidth="500.0" />
-                 <Text strokeType="OUTSIDE" strokeWidth="0.0" styleClass="medium-text" text="Ultimo aggiornamento: Maggio 2025 " wrappingWidth="500.0" />
-                 <Text strokeType="OUTSIDE" strokeWidth="0.0" styleClass="medium-text" text="Sviluppato da: ESA Dev Team" wrappingWidth="500.0" />
-            <Label text="Privacy &amp; Termini">
-               <styleClass>
-                  <String fx:value="bold-text" />
-                  <String fx:value="large-text" />
-               </styleClass></Label>
-            <Text strokeType="OUTSIDE" strokeWidth="0.0" styleClass="medium-text" text="MovieStar protegge la tua privacy. Consulta i nostri Termini di Servizio e l’Informativa sulla Privacy disponibili nella sezione dedicata." wrappingWidth="700.0" />
-         </children>
-         <StackPane.margin>
-            <Insets />
-         </StackPane.margin>
-         <padding>
-            <Insets left="30.0" />
-         </padding>
-      </VBox>
-   </children>
-</StackPane>
+<GridPane fx:id="accountContentSetting" prefHeight="467.0" prefWidth="1228.0" stylesheets="@../styles/general.css" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.esa.moviestar.settings.AboutSettingController">
+    <columnConstraints>
+        <ColumnConstraints hgrow="SOMETIMES" percentWidth="20.0" />
+        <ColumnConstraints hgrow="SOMETIMES" percentWidth="60.0" />
+        <ColumnConstraints hgrow="SOMETIMES" percentWidth="20.0" />
+    </columnConstraints>
+    <rowConstraints>
+        <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
+    </rowConstraints>
+    <children>
+        <AnchorPane GridPane.columnIndex="1">
+            <children>
+                <VBox alignment="CENTER_LEFT" prefHeight="200.0" prefWidth="100.0" spacing="15.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                    <children>
+                        <Label text="About &amp; Support">
+                            <styleClass>
+                                <String fx:value="bold-text" />
+                                <String fx:value="large-text" />
+                                <String fx:value="on-primary" />
+                            </styleClass>
+                        </Label>
+                        <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Welcome to the MovieStar support section. Here you can find answers to frequently asked questions, information about the app and how to contact us in case of problems." wrappingWidth="700.0">
+                            <styleClass>
+                                <String fx:value="medium-text" />
+                                <String fx:value="on-primary" />
+                            </styleClass>
+                        </Text>
+
+                        <Label text="FAQ">
+                            <styleClass>
+                                <String fx:value="large-text" />
+                                <String fx:value="bold-text" />
+                                <String fx:value="on-primary" />
+                            </styleClass>
+                        </Label>
+                        <Accordion>
+                            <panes>
+                                <TitledPane text="Is the app free?">
+                                    <content>
+                                        <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Yes, you can watch movies for free. Some premium content requires a monthly subscription." wrappingWidth="650.0">
+                                            <styleClass>
+                                                <String fx:value="on-primary" />
+                                                <String fx:value="medium-text" />
+                                            </styleClass>
+                                        </Text>
+                                    </content>
+                                </TitledPane>
+                                <TitledPane animated="false" text="How can I add a movie to favorites?">
+                                    <content>
+                                        <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Click on the heart-shaped icon on the movie card. You'll find it in the 'Favorites' section of your profile." wrappingWidth="650.0">
+                                            <styleClass>
+                                                <String fx:value="on-primary" />
+                                                <String fx:value="medium-text" />
+                                            </styleClass>
+                                        </Text>
+                                    </content>
+                                </TitledPane>
+                                <TitledPane animated="false" text="Can I use MovieStar offline?">
+                                    <content>
+                                        <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Yes, movies can be downloaded for offline viewing if you have an active plan." wrappingWidth="650.0">
+                                            <styleClass>
+                                                <String fx:value="on-primary" />
+                                                <String fx:value="medium-text" />
+                                            </styleClass>
+                                        </Text>
+                                    </content>
+                                </TitledPane>
+                            </panes>
+                        </Accordion>
+
+                        <Label text="Contact">
+                            <styleClass>
+                                <String fx:value="large-text" />
+                                <String fx:value="bold-text" />
+                                <String fx:value="on-primary" />
+                            </styleClass>
+                        </Label>
+                        <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Need help? Write to us at support@moviestar.com. Our team will respond within 24 hours." wrappingWidth="700.0">
+                            <styleClass>
+                                <String fx:value="medium-text" />
+                                <String fx:value="on-primary" />
+                            </styleClass>
+                        </Text>
+
+                        <Label text="Privacy &amp; Terms">
+                            <styleClass>
+                                <String fx:value="bold-text" />
+                                <String fx:value="large-text" />
+                                <String fx:value="on-primary" />
+                            </styleClass>
+                        </Label>
+                        <Text strokeType="OUTSIDE" strokeWidth="0.0" text="MovieStar protects your privacy. Check out our Terms of Service and Privacy Policy available in the dedicated section." wrappingWidth="700.0">
+                            <styleClass>
+                                <String fx:value="medium-text" />
+                                <String fx:value="on-primary" />
+                            </styleClass>
+                        </Text>
+
+                        <Label text="App Information">
+                            <styleClass>
+                                <String fx:value="bold-text" />
+                                <String fx:value="large-text" />
+                                <String fx:value="on-primary" />
+                            </styleClass>
+                        </Label>
+                        <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Version: 1.0.0" wrappingWidth="500.0">
+                            <styleClass>
+                                <String fx:value="medium-text" />
+                                <String fx:value="on-primary" />
+                            </styleClass>
+                        </Text>
+                        <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Last update: May 2025" wrappingWidth="500.0">
+                            <styleClass>
+                                <String fx:value="medium-text" />
+                                <String fx:value="on-primary" />
+                            </styleClass>
+                        </Text>
+                        <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Developed by: ESA Dev Team" wrappingWidth="500.0">
+                            <styleClass>
+                                <String fx:value="medium-text" />
+                                <String fx:value="on-primary" />
+                            </styleClass>
+                        </Text>
+                    </children>
+                    <padding>
+                        <Insets bottom="20.0" left="30.0" right="30.0" top="20.0" />
+                    </padding>
+                </VBox>
+            </children>
+        </AnchorPane>
+    </children>
+</GridPane>
