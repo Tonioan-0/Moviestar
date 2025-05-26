@@ -27,6 +27,7 @@ public class UtenteDao {
             stmt.setString(3, utente.getEmail());
             stmt.setInt(4, utente.getIDIcona());
             stmt.executeUpdate();
+            System.out.println("UtenteDao : utente inserito : "+utente.getNome()+"id utente : "+utente.getID());
         } catch (SQLException e) {
             System.err.println("utenteDao : errore di inserimento dell'utente "+e.getMessage());
         }
@@ -42,6 +43,7 @@ public class UtenteDao {
             if (rowsAffected == 0) {
                 throw new SQLException("Nessun utente trovato con codice utente = " + idUtente);
             }
+            System.out.println("UtenteDao : utente eliminato : "+idUtente);
         } catch (SQLException e) {
             System.err.println("utenteDao : errore di rimozione dell'utente "+e.getMessage());
         }
@@ -124,7 +126,6 @@ public class UtenteDao {
     // Metodo che recupera tutti gli utenti
     public List<Utente> recuperaTuttiGliUtenti(String email) {
         List<Utente> utenti = new ArrayList<>();
-        System.out.println("Email usata: " + email);
         String query = "SELECT * FROM Utente WHERE Email = ?;";  // Recupera tutti gli utenti in base all'email
 
         try (PreparedStatement stmt = connection.prepareStatement(query)) {
@@ -141,7 +142,7 @@ public class UtenteDao {
                 );
                 utenti.add(utente);  // Aggiungi l'utente alla lista
             }
-            System.out.println("Numero di utenti recuperati: " + utenti.size());
+            System.out.println("UtenteDao : Numero di utenti recuperati: " + utenti.size());
         } catch (SQLException e) {
             System.err.println("utenteDao : errore di recupero lista utenti in base l'email dell'utente "+e.getMessage());}
         return utenti;  // Restituisci la lista di utenti

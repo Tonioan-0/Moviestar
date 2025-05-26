@@ -38,6 +38,10 @@ public class AccountSettingController {
     private Label userName;
     @FXML
     private Button deleteUserButton;
+    @FXML
+    private Label registrationDate;
+    @FXML
+    private Label Email;
 
 
     private Utente utente;
@@ -46,6 +50,7 @@ public class AccountSettingController {
 
     public void setAccount(Account account){
         this.account=account;
+        System.out.println("AccountViewController: email "+account.getEmail());
     }
 
     public void setUtente(Utente utente){
@@ -55,7 +60,10 @@ public class AccountSettingController {
         profileImage.getChildren().clear();
         Group g = new Group(IconSVG.takeElement(codImmagineCorrente));
         profileImage.getChildren().add(g);
-        userName.setText(utente.getNome());
+        userName.setText("Name : "+utente.getNome());
+        registrationDate.setText("Registration Date : "+"21/01/2022");
+        Email.setText("Email : "+utente.getEmail());
+        System.out.println("AccountViewController : utente : "+utente.getNome()+" email dell'utente : "+utente.getEmail()+" id utente : "+utente.getID());
         }
     }
 
@@ -75,7 +83,7 @@ public class AccountSettingController {
 
     public void deleteUser(){
         deleteUserButton.setOnMouseClicked(event -> {
-            DeletePopUp userPopUp = new DeletePopUp(false);
+            DeletePopUp userPopUp = new DeletePopUp(false,account);
 
             AnchorPane.setBottomAnchor(userPopUp, 0.0);
             AnchorPane.setTopAnchor(userPopUp, 0.0);
@@ -87,7 +95,7 @@ public class AccountSettingController {
             userPopUp.getDeleteButton().setOnMouseClicked(e->{
                 if(userPopUp.getPasswordField().getText().equals(account.getPassword())){
                     UtenteDao utenteDao = new UtenteDao();
-                    boolean deleteSuccess = utenteDao.rimuoviUtente(utente.getID());
+                    utenteDao.rimuoviUtente(utente.getID());
                     System.out.println("numero di profili che hai all'interno del tuo account : "+utenteDao.contaProfiliPerEmail(account.getEmail()));
                     if(utenteDao.contaProfiliPerEmail(account.getEmail())>0){
                         System.out.println("hai eliminato un profilo , te ne restano "+utenteDao.contaProfiliPerEmail(account.getEmail()));
@@ -137,7 +145,7 @@ public class AccountSettingController {
 
     public void deleteAccount() {
         deleteAccountButton.setOnMouseClicked(event -> {
-            DeletePopUp accountPopUp = new DeletePopUp(true);
+            DeletePopUp accountPopUp = new DeletePopUp(true,account);
 
             AnchorPane.setBottomAnchor(accountPopUp, 0.0);
             AnchorPane.setTopAnchor(accountPopUp, 0.0);
@@ -149,9 +157,7 @@ public class AccountSettingController {
             accountPopUp.getDeleteButton().setOnMouseClicked(e -> {
                 if (accountPopUp.getPasswordField().getText().equals(account.getPassword())) {
                     AccountDao accountDao = new AccountDao();
-                    boolean deleteSuccess = accountDao.rimuoviAccount(account.getEmail());
-
-                    if (deleteSuccess) {
+                    accountDao.rimuoviAccount(account.getEmail());
                         try {
                             FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/esa/moviestar/login/access.fxml"), resourceBundle);
                             Parent accessContent = loader.load();
@@ -167,9 +173,6 @@ public class AccountSettingController {
                     } else {
                         System.out.println("Errore nell'eliminazione dell'account.");
                     }
-                } else {
-                    System.out.println("Password errata.");
-                }
             });
 
             accountPopUp.getCancelButton().setOnMouseClicked(e -> {
@@ -212,6 +215,7 @@ public class AccountSettingController {
 
                 UpdatePasswordController updatePasswordController = loader.getController();
                 updatePasswordController.setUtente(utente);
+                updatePasswordController.setAccount(account);
 
                 Scene currentScene = accountContentSetting.getScene();
 

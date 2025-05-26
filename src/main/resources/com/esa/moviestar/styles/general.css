@@ -171,9 +171,31 @@
 }
 
 
+/*Aggiunte eugenio */
+.grey-button{
+     -fx-background-color: #232323;
+}
 
+.grey-button:hover {
+    -fx-background-color: #141414;
+}
 
+.grey-button:pressed {
+    -fx-background-color: #121212;
+}
 
+.on-primary-border {
+ -fx-border-color: #F0ECFD;
+}
+
+.warningText {
+    -fx-text-fill: #ff3333;
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-alignment: center;
+    -fx-opacity: 0.9;
+    -fx-padding: 5px 0px;
+}
 
 .back-button {
     -fx-text-fill: #F0ECFD;

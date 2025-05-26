@@ -1,5 +1,6 @@
 package com.esa.moviestar.settings;
 
+import com.esa.moviestar.model.Account;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
@@ -18,7 +19,12 @@ public class DeletePopUp extends StackPane {
     private Button cancelButton;
     private TextField passwordField;
 
-    public DeletePopUp(boolean isAccount) {
+    public DeletePopUp(boolean isAccount , Account account) {
+        page(isAccount, account);
+        passwordProperty();
+    }
+
+    private void page(boolean isAccount, Account account) {
         StackPane mainPane = new StackPane();
 
         // StackPane per l'UI principale
@@ -36,13 +42,13 @@ public class DeletePopUp extends StackPane {
         mainVBox.setSpacing(24.0);
 
         // Label titolo
-        Label titleLabel = new Label(isAccount?"Elimina account":"Elimina utente");
+        Label titleLabel = new Label(isAccount?"Delete Account":"Delete User");
         titleLabel.setPrefHeight(35.0);
         titleLabel.setPrefWidth(406.0);
         titleLabel.getStyleClass().addAll("large-text", "bold-text", "on-primary");
 
         // Testo descrittivo
-        Text descriptionText = new Text(isAccount?"Sei sicuro di voler eliminare il tuo account ? Procedendo con l'eliminazione verrai disconesso e non potrai accedere":"Sei sicuro di voler eliminare il tuo profilo utente ? L'eliminazione del tuo profilo è un'azione irreversibile e perderai tutti i dati associato ad esso . ");
+        Text descriptionText = new Text(isAccount?"Are you sure you want to delete your account? By proceeding, you will be logged out and will no longer be able to access it.":"Are you sure you want to delete your user profile? Deleting your profile is an irreversible action and you will lose all data associated with it.");
         descriptionText.setStrokeType(javafx.scene.shape.StrokeType.OUTSIDE);
         descriptionText.setStrokeWidth(0.0);
         descriptionText.setWrappingWidth(400.0);
@@ -73,12 +79,12 @@ public class DeletePopUp extends StackPane {
         VBox.setMargin(buttonHBox, new Insets(0, 40.0, 0, 0));
 
         // Pulsante Annulla
-        cancelButton = new Button("Annulla");
+        cancelButton = new Button("Cancel");
         cancelButton.setMnemonicParsing(false);
         cancelButton.getStyleClass().addAll("medium-item", "back-button");
 
         // Pulsante Elimina account
-        deleteButton = new Button(isAccount?"Elimina account":"Elimina utente");
+        deleteButton = new Button(isAccount?"Delete account":"Delete user");
         deleteButton.setMnemonicParsing(false);
         deleteButton.setPrefHeight(35.0);
         deleteButton.setPrefWidth(110.0);
@@ -86,11 +92,6 @@ public class DeletePopUp extends StackPane {
 
         // Il pulsante elimina è inizialmente disabilitato
         deleteButton.setDisable(true);
-
-        // Listener per abilitare/disabilitare il pulsante in base al contenuto del TextField
-        passwordField.textProperty().addListener((observable, oldValue, newValue) -> {
-            deleteButton.setDisable(newValue == null || newValue.trim().isEmpty());
-        });
 
         buttonHBox.getChildren().addAll(cancelButton, deleteButton);
 
@@ -103,6 +104,12 @@ public class DeletePopUp extends StackPane {
         this.setStyle("-fx-background-color: rgba(0, 0, 0, 0.7);");
     }
 
+    private void passwordProperty() {
+        // Listener per abilitare/disabilitare il pulsante in base al contenuto del TextField
+        passwordField.textProperty().addListener((observable, oldValue, newValue) -> {
+            deleteButton.setDisable(newValue == null || newValue.trim().isEmpty());
+        });
+    }
 
     // Getter per accedere ai componenti dall'esterno
     public Button getDeleteButton() {

@@ -1,6 +1,7 @@
 package com.esa.moviestar.login;
 
 import com.esa.moviestar.database.AccountDao;
+import com.esa.moviestar.model.Account;
 import com.esa.moviestar.settings.SettingsViewController;
 import com.esa.moviestar.model.Utente;
 import javafx.animation.PauseTransition;
@@ -54,6 +55,12 @@ public class UpdatePasswordController {
     private Utente utente;
     public void setUtente(Utente utente){
         this.utente=utente;
+        System.out.println("UpdatePasswordController : utente passato : "+utente.getNome());
+    }
+    private Account account;
+    public void setAccount(Account account) {
+        this.account=account;
+        System.out.println("UpdatePasswordController : email passata : "+account.getEmail());
     }
 
 
@@ -73,13 +80,13 @@ public class UpdatePasswordController {
         }
 
         if (oldPasswordField != null) {
-            oldPasswordField.setPromptText("Vecchia Password");
+            oldPasswordField.setPromptText("Old Password");
         }
         if (newPasswordField != null) {
-            newPasswordField.setPromptText("Nuova Password");
+            newPasswordField.setPromptText("New Password");
         }
         if (confirmPasswordField != null) {
-            confirmPasswordField.setPromptText("Conferma Nuova Password");
+            confirmPasswordField.setPromptText("Confirm the new Password");
         }
 
         if (updateButton != null) {
@@ -188,49 +195,45 @@ public class UpdatePasswordController {
         }
     }
 
-    public void setUserEmail(String email) {
-        this.userEmail = email;
-    }
-
     private void validatePasswordReset() {
         String oldPassword = oldPasswordField.getText();
         String newPassword = newPasswordField.getText();
         String confirmPassword = confirmPasswordField.getText();
 
         if (oldPassword.isEmpty() || newPassword.isEmpty() || confirmPassword.isEmpty()) {
-            updateStatus("Tutti i campi sono obbligatori");
+            updateStatus("All fields are required.");
             AnimationUtils.shake(statusMessage);
             return;
         }
 
         AccountDao dao = new AccountDao();
-        boolean oldPasswordCorrect = dao.checkPassword(userEmail, oldPassword);
+        boolean oldPasswordCorrect = dao.checkPassword(account.getEmail(), oldPassword);
         if (!oldPasswordCorrect) {
-            updateStatus("La vecchia password è errata");
+            updateStatus("The old password is incorrect.");
             AnimationUtils.shake(statusMessage);
             return;
         }
 
         if (!newPassword.equals(confirmPassword)) {
-            updateStatus("Le password non corrispondono");
+            updateStatus("Passwords do not match.");
             AnimationUtils.shake(statusMessage);
             return;
         }
 
         Register tempRegister = new Register();
         if (!Pattern.matches(tempRegister.get_regex(), newPassword)) {
-            updateStatus("La password non rispetta i requisiti di sicurezza");
+            updateStatus("The password does not meet the security requirements.");
             AnimationUtils.shake(statusMessage);
             return;
         }
 
         try {
-            cambiaPassword(userEmail, newPassword);
+            cambiaPassword(account.getEmail(), newPassword);
             updateStatus("Password cambiata con successo");
             AnimationUtils.pulse(updateButton);
 
             PauseTransition pause = new PauseTransition(Duration.seconds(0.25));
-            pause.setOnFinished(e -> navigateToSetting());
+            pause.setOnFinished(e -> navigateToAccess());
             pause.play();
         } catch (SQLException e) {
             updateStatus("Errore durante il cambio password: " + e.getMessage());
@@ -251,13 +254,14 @@ public class UpdatePasswordController {
         }
     }
 
-    private void navigateToSetting() {
+    private void navigateToAccess(){
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/esa/moviestar/settings/settings-view.fxml"),resourceBundle);
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/esa/moviestar/login/access.fxml"),resourceBundle);
             Parent accountSettingContent = loader.load();
+            Access access = loader.getController();
+            access.setAccount(account);
+
             Scene currentScene = parentContainer.getScene();
-            SettingsViewController settingsViewController = loader.getController();
-            settingsViewController.setUtente(utente);
 
             Scene newScene = new Scene(accountSettingContent, currentScene.getWidth(), currentScene.getHeight());
 
@@ -269,4 +273,26 @@ public class UpdatePasswordController {
             updateStatus("Errore durante il caricamento della pagina");
         }
     }
+
+    private void navigateToSetting() {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/esa/moviestar/settings/settings-view.fxml"),resourceBundle);
+            Parent accountSettingContent = loader.load();
+            SettingsViewController settingsViewController = loader.getController();
+            settingsViewController.setUtente(utente);
+            settingsViewController.setAccount(account);
+
+            Scene currentScene = parentContainer.getScene();
+
+            Scene newScene = new Scene(accountSettingContent, currentScene.getWidth(), currentScene.getHeight());
+
+            Stage stage = (Stage) parentContainer.getScene().getWindow();
+            stage.setScene(newScene);
+
+        } catch (IOException e) {
+            e.printStackTrace();
+            updateStatus("Errore durante il caricamento della pagina");
+        }
+    }
+
 }

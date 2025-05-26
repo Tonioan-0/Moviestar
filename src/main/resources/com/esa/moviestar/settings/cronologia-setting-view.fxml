@@ -1,14 +1,57 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import java.lang.*?>
-<?import java.util.*?>
-<?import javafx.scene.*?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
+<?import java.lang.String?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Text?>
 
-<StackPane xmlns="http://javafx.com/javafx"
-            xmlns:fx="http://javafx.com/fxml"
-            fx:controller="com.esa.moviestar.settings.CronologiaSettingController"
-            prefHeight="400.0" prefWidth="600.0">
-    <Label text = "sei nella pagina delle impostazioni cronologia "/>
-</StackPane>
+<GridPane fx:id="gridPaneContent" prefHeight="467.0" prefWidth="1228.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1">
+   <columnConstraints>
+      <ColumnConstraints hgrow="SOMETIMES" maxWidth="95.20001220703125" minWidth="10.0" prefWidth="59.20001220703125" />
+      <ColumnConstraints hgrow="NEVER" maxWidth="429.6000244140625" minWidth="10.0" prefWidth="429.6000244140625" />
+   </columnConstraints>
+   <rowConstraints>
+      <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
+   </rowConstraints>
+   <children>
+      <AnchorPane fx:id="anchorPane1" styleClass="surface-gradient" stylesheets="@../styles/general.css" GridPane.columnIndex="1">
+         <children>
+            <ScrollPane fx:id="scrollPane" hbarPolicy="NEVER" vbarPolicy="ALWAYS" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+              <content>
+                <AnchorPane fx:id="anchorPane2">
+                     <children>
+                        <HBox fx:id="hbox" alignment="CENTER">
+                           <children>
+                              <VBox alignment="CENTER_LEFT">
+                                 <children>
+                                    <Label fx:id="label" text="Cronologia">
+                                       <styleClass>
+                                          <String fx:value="on-primary" />
+                                          <String fx:value="bold-text" />
+                                          <String fx:value="large-text" />
+                                       </styleClass>
+                                    </Label>
+                                    <Text fx:id="text" strokeType="OUTSIDE" strokeWidth="0.0" text="Testo che riguarda la cronologia e che ci fa capire robe ">
+                                       <styleClass>
+                                          <String fx:value="on-primary" />
+                                          <String fx:value="medium-text" />
+                                       </styleClass>
+                                    </Text>
+                                 </children>
+                              </VBox>
+                           </children>
+                        </HBox>
+                     </children>
+                  </AnchorPane>
+              </content>
+            </ScrollPane>
+         </children>
+      </AnchorPane>
+   </children>
+</GridPane>

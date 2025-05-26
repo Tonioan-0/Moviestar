@@ -5,16 +5,16 @@ import com.esa.moviestar.home.MainPagesController;
 import com.esa.moviestar.model.Account;
 import com.esa.moviestar.model.Utente;
 import javafx.fxml.FXML;
-import javafx.scene.Group;
-import javafx.scene.Scene;
-import javafx.scene.layout.StackPane;
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.Group;
 import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
-import javafx.geometry.Insets;
 import javafx.scene.shape.SVGPath;
 import javafx.stage.Stage;
 
@@ -22,10 +22,10 @@ import java.io.IOException;
 import java.util.List;
 import java.util.ResourceBundle;
 
-
 public class ProfileView {
 
-    @FXML   // Collegamento alla label del testo
+    // FXML Components
+    @FXML
     Label testo;
 
     @FXML   // HBox per la griglia che contiene gli utenti
@@ -38,124 +38,144 @@ public class ProfileView {
     Label warningText;
 
 
-    private final ResourceBundle resourceBundle = ResourceBundle.getBundle("com.esa.moviestar.images.svg-paths.general-svg");
-
-
     private Account account;
-    public void setAccount(Account account) {
-        this.account = account;
-        System.out.println("Email passata alla schermata creazione profilo: " + account.getEmail());
-        caricaUtenti();
-    }
+    private final ResourceBundle resourceBundle = ResourceBundle.getBundle("com.esa.moviestar.images.svg-paths.general-svg");
 
     // Metodo di inizializzazione che viene eseguito subito all'avvio
     public void initialize() {
-        testo.setText("Chi vuole guardare Moviestar ?");  // Impostazione del testo della label iniziale
+        testo.setText("Who wants to watch Moviestar?");  // Impostazione del testo della label iniziale
         griglia.setSpacing(40);  // Impostazione della spaziatura tra gli elementi nella griglia
-
-
     }
 
+    public void setAccount(Account account) {
+        this.account = account;
+        System.out.println("ProfileView : email "+account.getEmail());
+        caricaUtenti();
+    }
+
+
     private void caricaUtenti() {
-            griglia.getChildren().clear(); // Pulisci sempre la griglia prima di ricaricare
-            UtenteDao dao = new UtenteDao();
-            List<Utente> utenti = dao.recuperaTuttiGliUtenti(account.getEmail());
+        griglia.getChildren().clear(); // Pulisci sempre la griglia prima di ricaricare
+        UtenteDao dao = new UtenteDao();
+        List<Utente> utenti = dao.recuperaTuttiGliUtenti(account.getEmail());
 
-            for (Utente utente : utenti) {
-                VBox box = new VBox();
-                box.setSpacing(10);
-                box.setPadding(new Insets(10));
-                box.setAlignment(Pos.CENTER);
+        for (Utente utente : utenti) {
+            VBox userBox = creaBoxUtente(utente);
+            griglia.getChildren().add(userBox);
+        }
 
-                Label name = new Label(utente.getNome());
-                name.getStyleClass().addAll("on-primary", "bold-text", "large-text");
-
-                Group icon = new Group(IconSVG.takeElement(utente.getIDIcona()));
-                icon.setScaleY(8);
-                icon.setScaleX(8);
-
-                StackPane iconBox = new StackPane(icon);
-                StackPane.setAlignment(icon, Pos.CENTER);
-                iconBox.setMinSize(204, 204);
-
-                box.setOnMouseEntered(event -> {
-                    icon.setScaleX(8.2);
-                    icon.setScaleY(8.2);
-                    name.getStyleClass().remove("on-primary");
-                    name.getStyleClass().addAll("on-primary","bold-text", "large-text");
-                });
-
-                box.setOnMouseExited(event -> {
-                    icon.setScaleX(8);
-                    icon.setScaleY(8);
-                    name.getStyleClass().remove("on-primary");
-                    name.getStyleClass().addAll("on-primary", "bold-text", "large-text");
-                });
-
-                StackPane modifica = new StackPane();
-                modifica.setPrefWidth(100);
-                SVGPath pencilModify = new SVGPath();
-                pencilModify.setContent(resourceBundle.getString("pencil"));
-                pencilModify.setScaleY(0.5);
-                pencilModify.setScaleX(0.5);
-                pencilModify.setStyle("-fx-fill: #E6E3DC;");
+        //creazione e settaggio del bottone aggiungi
+        if (utenti.size() < 4) {
+            VBox addUserBox = creaBoxAggiungiUtente();
+            griglia.getChildren().add(addUserBox);
+        }
+    }
 
 
-                pencilModify.setOnMouseEntered(event -> {
-                    pencilModify.setStyle("-fx-fill: #F0ECFD;");
-                });
+    private VBox creaBoxUtente(Utente utente) {
+        VBox box = new VBox();
+        box.setSpacing(10);
+        box.setPadding(new Insets(10));
+        box.setAlignment(Pos.CENTER);
 
-                pencilModify.setOnMouseExited(event -> {
-                    pencilModify.setStyle("-fx-fill: #E6E3DC;");
-                });
+        Label name = new Label(utente.getNome());
+        name.getStyleClass().addAll("on-primary", "bold-text", "large-text");
 
+        Group icon = new Group(IconSVG.takeElement(utente.getIDIcona()));
+        icon.setScaleY(8);
+        icon.setScaleX(8);
 
-                modifica.getChildren().add(pencilModify);
-                icon.setOnMouseClicked(e -> paginaHome(utente));
-                modifica.setOnMouseClicked(e -> paginaModifica(utente));
+        StackPane iconBox = new StackPane(icon);
+        StackPane.setAlignment(icon, Pos.CENTER);
+        iconBox.setMinSize(204, 204);
 
-                box.getChildren().addAll(iconBox, name, modifica);
-                griglia.getChildren().add(box);
-            }
-            //creazione e settaggio del bottone aggiungi
-            if (utenti.size() < 4) {
-                StackPane creazione = new StackPane();
-                creazione.setMinSize(190,190);
-                creazione.setTranslateY(-20);
-                creazione.setStyle("-fx-background-color: #333333;" +
-                        "-fx-background-radius: 48px;" +
-                        "-fx-border-radius: 48px;");
+        StackPane modifica = creaBottoneModifica();
 
-                SVGPath crossAggiungi = new SVGPath();
-                crossAggiungi.setContent(resourceBundle.getString("plusButton"));
-                crossAggiungi.setScaleX(1.8);
-                crossAggiungi.setScaleY(1.8);
-                crossAggiungi.setStyle("-fx-fill: #F0ECFD;");
+        // Event Handlers
+        setupUserBoxEvents(box, icon, name);
+        icon.setOnMouseClicked(e -> paginaHome(utente));
+        modifica.setOnMouseClicked(e -> paginaModifica(utente));
 
-                // Aggiungi al pane
-                creazione.getChildren().add(crossAggiungi);
+        box.getChildren().addAll(iconBox, name, modifica);
+        return box;
+    }
 
+    private void setupUserBoxEvents(VBox box, Group icon, Label name) {
+        box.setOnMouseEntered(event -> {
+            icon.setScaleX(8.2);
+            icon.setScaleY(8.2);
+            name.getStyleClass().remove("on-primary");
+            name.getStyleClass().addAll("on-primary","bold-text", "large-text");
+        });
 
-                VBox creazioneUtente = new VBox();
-                Label plusText = new Label();
-                plusText.setText("Aggiungi");
-                plusText.setTranslateY(-18);
-                plusText.getStyleClass().addAll("on-primary", "bold-text", "large-text");
-                creazioneUtente.getChildren().addAll(creazione,plusText);
-                creazioneUtente.setSpacing(20);
+        box.setOnMouseExited(event -> {
+            icon.setScaleX(8);
+            icon.setScaleY(8);
+            name.getStyleClass().remove("on-primary");
+            name.getStyleClass().addAll("on-primary", "bold-text", "large-text");
+        });
+    }
 
-                creazione.setOnMouseEntered(event -> {
-                    crossAggiungi.setStyle("-fx-fill: #121212;");
-                });
+    private StackPane creaBottoneModifica() {
+        StackPane modifica = new StackPane();
+        modifica.setPrefWidth(100);
 
-                creazione.setOnMouseExited(event -> {
-                    crossAggiungi.setStyle("-fx-fill: #F0ECFD;");
-                });
+        SVGPath pencilModify = new SVGPath();
+        pencilModify.setContent(resourceBundle.getString("pencil"));
+        pencilModify.setScaleY(0.5);
+        pencilModify.setScaleX(0.5);
+        pencilModify.setStyle("-fx-fill: #E6E3DC;");
 
-                griglia.getChildren().add(creazioneUtente);
-                creazioneUtente.setAlignment(Pos.CENTER);
-                creazione.setOnMouseClicked(e -> paginaCreazioneUtente());
-            }
+        pencilModify.setOnMouseEntered(event -> {
+            pencilModify.setStyle("-fx-fill: #F0ECFD;");
+        });
+
+        pencilModify.setOnMouseExited(event -> {
+            pencilModify.setStyle("-fx-fill: #E6E3DC;");
+        });
+
+        modifica.getChildren().add(pencilModify);
+        return modifica;
+    }
+
+    private VBox creaBoxAggiungiUtente() {
+        StackPane creazione = new StackPane();
+        creazione.setMinSize(190,190);
+        creazione.setTranslateY(-20);
+        creazione.setStyle("-fx-background-color: #333333;" +
+                "-fx-background-radius: 48px;" +
+                "-fx-border-radius: 48px;");
+
+        SVGPath crossAggiungi = new SVGPath();
+        crossAggiungi.setContent(resourceBundle.getString("plusButton"));
+        crossAggiungi.setScaleX(1.8);
+        crossAggiungi.setScaleY(1.8);
+        crossAggiungi.setStyle("-fx-fill: #F0ECFD;");
+
+        // Aggiungi al pane
+        creazione.getChildren().add(crossAggiungi);
+
+        VBox creazioneUtente = new VBox();
+        Label plusText = new Label();
+        plusText.setText("Add");
+        plusText.setTranslateY(-18);
+        plusText.getStyleClass().addAll("on-primary", "bold-text", "large-text");
+
+        creazioneUtente.getChildren().addAll(creazione,plusText);
+        creazioneUtente.setSpacing(20);
+        creazioneUtente.setAlignment(Pos.CENTER);
+
+        creazione.setOnMouseEntered(event -> {
+            crossAggiungi.setStyle("-fx-fill: #121212;");
+        });
+
+        creazione.setOnMouseExited(event -> {
+            crossAggiungi.setStyle("-fx-fill: #F0ECFD;");
+        });
+
+        creazione.setOnMouseClicked(e -> paginaCreazioneUtente());
+
+        return creazioneUtente;
     }
 
 
@@ -233,5 +253,4 @@ public class ProfileView {
             System.err.println("ProfileView : Errore caricamento pagina di creazione"+e.getMessage());
         }
     }
-
 }
