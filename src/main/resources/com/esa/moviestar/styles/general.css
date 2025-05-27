@@ -188,56 +188,9 @@
  -fx-border-color: #F0ECFD;
  }
 
- /* Stili semplici per l'Accordion - coerenti con general.css */
-
- .accordion {
-     -fx-background-color: transparent;
-     -fx-spacing: 8px;
- }
-
- .titled-pane {
-     -fx-background-color: #262626;
-     -fx-padding: 0;
- }
-
- .titled-pane:hover {
-     -fx-background-color: #232323;
- }
-
- .titled-pane:expanded {
-     -fx-background-color: #262626;
- }
-
- /* Header del TitledPane */
- .titled-pane > .title {
-     -fx-background-color: transparent;
-     -fx-padding: 16px 20px;
-     -fx-text-fill: #F0ECFD;
- }
-
- .titled-pane > .title:hover {
-     -fx-background-color: transparent;
- }
-
- .titled-pane:expanded > .title {
-     -fx-text-fill: #7341BE;
- }
-
- /* Freccia */
- .titled-pane > .title > .arrow-button > .arrow {
-     -fx-background-color: #F0ECFD;
- }
-
- .titled-pane:expanded > .title > .arrow-button > .arrow {
-     -fx-background-color: #7341BE;
- }
-
- /* Contenuto */
- .titled-pane > .content {
-     -fx-background-color: transparent;
-     -fx-padding: 0 20px 16px 20px;
-     -fx-border-color: transparent;
- }
+.menu-button-selected {
+    -fx-background-color: #7341BE;
+}
 
 .warningText {
     -fx-text-fill: #ff3333;

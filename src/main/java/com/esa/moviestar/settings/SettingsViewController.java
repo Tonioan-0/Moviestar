@@ -59,6 +59,7 @@ public class SettingsViewController {
 
     public void initialize() {
         backToHome();
+        evidenziaMenu(accountContent);
         menuClick();
     }
 
@@ -90,12 +91,38 @@ public class SettingsViewController {
     }
 
     private void menuClick() {
-        // Collegamenti ai pulsanti
-        accountContent.setOnMouseClicked(event -> caricaVista("/com/esa/moviestar/settings/account-setting-view.fxml"));
-        cronologia.setOnMouseClicked(event -> caricaVista("/com/esa/moviestar/settings/cronologia-setting-view.fxml"));
-        privacy.setOnMouseClicked(event -> caricaVista("/com/esa/moviestar/settings/privacy-setting-view.fxml"));
-        accessibilità.setOnMouseClicked(event -> caricaVista("/com/esa/moviestar/settings/accessibilità-setting-view.fxml"));
-        about.setOnMouseClicked(event -> caricaVista("/com/esa/moviestar/settings/about-setting-view.fxml"));
+        accountContent.setOnMouseClicked(event -> {
+            evidenziaMenu(accountContent);
+            caricaVista("/com/esa/moviestar/settings/account-setting-view.fxml");
+        });
+
+        cronologia.setOnMouseClicked(event -> {
+            evidenziaMenu(cronologia);
+            caricaVista("/com/esa/moviestar/settings/cronologia-setting-view.fxml");
+        });
+
+        privacy.setOnMouseClicked(event -> {
+            evidenziaMenu(privacy);
+            caricaVista("/com/esa/moviestar/settings/privacy-setting-view.fxml");
+        });
+
+        about.setOnMouseClicked(event -> {
+            evidenziaMenu(about);
+            caricaVista("/com/esa/moviestar/settings/about-setting-view.fxml");
+        });
+    }
+
+    private void evidenziaMenu(HBox selezionato) {
+        // Rimuove la classe selezionata da tutti
+        accountContent.getStyleClass().remove("menu-button-selected");
+        cronologia.getStyleClass().remove("menu-button-selected");
+        privacy.getStyleClass().remove("menu-button-selected");
+        about.getStyleClass().remove("menu-button-selected");
+
+        // Aggiunge la classe selezionata a quello cliccato
+        if (!selezionato.getStyleClass().contains("menu-button-selected")) {
+            selezionato.getStyleClass().add("menu-button-selected");
+        }
     }
 
     private void caricaVista(String percorsoFXML) {
