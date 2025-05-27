@@ -18,6 +18,9 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 
+// BCrypt import
+import org.mindrot.jbcrypt.BCrypt;
+
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ResourceBundle;
@@ -53,6 +56,9 @@ public class ResetController {
     private String userEmail;
     private String verificationCode;
 
+    // BCrypt work factor (cost parameter) - stesso valore utilizzato in Register
+    private static final int BCRYPT_ROUNDS = 12;
+
     // Valori di riferimento per il layout responsivo
     private final double REFERENCE_WIDTH = 1720.0;
     private final double REFERENCE_HEIGHT = 980.0;
@@ -69,15 +75,15 @@ public class ResetController {
 
         // Configure UI components
         if (codeField != null) {
-            codeField.setPromptText("Codice di verifica");
+            codeField.setPromptText("Verifycation code");
         }
 
         if (newPasswordField != null) {
-            newPasswordField.setPromptText("Nuova Password");
+            newPasswordField.setPromptText("New password");
         }
 
         if (confirmPasswordField != null) {
-            confirmPasswordField.setPromptText("Conferma Nuova Password");
+            confirmPasswordField.setPromptText("Confirm new password");
         }
 
         // Setup resetButton
@@ -118,7 +124,7 @@ public class ResetController {
     private void adjustLayout(double width, double height) {
         // Scale factor based on the SMALLER dimension
         double rawScale = Math.min(width / REFERENCE_WIDTH, height / REFERENCE_HEIGHT);
-        double scale = 1 - (1 - rawScale) * 0.5; // Applica smorzamento del 50%
+        double scale = 1 - (1 - rawScale) * 0.5;
 
         // Handle main container
         if (mainContainer != null) {
@@ -166,7 +172,6 @@ public class ResetController {
                     statusMessage.setStyle("-fx-font-size: " + (baseFontSize) + "px;");
                 }
 
-                // Set proportional width that adapts to container
                 double fieldWidth = (Math.min(containerWidth - padding * 2, containerWidth * 0.9) - 15);
                 if (codeField != null) {
                     codeField.setPrefWidth(fieldWidth);
@@ -204,7 +209,6 @@ public class ResetController {
         }
     }
 
-    // Setters per i valori necessari al reset
     public void setUserEmail(String email) {
         this.userEmail = email;
     }
@@ -213,11 +217,16 @@ public class ResetController {
         this.verificationCode = code;
     }
 
-    // Metodo per configurare il pulsante di reset con i relativi dati
     public void setupResetButton() {
         if (resetButton != null) {
             resetButton.setOnAction(event -> validatePasswordReset());
         }
+    }
+
+    private String hashPassword(String plainTextPassword) {
+
+        return BCrypt.hashpw(plainTextPassword, BCrypt.gensalt(BCRYPT_ROUNDS));
+
     }
 
     private void validatePasswordReset() {
@@ -246,7 +255,6 @@ public class ResetController {
             return;
         }
 
-        // Controllo la validità della password usando il pattern regex dal Register
         Register tempRegister = new Register();
         if (!Pattern.matches(tempRegister.get_regex(), newPassword)) {
             updateStatus("La password non rispetta i requisiti di sicurezza");
@@ -255,14 +263,13 @@ public class ResetController {
         }
 
         try {
-            // Aggiorna la password nel database
-            cambiaPassword(userEmail, newPassword);
+            String hashedPassword = hashPassword(newPassword);
 
-            // Mostra messaggio di successo
+            cambiaPassword(userEmail, hashedPassword);
+
             updateStatus("Password cambiata con successo");
             AnimationUtils.pulse(resetButton);
 
-            // Torna alla schermata di login dopo un breve ritardo
             PauseTransition pause = new PauseTransition(Duration.seconds(0.25));
             pause.setOnFinished(e -> navigateToLogin());
             pause.play();
@@ -272,9 +279,9 @@ public class ResetController {
         }
     }
 
-    private void cambiaPassword(String email, String newPassword) throws SQLException {
+    private void cambiaPassword(String email, String hashedPassword) throws SQLException {
         AccountDao dao = new AccountDao();
-        dao.updatePassword(email, newPassword);
+        dao.updatePassword(email, hashedPassword);
     }
 
     private void updateStatus(String message) {
@@ -288,22 +295,20 @@ public class ResetController {
 
     private void navigateToLogin() {
         try {
-            // Carica la schermata di login
+
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/esa/moviestar/login/access.fxml"),resourceBundle);
             Parent loginContent = loader.load();
             Scene currentScene = parentContainer.getScene();
 
-            // Crea una nuova scena con il nuovo contenuto
             Scene newScene = new Scene(loginContent, currentScene.getWidth(), currentScene.getHeight());
 
-            // Ottieni lo Stage corrente e imposta la nuova scena
             Stage stage = (Stage) parentContainer.getScene().getWindow();
             stage.setScene(newScene);
 
         }
         catch (IOException e) {
             e.printStackTrace();
-            updateStatus("Errore durante il caricamento della pagina");
+            updateStatus("An error occurred while navigating to login: " + e.getMessage());
         }
     }
 }
