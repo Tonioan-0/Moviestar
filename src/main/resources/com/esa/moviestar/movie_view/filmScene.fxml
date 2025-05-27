@@ -1,14 +1,156 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import java.lang.*?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
 <?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
 
-<AnchorPane fx:id="background" prefHeight="400.0" prefWidth="600.0" stylesheets="@../styles/general.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.esa.moviestar.movie_view.FilmSceneController">
-    <VBox fx:id="filmdetail" maxHeight="Infinity" maxWidth="800">
+<StackPane fx:id="background" prefHeight="800.0" prefWidth="1200.0" stylesheets="@../styles/general.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.esa.moviestar.movie_view.FilmSceneController">
 
-    </VBox>
-    <styleClass>
-        <String fx:value="surface-dim" />
-        <String fx:value="very-large-item" />
-    </styleClass>
-</AnchorPane>
+    <!-- Main Content -->
+    <ScrollPane fx:id="scrollPane" fitToWidth="true" hbarPolicy="NEVER" vbarPolicy="AS_NEEDED">
+        <content>
+         <AnchorPane>
+            <children>
+                  <VBox alignment="TOP_CENTER" spacing="0" styleClass="surface-dim" AnchorPane.leftAnchor="400.0" AnchorPane.rightAnchor="400.0" AnchorPane.topAnchor="50.0">
+                      <!-- Hero Section -->
+                      <VBox alignment="BOTTOM_LEFT" prefHeight="500.0" styleClass="bakground-image">
+                          <padding>
+                              <Insets top="100.0" />
+                          </padding>
+
+                          <!-- Title -->
+                          <Label fx:id="titleLabel" styleClass="hero-title" text="NEON GENESIS EVANGELION" wrapText="true">
+                              <font>
+                                  <Font name="System Bold" size="48.0" />
+                              </font>
+                        <VBox.margin>
+                           <Insets left="60.0" />
+                        </VBox.margin>
+                          </Label>
+
+                          <!-- Action Buttons -->
+                          <HBox alignment="CENTER_LEFT" spacing="12.0">
+                              <VBox.margin>
+                                  <Insets top="25.0" />
+                              </VBox.margin>
+
+                              <!-- Play Button -->
+                              <Button fx:id="playButton" mnemonicParsing="false" onAction="#playContent" prefHeight="40.0" prefWidth="180.0" styleClass="play-button" text="Prossimo episodio">
+                                  <font>
+                                      <Font name="System Bold" size="14.0" />
+                                  </font>
+                           <HBox.margin>
+                              <Insets left="60.0" />
+                           </HBox.margin>
+                           <cursor>
+                              <Cursor fx:constant="DEFAULT" />
+                           </cursor>
+                              </Button>
+
+                              <!-- Add to List Button -->
+                              <Button fx:id="addButton" mnemonicParsing="false" onAction="#addToList" prefHeight="40.0" prefWidth="40.0" styleClass="icon-button" text="+">
+                                  <font>
+                                      <Font name="System Bold" size="20.0" />
+                                  </font>
+                              </Button>
+
+                              <!-- Info Button -->
+                              <Button fx:id="infoButton" mnemonicParsing="false" onAction="#showInfo" prefHeight="40.0" prefWidth="40.0" styleClass="icon-button" text="i">
+                                  <font>
+                                      <Font name="System Bold" size="16.0" />
+                                  </font>
+                              </Button>
+                          </HBox>
+                     <Region prefHeight="45.0" prefWidth="405.0" styleClass="surface-vertical-gradient" />
+                      </VBox>
+
+                      <!-- Content Details Section -->
+                      <VBox spacing="25.0" styleClass="surface-dim-opaque-gradient">
+                          <padding>
+                              <Insets bottom="50.0" left="60.0" right="60.0" top="30.0" />
+                          </padding>
+
+                          <!-- Info Row -->
+                          <HBox alignment="TOP_LEFT" spacing="30.0">
+                              <!-- Left Column - Description and Details -->
+                              <VBox prefWidth="550.0" spacing="15.0">
+                                  <!-- Year, Episodes, Rating -->
+                                  <HBox alignment="CENTER_LEFT" spacing="15.0">
+                                      <Label fx:id="yearLabel" styleClass="metadata-text" text="1995" />
+                                      <Label fx:id="episodesLabel" styleClass="metadata-text" text="26 episodi" />
+                                      <Label fx:id="ratingLabel" styleClass="rating-badge" text="HD" />
+                                      <Label fx:id="maturityLabel" styleClass="maturity-badge" text="13+" />
+                                      <Label fx:id="violenceLabel" styleClass="content-warning" text="violenza" />
+                                  </HBox>
+
+                                  <!-- Description -->
+                                  <Label fx:id="descriptionLabel" styleClass="description-text" text="Quindici anni dopo il Second Impact, il giovane Shinji si unisce alla NERV, agenzia guidata dal padre, per pilotare uno dei mecha e combattere contro i mostruosi Angeli." wrapText="true" />
+                              </VBox>
+
+                              <!-- Right Column - Cast and Genres -->
+                              <VBox prefWidth="350.0" spacing="15.0">
+                                  <!-- Cast -->
+                                  <VBox spacing="8.0">
+                                      <Label styleClass="info-label" text="Cast:" />
+                                      <Label fx:id="castLabel" styleClass="info-text" text="Megumi Ogata, Kotono Mitsuishi, Yuriko Yamaguchi" wrapText="true" />
+                                  </VBox>
+
+                                  <!-- Genres -->
+                                  <VBox spacing="8.0">
+                                      <Label styleClass="info-label" text="Generi:" />
+                                      <Label fx:id="genresLabel" styleClass="info-text" text="Anime di fantascienza e fantasy, Anime d'azione, Giapponese" wrapText="true" />
+                                  </VBox>
+
+                                  <!-- This Show -->
+                                  <VBox spacing="8.0">
+                                      <Label styleClass="info-label" text="Questa serie:" />
+                                      <Label fx:id="showTypeLabel" styleClass="info-text" text="Suspense, Avvincente" wrapText="true" />
+                                  </VBox>
+                              </VBox>
+                          </HBox>
+
+                          <!-- Episodes Section -->
+                          <VBox spacing="20.0">
+                              <HBox alignment="CENTER_LEFT" spacing="20.0">
+                                  <Label styleClass="section-title" text="Episodi" />
+                                  <Label fx:id="seriesTitleLabel" styleClass="series-title" text="Neon Genesis Evangelion" />
+                              </HBox>
+
+                              <!-- Episode List -->
+                              <VBox fx:id="episodesList" spacing="15.0" styleClass="episodes-container">
+                                  <!-- Episode 1 -->
+                                  <HBox alignment="CENTER_LEFT" spacing="20.0" styleClass="episode-item">
+                                      <Label styleClass="episode-number" text="1" />
+                                      <ImageView fx:id="episode1Thumb" fitHeight="80.0" fitWidth="140.0" preserveRatio="true" styleClass="episode-thumbnail" />
+                                      <VBox spacing="8.0" HBox.hgrow="ALWAYS">
+                                          <HBox alignment="CENTER_LEFT" spacing="10.0">
+                                              <Label fx:id="episode1Title" styleClass="episode-title" text="L'attacco dell'Angelo" />
+                                              <Region HBox.hgrow="ALWAYS" />
+                                              <Label fx:id="episode1Duration" styleClass="episode-duration" text="23min" />
+                                          </HBox>
+                                          <Label fx:id="episode1Description" styleClass="episode-description" text="Nell'anno 2015 un Angelo torna ad attaccare Neo Tokyo-3. Misato Katsuragi trasporta Shinji alla base della NERV diretta dal padre del ragazzo, Gendo." wrapText="true" />
+                                      </VBox>
+                                  </HBox>
+
+                                  <!-- Additional episodes can be added here -->
+                              </VBox>
+                          </VBox>
+                      </VBox>
+                  </VBox>
+            </children>
+         </AnchorPane>
+        </content>
+    </ScrollPane>
+
+    <!-- Background Image will be added programmatically -->
+
+    <!-- Close Button -->
+    <Button fx:id="closeButton" mnemonicParsing="false" onAction="#closeView" prefHeight="40.0" prefWidth="40.0" styleClass="close-button" text="✕" StackPane.alignment="TOP_RIGHT">
+        <StackPane.margin>
+            <Insets right="20.0" top="20.0" />
+        </StackPane.margin>
+    </Button>
+</StackPane>

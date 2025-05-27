@@ -9,22 +9,27 @@
 
 <StackPane fx:id="ContenitorePadre" prefHeight="453.0" prefWidth="608.0" styleClass="MainPane" stylesheets="@../styles/access.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.esa.moviestar.login.Access">
     <StackPane prefHeight="250.0" prefWidth="200.0" styleClass="Hbox-Padre" HBox.hgrow="ALWAYS" StackPane.alignment="TOP_LEFT" />
-   <StackPane fx:id="ContenitoreImmagine" prefHeight="150.0" prefWidth="200.0" StackPane.alignment="TOP_LEFT">
-      <children>
-           <Group scaleX="2.9" scaleY="3.0" StackPane.alignment="CENTER">
-               <SVGPath content="%icon-moviestar-bg" styleClass="surface-solid" />
-               <SVGPath content="%icon-moviestar-fg" fill="WHITE" styleClass="on-primary" />
-            <StackPane.margin>
-               <Insets left="60.0" top="60.0" />
-            </StackPane.margin>
-           </Group>
-      </children>
-   </StackPane>
+    <StackPane fx:id="ContenitoreImmagine" prefHeight="150.0" prefWidth="200.0" StackPane.alignment="TOP_LEFT">
+        <children>
+            <Group scaleX="2.9" scaleY="3.0" StackPane.alignment="CENTER">
+                <SVGPath content="%icon-moviestar-bg" styleClass="surface-solid" />
+                <SVGPath content="%icon-moviestar-fg" fill="WHITE" styleClass="on-primary" />
+                <StackPane.margin>
+                    <Insets left="60.0" top="60.0" />
+                </StackPane.margin>
+            </Group>
+        </children>
+    </StackPane>
     <VBox fx:id="loginBox" alignment="CENTER" fillWidth="false" StackPane.alignment="CENTER">
         <Label fx:id="welcomeText" alignment="CENTER" styleClass="welcome-text" text="BENVENUTO" />
         <TextField fx:id="emailField" styleClass="small-item" text="prova2@gmail.com" />
 
-        <PasswordField fx:id="passwordField" text="Eugenio04." />
+        <!-- Container per il campo password con bottone toggle -->
+        <StackPane fx:id="passwordContainer" alignment="CENTER_RIGHT">
+            <PasswordField fx:id="passwordField" text="Eugenio04." />
+            <TextField fx:id="passwordTextField" text="Eugenio04." visible="false" managed="false" />
+            <Button fx:id="togglePasswordButton" styleClass="toggle-password-button" text="👁" />
+        </StackPane>
 
         <Button fx:id="access" alignment="CENTER" styleClass="button-text" text="Accedi" />
 

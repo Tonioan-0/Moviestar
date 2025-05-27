@@ -34,6 +34,7 @@ public class MainPagesController {
     // FXML elements
     @FXML private AnchorPane body;
     @FXML private StackPane headerContainer;
+    @FXML private AnchorPane root;
 
     // Constants
     public final ResourceBundle resourceBundle = ResourceBundle.getBundle("com.esa.moviestar.images.svg-paths.general-svg");
@@ -168,6 +169,7 @@ public class MainPagesController {
                     ((SearchController) search.controller).set_paramcontroller((HeaderController) header.controller, user, resourceBundle, this);
                     body.getChildren().clear();
                     body.getChildren().add(search.node);
+                    currentScene = search;
                 } catch (Exception e) {
                     System.err.println("MainPagesController: tbxSearchListener error \n Error:" + e.getMessage());
                     e.printStackTrace();
@@ -338,25 +340,12 @@ public class MainPagesController {
      */
     private ImageView deletedynamicbody() {
         // Store the current scene node for later restoration
-        Node savedNode = null;
-        if (currentScene != null) {
-            savedNode = currentScene.node;
-        }
-        if (home != null) {
-            home = null;
-        }
-        if (filter_film != null) {
-            filter_film = null;
-        }
-        if (filter_series != null) {
-            filter_series = null;
-        }
+        Node savedNode = root;
 
         // Add a new field to the class to store this for later
         this.savedSceneNode = savedNode;
-
         // Create a screenshot of the current scene
-        Stage stage = (Stage) currentScene.node.getScene().getWindow();
+        Stage stage = (Stage) root.getScene().getWindow();
         Scene scene = stage.getScene();
         double width = scene.getWidth();
         double height = scene.getHeight();
@@ -375,16 +364,14 @@ public class MainPagesController {
      */
     public void restorePreviousScene() {
         if (savedSceneNode != null) {
+            System.out.println("Restoring previous scene");
             // Apply fade-out transition
             FadeTransition fadeOut = new FadeTransition(Duration.millis(FADE_DURATION), body);
             fadeOut.setFromValue(1.0);
             fadeOut.setToValue(0.0);
             fadeOut.setOnFinished(e -> {
-                body.getChildren().clear();
-                body.getChildren().add(savedSceneNode);
 
-                // Add the loading overlay back to the body
-                body.getChildren().add(loadingOverlay);
+                root = (AnchorPane) savedSceneNode;
 
                 // Apply fade-in transition
                 FadeTransition fadeIn = new FadeTransition(Duration.millis(FADE_DURATION), body);
@@ -403,41 +390,20 @@ public class MainPagesController {
     public void openFilmScene(String filmFxmlPath) {
         // Capture screenshot and clean scene
         ImageView screenshotView = deletedynamicbody();
-
+        
         // Load film detail
+        
         PageData filmDetail = loadDynamicBody(filmFxmlPath);
 
         if (filmDetail != null) {
             FilmSceneController filmController = ((FilmSceneController) filmDetail.controller());
-            BackgroundImage bgImage = getBackgroundImage(screenshotView);
-            Background background = new Background(bgImage);
-            filmController.background.setBackground(background);
+            filmController.setProperties(screenshotView, this);
+            root.getChildren().clear();
+            root.getChildren().add(filmDetail.node);
         }
     }
 
-    /**
-     * MISSING FUNCTION: Creates background image from screenshot
-     * @param screenshotView ImageView containing the screenshot
-     * @return BackgroundImage for use in film scene
-     */
-    private BackgroundImage getBackgroundImage(ImageView screenshotView) {
-        Image screenshotImage = screenshotView.getImage();
-        // cover - to fill all space
-        return new BackgroundImage(
-                screenshotImage,
-                BackgroundRepeat.NO_REPEAT,
-                BackgroundRepeat.NO_REPEAT,
-                BackgroundPosition.CENTER,
-                new BackgroundSize(
-                        BackgroundSize.AUTO,
-                        BackgroundSize.AUTO,
-                        false,
-                        false,
-                        false,
-                        true  // cover - to fill all space
-                )
-        );
-    }
+
 
     /**
      * Transitions to a new page with a fade effect

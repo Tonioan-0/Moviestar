@@ -171,10 +171,6 @@
 }
 
 
-
-
-
-
 .back-button {
     -fx-text-fill: #F0ECFD;
     -fx-font-size: 14px;
@@ -189,3 +185,226 @@
     -fx-text-fill: white;
 }
 
+.surface-dim-opaque-gradient {
+    -fx-background-color:
+        linear-gradient(to bottom,
+            #2A2A2A 0%,   /* leggermente più scuro in alto */
+            #252525 10%,  /* graduale passaggio */
+            #252525 100%  /* colore finale uniforme */
+        );
+}
+
+.surface-vertical-gradient {
+   -fx-background-color: linear-gradient(to bottom,
+       rgba(37, 37, 37, 0) 0%,
+       rgba(37, 37, 37, 0.32) 15%,
+       rgba(37, 37, 37, 0.43) 25%,
+       rgba(37, 37, 37, 0.58) 35%,
+       rgba(37, 37, 37, 0.67) 50%,
+       rgba(37, 37, 37, 0.78) 65%,
+       rgba(37, 37, 37, 0.85) 75%,
+       rgba(37, 37, 37, 0.9) 85%,
+       rgba(37, 37, 37, 0.93) 92%,
+       rgba(37, 37, 37, 0.97) 100%);
+}
+
+/* Close Button */
+.close-button {
+    -fx-background-color: rgba(42, 42, 42, 0.6);
+    -fx-text-fill: white;
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+    -fx-background-radius: 16px;
+    -fx-border-radius: 16px;
+    -fx-cursor: hand;
+    -fx-pref-height: 40px;
+    -fx-pref-width: 40px;
+}
+
+.close-button:hover {
+    -fx-background-color: rgba(42, 42, 42, 0.8);
+}
+
+/* Transparent ScrollPane */
+.transparent-scroll {
+    -fx-background-color: transparent;
+    -fx-background: transparent;
+}
+
+.transparent-scroll .viewport {
+    -fx-background-color: transparent;
+}
+
+.transparent-scroll .scroll-bar {
+    -fx-background-color: rgba(255, 255, 255, 0.1);
+}
+
+.transparent-scroll .scroll-bar .thumb {
+    -fx-background-color: rgba(255, 255, 255, 0.3);
+    -fx-background-radius: 5px;
+}
+
+/* Hero Section */
+.hero-section {
+    -fx-background-color: transparent;
+
+}
+.bakground-image {
+    -fx-background-image: url('../images/evangeliontry.jpg');
+    -fx-background-repeat: no-repeat;
+    -fx-background-position: center center;
+    -fx-background-size: cover; /* oppure 'contain' se vuoi vedere l'immagine intera */
+}
+
+.hero-title {
+    -fx-text-fill: white;
+    -fx-font-size: 42px;
+    -fx-font-weight: bold;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.8), 10, 0, 2, 2);
+    -fx-max-width: 600px;
+}
+
+/* Buttons */
+.play-button {
+    -fx-background-color: white;
+    -fx-text-fill: black;
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+    -fx-background-radius: 4px;
+    -fx-cursor: hand;
+    -fx-padding: 8px 20px;
+    -fx-pref-height: 40px;
+}
+
+.play-button:hover {
+    -fx-background-color: rgba(255, 255, 255, 0.8);
+}
+
+.icon-button {
+    -fx-background-color: rgba(42, 42, 42, 0.6);
+    -fx-text-fill: white;
+    -fx-font-size: 16px;
+    -fx-background-radius: 16px;
+    -fx-cursor: hand;
+    -fx-border-color: rgba(255, 255, 255, 0.7);
+    -fx-border-width: 2px;
+    -fx-border-radius: 16px;
+    -fx-pref-height: 40px;
+    -fx-pref-width: 40px;
+}
+
+.icon-button:hover {
+    -fx-background-color: rgba(42, 42, 42, 0.8);
+    -fx-border-color: white;
+}
+
+/* Content Details Section */
+.content-details {
+    -fx-background-color: #141414;
+}
+
+/* Metadata Text */
+.metadata-text {
+    -fx-text-fill: white;
+    -fx-font-size: 16px;
+}
+
+.rating-badge {
+    -fx-background-color: rgba(255, 255, 255, 0.2);
+    -fx-text-fill: white;
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+    -fx-padding: 1px 4px;
+    -fx-background-radius: 2px;
+}
+
+.maturity-badge {
+    -fx-background-color: #f5c518;
+    -fx-text-fill: black;
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+    -fx-padding: 1px 4px;
+    -fx-background-radius: 2px;
+}
+
+.content-warning {
+    -fx-text-fill: #999999;
+    -fx-font-size: 12px;
+}
+
+/* Description */
+.description-text {
+    -fx-text-fill: white;
+    -fx-font-size: 16px;
+    -fx-line-spacing: 2px;
+}
+
+/* Info Labels and Text */
+.info-label {
+    -fx-text-fill: #777777;
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+}
+
+.info-text {
+    -fx-text-fill: white;
+    -fx-font-size: 16px;
+    -fx-line-spacing: 1px;
+}
+
+/* Section Titles */
+.section-title {
+    -fx-text-fill: white;
+    -fx-font-size: 24px;
+    -fx-font-weight: bold;
+}
+
+.series-title {
+    -fx-text-fill: #777777;
+    -fx-font-size: 16px;
+}
+
+/* Episodes Container */
+.episodes-container {
+    -fx-background-color: transparent;
+}
+
+.episode-item {
+    -fx-background-color: rgba(42, 42, 42, 0.3);
+    -fx-background-radius: 12px;
+    -fx-padding: 15px;
+    -fx-cursor: hand;
+}
+
+.episode-item:hover {
+    -fx-background-color: rgba(42, 42, 42, 0.6);
+}
+
+.episode-number {
+    -fx-text-fill: #d2d2d2;
+    -fx-font-size: 24px;
+    -fx-font-weight: bold;
+    -fx-min-width: 30px;
+}
+
+.episode-thumbnail {
+    -fx-background-color: #333333;
+    -fx-background-radius: 4px;
+}
+
+.episode-title {
+    -fx-text-fill: white;
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+}
+
+.episode-duration {
+    -fx-text-fill: #d2d2d2;
+    -fx-font-size: 12px;
+}
+
+.episode-description {
+    -fx-text-fill: #d2d2d2;
+    -fx-font-size: 16px;
+    -fx-line-spacing: 1px;
+}
