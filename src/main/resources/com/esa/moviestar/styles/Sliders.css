@@ -1,0 +1,59 @@
+.video-slider .track {
+     -fx-pref-height:16;
+     -fx-background-color: transparent;
+}
+
+.video-slider .thumb {
+    -fx-background-color: white;
+    -fx-border-color:#1f1f1f;
+    -fx-pref-width: 8;
+    -fx-pref-height: 24;
+    -fx-border-radius:4;
+}
+
+.volume-slider .track {
+    -fx-pref-height:48;
+    -fx-background-color: transparent;
+}
+
+.volume-slider .thumb {
+    -fx-background-color: transparent;
+}
+.audio-progress-bar {
+    -fx-background-color: transparent;
+    -fx-background-insets: 0;
+    -fx-background-radius: 16;
+}
+
+.audio-progress-bar .track {
+    -fx-background-color: transparent;
+    -fx-background-insets: 0;
+    -fx-background-radius: 16;
+}
+
+.audio-progress-bar .bar {
+    -fx-background-color: #444444;
+    -fx-background-insets: 0;
+    -fx-background-radius: 16;
+}
+.video-progress-bar {
+    -fx-background-color: white;
+    -fx-background-insets: 0;
+    -fx-background-radius: 16;
+}
+
+.video-progress-bar .bar {
+    -fx-background-color: #444444;
+    -fx-background-insets: 0;
+}
+
+.surface-transparent {
+    -fx-background-color: transparent;
+}
+.surface-transparent:hover {
+    -fx-background-color: #444444;
+}
+.surface-transparent:pressed {
+    -fx-background-color: #101010;
+}
+

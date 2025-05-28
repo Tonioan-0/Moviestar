@@ -1,0 +1,178 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import java.net.*?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.shape.*?>
+<?import javafx.scene.text.*?>
+
+<AnchorPane fx:id="root" prefHeight="718.0" prefWidth="1118.0" styleClass="surface-solid" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.esa.moviestar.movie_view.FilmPlayer">
+   <StackPane fx:id="playerContainer" layoutX="157.0" prefHeight="150.0" prefWidth="200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+   <VBox fx:id="bottomBar" layoutX="8.0" layoutY="646.0" spacing="8.0" AnchorPane.bottomAnchor="8.0" AnchorPane.leftAnchor="8.0" AnchorPane.rightAnchor="8.0">
+      <AnchorPane style="-fx-view-order: -1;">
+         <ProgressBar fx:id="pbrVideo" maxHeight="8.0" prefWidth="200.0" progress="0.25" styleClass="video-progress-bar"
+                      AnchorPane.bottomAnchor="8.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0"
+                      AnchorPane.topAnchor="8.0"/>
+         <Slider fx:id="sliderVideo" layoutX="2.5" layoutY="1.0" min="1.0" styleClass="video-slider"
+                 AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="4.0" AnchorPane.rightAnchor="0.0"
+                 AnchorPane.topAnchor="0.0"/>
+      </AnchorPane>
+      <GridPane>
+         <columnConstraints>
+            <ColumnConstraints hgrow="SOMETIMES" maxWidth="192.0" minWidth="64.0" percentWidth="10.0" />
+            <ColumnConstraints hgrow="SOMETIMES" minWidth="4.0" percentWidth="1.0" prefWidth="100.0" />
+            <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" percentWidth="22.0" />
+            <ColumnConstraints fx:id="spaceColumn" hgrow="ALWAYS" minWidth="10.0" percentWidth="60.0" />
+            <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" percentWidth="31.0" />
+         </columnConstraints>
+         <rowConstraints>
+            <RowConstraints maxHeight="64.0" minHeight="10.0" vgrow="SOMETIMES" />
+         </rowConstraints>
+         <StackPane fx:id="btnPlay" prefHeight="64.0" prefWidth="60.0">
+            <styleClass>
+               <String fx:value="primary" />
+               <String fx:value="small-item" />
+            </styleClass>
+            <SVGPath fx:id="iconPlay" content="%buttons.play" styleClass="on-primary" />
+         </StackPane>
+         <GridPane GridPane.columnIndex="2">
+            <columnConstraints>
+               <ColumnConstraints hgrow="SOMETIMES" minWidth="32.0" percentWidth="25.0" />
+               <ColumnConstraints hgrow="SOMETIMES" minWidth="32.0" percentWidth="25.0" />
+               <ColumnConstraints hgrow="SOMETIMES" minWidth="128.0" />
+            </columnConstraints>
+            <rowConstraints>
+               <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
+            </rowConstraints>
+            <styleClass>
+               <String fx:value="small-item" />
+               <String fx:value="surface-dim" />
+            </styleClass>
+            <StackPane fx:id="btnReturn" prefHeight="64.0" prefWidth="60.0">
+               <styleClass>
+                  <String fx:value="small-item" />
+                  <String fx:value="surface-transparent" />
+               </styleClass>
+               <GridPane.margin>
+                  <Insets bottom="4.0" left="4.0" right="4.0" top="4.0" />
+               </GridPane.margin>
+               <SVGPath content="%buttons.seconds_rewind" styleClass="on-primary" />
+            </StackPane>
+            <StackPane fx:id="btnForward" prefHeight="64.0" prefWidth="64.0" GridPane.columnIndex="1">
+               <styleClass>
+                  <String fx:value="small-item" />
+                  <String fx:value="surface-transparent" />
+               </styleClass>
+               <GridPane.margin>
+                  <Insets bottom="4.0" left="4.0" right="4.0" top="4.0" />
+               </GridPane.margin>
+               <SVGPath content="%buttons.seconds_forward" styleClass="on-primary" />
+            </StackPane>
+            <HBox alignment="CENTER" GridPane.columnIndex="2">
+               <Text fx:id="textActualTime" text="00:00">
+                  <styleClass>
+                     <String fx:value="on-primary" />
+                     <String fx:value="medium-text" />
+                     <String fx:value="bold-text" />
+                  </styleClass>
+               </Text>
+               <Text text=" / ">
+                  <styleClass>
+                     <String fx:value="on-primary" />
+                     <String fx:value="medium-text" />
+                     <String fx:value="bold-text" />
+                  </styleClass>
+               </Text>
+               <Text fx:id="textTotalTime" text="10:00">
+                  <styleClass>
+                     <String fx:value="on-primary" />
+                     <String fx:value="medium-text" />
+                     <String fx:value="bold-text" />
+                  </styleClass>
+               </Text>
+            </HBox>
+         </GridPane>
+         <Region prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="3" />
+         <GridPane GridPane.columnIndex="4">
+            <columnConstraints>
+               <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" minWidth="10.0" percentWidth="40.0" />
+               <ColumnConstraints hgrow="SOMETIMES" minWidth="48.0" percentWidth="20.0" prefWidth="100.0" />
+               <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" percentWidth="20.0" prefWidth="100.0" />
+               <ColumnConstraints hgrow="SOMETIMES" minWidth="48.0" percentWidth="20.0" prefWidth="100.0" />
+            </columnConstraints>
+            <rowConstraints>
+               <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
+            </rowConstraints>
+            <styleClass>
+               <String fx:value="surface-dim" />
+               <String fx:value="small-item" />
+            </styleClass>
+            <AnchorPane>
+               <StackPane layoutY="16.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0"
+                          AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                  <padding>
+                     <Insets bottom="16.0" left="8.0" right="8.0" top="16.0"/>
+                  </padding>
+                  <AnchorPane fx:id="volumeSliderContainer">
+                     <styleClass>
+                        <String fx:value="surface-dim-border"/>
+                        <String fx:value="small-item"/>
+                        <String fx:value="surface-solid"/>
+                     </styleClass>
+                     <ProgressBar fx:id="pbrVolume" progress="0.28" styleClass="audio-progress-bar"
+                                  AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0"
+                                  AnchorPane.topAnchor="0.0"/>
+                     <Slider fx:id="sliderVolume" styleClass="volume-slider" value="100.0" AnchorPane.bottomAnchor="0.0"
+                             AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0"/>
+                  </AnchorPane>
+               </StackPane>
+               <StackPane fx:id="volumeIconContainer" AnchorPane.bottomAnchor="32.0" AnchorPane.leftAnchor="24.0" AnchorPane.topAnchor="32.0">
+                  <SVGPath fx:id="iconVolume" content="%buttons.volume_high" styleClass="on-primary" />
+               </StackPane>
+               <padding>
+                  <Insets bottom="16.0" top="16.0" />
+               </padding>
+            </AnchorPane>
+            <StackPane fx:id="btnSpeed" prefHeight="64.0" prefWidth="60.0" GridPane.columnIndex="1">
+               <styleClass>
+                  <String fx:value="small-item" />
+                  <String fx:value="surface-transparent" />
+               </styleClass>
+               <GridPane.margin>
+                  <Insets bottom="4.0" left="4.0" right="4.0" top="4.0" />
+               </GridPane.margin>
+               <SVGPath fx:id="iconSpeed" content="%buttons.speed_1" styleClass="on-primary" />
+            </StackPane>
+            <StackPane fx:id="btnQuality" prefHeight="64.0" prefWidth="60.0" GridPane.columnIndex="2">
+               <styleClass>
+                  <String fx:value="small-item" />
+                  <String fx:value="surface-transparent" />
+               </styleClass>
+               <GridPane.margin>
+                  <Insets bottom="4.0" left="4.0" right="4.0" top="4.0" />
+               </GridPane.margin>
+               <SVGPath content="%buttons.quality" styleClass="on-primary" />
+            </StackPane>
+            <StackPane fx:id="btnMaximize" prefHeight="64.0" prefWidth="60.0" GridPane.columnIndex="3">
+               <styleClass>
+                  <String fx:value="small-item" />
+                  <String fx:value="surface-transparent" />
+               </styleClass>
+               <GridPane.margin>
+                  <Insets bottom="4.0" left="4.0" right="4.0" top="4.0" />
+               </GridPane.margin>
+               <SVGPath fx:id="iconMaximize" content="%buttons.maximize" styleClass="on-primary" />
+            </StackPane>
+            <GridPane.margin>
+               <Insets />
+            </GridPane.margin>
+         </GridPane>
+      </GridPane>
+   </VBox>
+   <stylesheets>
+      <URL value="@../styles/general.css" />
+      <URL value="@../styles/Sliders.css" />
+   </stylesheets>
+</AnchorPane>

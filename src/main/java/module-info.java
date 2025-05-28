@@ -6,6 +6,7 @@ module com.esa.moviestar {
     requires java.desktop;
     requires jbcrypt;
     requires javafx.graphics;
+    requires javafx.media;
 
     opens com.esa.moviestar to javafx.fxml;
     exports com.esa.moviestar;
