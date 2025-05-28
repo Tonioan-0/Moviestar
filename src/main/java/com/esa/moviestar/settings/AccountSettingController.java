@@ -2,7 +2,7 @@ package com.esa.moviestar.settings;
 
 import com.esa.moviestar.database.AccountDao;
 import com.esa.moviestar.database.UtenteDao;
-import com.esa.moviestar.login.UpdatePasswordController;
+import com.esa.moviestar.login.AnimationUtils;
 import com.esa.moviestar.profile.CreateProfileController;
 import com.esa.moviestar.profile.IconSVG;
 import com.esa.moviestar.profile.ModifyProfileController;
@@ -11,6 +11,7 @@ import com.esa.moviestar.model.Account;
 import com.esa.moviestar.model.Utente;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.Insets;
 import javafx.scene.Group;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -18,6 +19,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
 import java.io.IOException;
@@ -47,6 +49,7 @@ public class AccountSettingController {
     private Utente utente;
     private AnchorPane contenitore;
     private Account account;
+    private Label passwordErrata;
 
     public void setAccount(Account account){
         this.account=account;
@@ -78,7 +81,7 @@ public class AccountSettingController {
         deleteAccount();
         updatePassword();
         deleteUser();
-
+        setPasswordWarning();
     }
 
     public void deleteUser(){
@@ -133,6 +136,10 @@ public class AccountSettingController {
                             System.err.println("AccountSettingController : errore nel ritornare alla pagina di creazione di un profilo "+ex.getMessage());
                         }
                     }
+                }else{
+                    System.err.println("password sbagliata");
+                    userPopUp.getPasswordBox().getChildren().add(passwordErrata);
+                    AnimationUtils.shake(passwordErrata);
                 }
             });
 
@@ -171,7 +178,9 @@ public class AccountSettingController {
                             System.err.println("AccountSettingController: Errore caricamento pagina di accesso dell'account: " + ex.getMessage());
                         }
                     } else {
-                        System.out.println("Errore nell'eliminazione dell'account.");
+                        accountPopUp.getPasswordBox().getChildren().add(passwordErrata);
+                        AnimationUtils.shake(passwordErrata);
+                        System.out.println("Errore nell'eliminazione dell'account , password sbagliata.");
                     }
             });
 
@@ -228,6 +237,16 @@ public class AccountSettingController {
                 System.err.println("AccountSettingController: Errore caricamento pagina di aggiornamento della password"+e.getMessage());
             }
         });
+    }
+
+    private void setPasswordWarning(){
+        passwordErrata  = new Label();
+
+        passwordErrata.setText("Password Errata");
+
+        passwordErrata.getStyleClass().addAll("warningText");
+
+        VBox.setMargin(passwordErrata, new Insets(0, 0, 0, 40.0));
     }
 
 }

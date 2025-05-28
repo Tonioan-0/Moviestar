@@ -170,6 +170,44 @@
     -fx-background-radius: 5em;
 }
 
+.warningText{
+    -fx-text-fill: #9E3536;
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-alignment: center;
+    -fx-opacity: 0.9;
+}
+
+.menu-button-selected {
+    -fx-background-color: #7341BE;
+}
+
+.grey-button{
+     -fx-background-color: #232323;
+}
+
+.grey-button:hover {
+    -fx-background-color: #141414;
+}
+
+.grey-button:pressed {
+    -fx-background-color: #121212;
+}
+
+.on-primary-border {
+ -fx-border-color: #F0ECFD;
+}
+
+.hboxMenu:hover {
+    -fx-translate-x: 1.5;
+    -fx-translate-y: 1.5;
+}
+
+.hboxMenu{
+    -fx-translate-x: 0;
+    -fx-translate-y: 0;
+}
+
 
 .back-button {
     -fx-text-fill: #F0ECFD;

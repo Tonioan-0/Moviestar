@@ -37,13 +37,25 @@
                         <Insets />
                      </VBox.margin>
                      <children>
-                        <HBox alignment="CENTER_LEFT" prefHeight="112.0" prefWidth="224.0" styleClass="large-item">
+                        <HBox alignment="CENTER_LEFT" prefHeight="112.0" prefWidth="224.0" spacing="35.0" styleClass="large-item">
                            <children>
+                              <VBox alignment="CENTER" spacing="30.0">
+                                 <children>
+                                    <StackPane minHeight="150.0" minWidth="150.0">
+                                       <children>
+                                          <Group fx:id="profileImage" scaleX="5.5" scaleY="5.5" />
+                                       </children>
+                                    </StackPane>
+                                 </children>
+                                 <HBox.margin>
+                                    <Insets />
+                                 </HBox.margin>
+                              </VBox>
                               <VBox alignment="CENTER_LEFT" prefHeight="150.0" prefWidth="250.0" spacing="15.0">
                                  <children>
                                     <Label fx:id="userName">
                                        <styleClass>
-                                          <String fx:value="medium-text" />
+                                          <String fx:value="large-text" />
                                           <String fx:value="bold-text" />
                                           <String fx:value="on-primary" />
                                        </styleClass>
@@ -52,14 +64,12 @@
                                        <styleClass>
                                           <String fx:value="on-primary" />
                                           <String fx:value="small-text" />
-                                          <String fx:value="bold-text" />
                                        </styleClass>
                                     </Label>
                                     <Label fx:id="Email">
                                        <styleClass>
                                           <String fx:value="small-text" />
                                           <String fx:value="on-primary" />
-                                          <String fx:value="bold-text" />
                                        </styleClass>
                                     </Label>
                                     <HBox alignment="CENTER_LEFT" spacing="30.0">
@@ -84,23 +94,6 @@
                                        </children>
                                     </HBox>
                                  </children>
-                              </VBox>
-                              <Region prefHeight="150.0" prefWidth="290.0">
-                                 <HBox.margin>
-                                    <Insets left="20.0" />
-                                 </HBox.margin>
-                              </Region>
-                              <VBox alignment="CENTER">
-                                 <children>
-                                    <StackPane minHeight="150.0" minWidth="150.0">
-                                       <children>
-                                          <Group fx:id="profileImage" scaleX="5.5" scaleY="5.5" />
-                                       </children>
-                                    </StackPane>
-                                 </children>
-                                 <HBox.margin>
-                                    <Insets />
-                                 </HBox.margin>
                               </VBox>
                            </children>
                            <padding>

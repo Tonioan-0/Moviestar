@@ -1,14 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import java.net.URL?>
-<?import javafx.geometry.Insets?>
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.layout.HBox?>
-<?import javafx.scene.layout.StackPane?>
-<?import javafx.scene.layout.VBox?>
-<?import javafx.scene.text.Font?>
+<?import java.net.*?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
 
-<StackPane fx:id="ContenitorePadre" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.esa.moviestar.profile.ProfileView">
+<StackPane fx:id="ContenitorePadre" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.esa.moviestar.profile.ProfileView">
     <stylesheets>
         <URL value="@../styles/general.css" />
     </stylesheets>
@@ -21,7 +19,7 @@
 
         <Label fx:id="testo" alignment="TOP_CENTER" text="Label" textAlignment="CENTER" textFill="WHITE" wrapText="true">
             <font>
-                <Font name="Arial Bold" size="48.0" />
+                <Font name="Arial Bold" size="50.0" />
             </font>
          <padding>
             <Insets bottom="50.0" />
