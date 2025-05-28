@@ -1,12 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import java.lang.*?>
-<?import javafx.geometry.*?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
-<?import javafx.scene.text.*?>
+<?import java.lang.String?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Text?>
 
-<GridPane fx:id="aboutContentSetting" prefHeight="467.0" prefWidth="1228.0" stylesheets="@../styles/general.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.esa.moviestar.settings.AboutSettingController">
+<GridPane fx:id="aboutContentSetting" prefHeight="467.0" prefWidth="1228.0" stylesheets="@../styles/general.css" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.esa.moviestar.settings.AboutSettingController">
     <columnConstraints>
         <ColumnConstraints hgrow="SOMETIMES" maxWidth="600.0" minWidth="0.0" percentWidth="20.0" prefWidth="235.5999755859375" />
         <ColumnConstraints hgrow="SOMETIMES" minWidth="0.0" />
@@ -18,7 +25,7 @@
     <children>
         <AnchorPane GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.hgrow="NEVER" GridPane.valignment="CENTER" GridPane.vgrow="ALWAYS">
             <children>
-                <VBox alignment="CENTER_LEFT" prefHeight="200.0" prefWidth="100.0" spacing="15.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                <VBox alignment="CENTER_LEFT" prefHeight="200.0" prefWidth="100.0" spacing="15.0" styleClass="VBox-style" stylesheets="@../styles/access.css" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                     <children>
                         <Label text="About &amp; Support">
                             <styleClass>
@@ -27,7 +34,7 @@
                                 <String fx:value="on-primary" />
                             </styleClass>
                         </Label>
-                        <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Welcome to the MovieStar support section. Here you can find answers to frequently asked questions, information about the app and how to contact us in case of problems." wrappingWidth="700.0">
+                        <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Welcome to the MovieStar support section. Here you can find answers to frequently asked questions, information about the app and how to contact us in case of problems." wrappingWidth="800.0">
                             <styleClass>
                                 <String fx:value="medium-text" />
                                 <String fx:value="on-primary" />
@@ -42,25 +49,6 @@
                                       <String fx:value="on-primary" />
                                   </styleClass>
                               </Label>
-                        <HBox>
-                           <children>
-
-                                    <Label text="Is MovieStar free to use?">
-                                        <styleClass>
-                                            <String fx:value="bold-text" />
-                                            <String fx:value="medium-text" />
-                                            <String fx:value="on-primary" />
-                                        </styleClass>
-                                    </Label>
-                           </children>
-                        </HBox>
-                              <Separator prefHeight="1" style="-fx-background-color: white;" />
-                              <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Yes, MovieStar is free to download and use. Some premium features may be added in future updates.">
-                                  <styleClass>
-                                      <String fx:value="medium-text" />
-                                      <String fx:value="on-primary" />
-                                  </styleClass>
-                              </Text>
                         <HBox>
                            <children>
 
@@ -119,21 +107,39 @@
                                   </styleClass>
                               </Text>
                      </children>
+                     <padding>
+                        <Insets bottom="30.0" left="30.0" right="30.0" top="30.0" />
+                     </padding>
+                     <styleClass>
+                        <String fx:value="surface-dim" />
+                        <String fx:value="large-item" />
+                     </styleClass>
                   </VBox>
 
-                        <Label text="Contact">
+                                    <Label text="Contact">
                             <styleClass>
                                 <String fx:value="large-text" />
                                 <String fx:value="bold-text" />
                                 <String fx:value="on-primary" />
                             </styleClass>
                         </Label>
-                        <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Need help? Write to us at moviestarclient@gmail.com . Our team will respond within 24 hours." wrappingWidth="700.0">
-                            <styleClass>
-                                <String fx:value="medium-text" />
-                                <String fx:value="on-primary" />
-                            </styleClass>
-                        </Text>
+                  <VBox prefHeight="98.0" prefWidth="961.0" spacing="8.0">
+                     <children>
+                              <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Need help? Write to us at moviestarclient@gmail.com . Our team will respond within 24 hours." wrappingWidth="700.0">
+                                  <styleClass>
+                                      <String fx:value="medium-text" />
+                                      <String fx:value="on-primary" />
+                                  </styleClass>
+                              </Text>
+                     </children>
+                     <styleClass>
+                        <String fx:value="surface-dim" />
+                        <String fx:value="large-item" />
+                     </styleClass>
+                     <padding>
+                        <Insets bottom="40.0" left="20.0" right="20.0" top="40.0" />
+                     </padding>
+                  </VBox>
                         <Label text="App Information">
                             <styleClass>
                                 <String fx:value="bold-text" />
@@ -141,27 +147,67 @@
                                 <String fx:value="on-primary" />
                             </styleClass>
                         </Label>
-                        <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Version: 1.0.0" wrappingWidth="500.0">
-                            <styleClass>
-                                <String fx:value="medium-text" />
-                                <String fx:value="on-primary" />
-                            </styleClass>
-                        </Text>
-                        <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Last update: May 2025" wrappingWidth="500.0">
-                            <styleClass>
-                                <String fx:value="medium-text" />
-                                <String fx:value="on-primary" />
-                            </styleClass>
-                        </Text>
-                        <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Developed by: ESA Dev Team" wrappingWidth="500.0">
-                            <styleClass>
-                                <String fx:value="medium-text" />
-                                <String fx:value="on-primary" />
-                            </styleClass>
-                        </Text>
+                  <HBox alignment="CENTER_LEFT" prefHeight="60.0" prefWidth="961.0" spacing="230.0">
+                     <children>
+                        <StackPane prefHeight="50.0" prefWidth="100.0">
+                           <children>
+                                    <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Version: 1.0.0" wrappingWidth="110.4000244140625" StackPane.alignment="CENTER">
+                                        <styleClass>
+                                            <String fx:value="small-item" />
+                                            <String fx:value="on-primary" />
+                                        </styleClass>
+                                    </Text>
+                           </children>
+                           <styleClass>
+                              <String fx:value="surface-dim" />
+                              <String fx:value="large-item" />
+                           </styleClass>
+                           <padding>
+                              <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                           </padding>
+                        </StackPane>
+                        <StackPane prefHeight="200.0" prefWidth="50.0">
+                           <children>
+                                    <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Last update: May 2025" wrappingWidth="120.0" StackPane.alignment="CENTER">
+                                        <styleClass>
+                                            <String fx:value="small-text" />
+                                            <String fx:value="on-primary" />
+                                        </styleClass>
+                                    </Text>
+                           </children>
+                           <styleClass>
+                              <String fx:value="surface-dim" />
+                              <String fx:value="large-item" />
+                           </styleClass>
+                           <padding>
+                              <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                           </padding>
+                        </StackPane>
+                        <StackPane prefHeight="200.0" prefWidth="50.0">
+                           <children>
+                                    <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Developed by: ESA Dev Team" wrappingWidth="120.0" StackPane.alignment="CENTER">
+                                        <styleClass>
+                                            <String fx:value="small-text" />
+                                            <String fx:value="on-primary" />
+                                        </styleClass>
+                                    </Text>
+                           </children>
+                           <styleClass>
+                              <String fx:value="surface-dim" />
+                              <String fx:value="large-item" />
+                           </styleClass>
+                           <padding>
+                              <Insets bottom="7.0" left="7.0" right="7.0" top="7.0" />
+                           </padding>
+                        </StackPane>
+                     </children>
+                     <padding>
+                        <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                     </padding>
+                  </HBox>
                     </children>
                     <padding>
-                        <Insets bottom="20.0" left="30.0" right="30.0" top="20.0" />
+                        <Insets bottom="40.0" left="50.0" right="50.0" top="40.0" />
                     </padding>
                 </VBox>
             </children>

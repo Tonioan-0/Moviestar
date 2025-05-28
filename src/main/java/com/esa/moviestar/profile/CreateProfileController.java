@@ -156,6 +156,15 @@ public class CreateProfileController {
             g.setScaleX(3.8);
             g.setScaleY(3.8);
 
+            g.setOnMouseEntered(event -> {
+                g.setScaleY(4);
+                g.setScaleX(4);
+            });
+            g.setOnMouseExited(event -> {
+                g.setScaleX(3.8);
+                g.setScaleY(3.8);
+            });
+
             // Usa IconSVG.takeElement(i + 1) per ottenere tutte le icone
             g.getChildren().add(IconSVG.takeElement(i));  // Aggiungi l'elemento SVG al gruppo g
 
@@ -171,10 +180,10 @@ public class CreateProfileController {
             }
         }
 
-        imageScroll1.setSpacing(120);
-        imageScroll2.setSpacing(120);
-        imageScroll3.setSpacing(120);
-        imageScroll4.setSpacing(120);
+        imageScroll1.setSpacing(130);
+        imageScroll2.setSpacing(130);
+        imageScroll3.setSpacing(130);
+        imageScroll4.setSpacing(130);
 
         // Inizializza tutti gli HBox di immagini
         setupImageProfile(imageScroll1);

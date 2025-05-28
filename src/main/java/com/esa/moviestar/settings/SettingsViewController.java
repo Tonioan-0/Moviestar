@@ -26,9 +26,17 @@ public class SettingsViewController {
     @FXML
     private AnchorPane contenitore;
     @FXML
-    private HBox accountContent;
+    private HBox userContent;
     @FXML
-    private HBox cronologia;
+    private Label userText;
+    @FXML
+    private SVGPath userSVG;
+    @FXML
+    private HBox historyContent;
+    @FXML
+    private SVGPath historySVG;
+    @FXML
+    private Label historyText;
     @FXML
     private HBox privacy;
     @FXML
@@ -59,7 +67,7 @@ public class SettingsViewController {
 
     public void initialize() {
         backToHome();
-        evidenziaMenu(accountContent);
+        evidenziaMenu(userContent);
         menuClick();
     }
 
@@ -91,13 +99,13 @@ public class SettingsViewController {
     }
 
     private void menuClick() {
-        accountContent.setOnMouseClicked(event -> {
-            evidenziaMenu(accountContent);
+        userContent.setOnMouseClicked(event -> {
+            evidenziaMenu(userContent);
             caricaVista("/com/esa/moviestar/settings/account-setting-view.fxml");
         });
 
-        cronologia.setOnMouseClicked(event -> {
-            evidenziaMenu(cronologia);
+        historyContent.setOnMouseClicked(event -> {
+            evidenziaMenu(historyContent);
             caricaVista("/com/esa/moviestar/settings/cronologia-setting-view.fxml");
         });
 
@@ -114,8 +122,8 @@ public class SettingsViewController {
 
     private void evidenziaMenu(HBox selezionato) {
         // Rimuove la classe selezionata da tutti
-        accountContent.getStyleClass().remove("menu-button-selected");
-        cronologia.getStyleClass().remove("menu-button-selected");
+        userContent.getStyleClass().remove("menu-button-selected");
+        historyContent.getStyleClass().remove("menu-button-selected");
         privacy.getStyleClass().remove("menu-button-selected");
         about.getStyleClass().remove("menu-button-selected");
 
@@ -147,4 +155,6 @@ public class SettingsViewController {
             System.err.println("Errore nel caricamento della vista: " + percorsoFXML);
         }
     }
+
+
 }

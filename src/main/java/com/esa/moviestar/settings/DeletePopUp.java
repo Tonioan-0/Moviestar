@@ -5,6 +5,7 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
@@ -17,7 +18,8 @@ public class DeletePopUp extends StackPane {
 
     private Button deleteButton;
     private Button cancelButton;
-    private TextField passwordField;
+    private PasswordField passwordField;
+    private VBox passwordVBox;
 
     public DeletePopUp(boolean isAccount , Account account) {
         page(isAccount, account);
@@ -55,7 +57,7 @@ public class DeletePopUp extends StackPane {
         descriptionText.getStyleClass().addAll("medium-text", "on-primary");
 
         // VBox per password
-        VBox passwordVBox = new VBox();
+        passwordVBox = new VBox();
         passwordVBox.setSpacing(5.0);
 
         // Label password
@@ -63,8 +65,8 @@ public class DeletePopUp extends StackPane {
         passwordLabel.getStyleClass().addAll("bold-text", "on-primary", "medium-text");
         VBox.setMargin(passwordLabel, new Insets(0, 0, 0, 40.0));
 
-        // TextField password
-        passwordField = new TextField();
+        //password
+        passwordField = new PasswordField();
         passwordField.getStyleClass().addAll( "on-primary", "small-item","medium-text","surface-dim-border","text-area");
         VBox.setMargin(passwordField, new Insets(0, 40.0, 0, 40.0));
 
@@ -114,6 +116,10 @@ public class DeletePopUp extends StackPane {
     // Getter per accedere ai componenti dall'esterno
     public Button getDeleteButton() {
         return deleteButton;
+    }
+
+    public VBox getPasswordBox(){
+        return passwordVBox;
     }
 
     public Button getCancelButton() {

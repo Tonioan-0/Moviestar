@@ -126,15 +126,15 @@ public class ProfileView {
         pencilModify.setScaleX(0.5);
         pencilModify.setStyle("-fx-fill: #E6E3DC;");
 
-        pencilModify.setOnMouseEntered(event -> {
-            pencilModify.setStyle("-fx-fill: #F0ECFD;");
-        });
-
-        pencilModify.setOnMouseExited(event -> {
-            pencilModify.setStyle("-fx-fill: #E6E3DC;");
-        });
-
         modifica.getChildren().add(pencilModify);
+
+        modifica.setOnMouseEntered(event -> {
+            pencilModify.setTranslateY(-3.5);
+        });
+
+        modifica.setOnMouseExited(event -> {
+            pencilModify.setTranslateY(0);
+        });
         return modifica;
     }
 
