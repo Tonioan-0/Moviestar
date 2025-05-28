@@ -59,6 +59,16 @@
     -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.5), 15, 0, 0, 5);
 }
 
+.register-box2 {
+    -fx-background-color: rgba(37, 37, 37, 0.97);
+    -fx-border-color: #262626;
+    -fx-border-width: 2px;
+    -fx-border-radius: 24px;
+    -fx-background-radius: 24px;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.5), 15, 0, 0, 5);
+    -fx-alignment: center;
+}
+
 /* ========== TEXT ELEMENTS ========== */
 
 /* Welcome text style */
@@ -86,7 +96,6 @@
     -fx-font-weight: bold;
     -fx-alignment: center;
     -fx-opacity: 0.9;
-    -fx-padding: 5px 0px;
 }
 
 /* Warning texts variants */
@@ -111,11 +120,13 @@
     -fx-font-size: 16px;
     -fx-alignment: center;
 }
+
 .register-text-raccomendations-mid {
     -fx-background-color: transparent;
     -fx-font-size: 16px;
     -fx-alignment: center;
 }
+
 .register-text-raccomendations-big {
     -fx-background-color: transparent;
     -fx-font-size: 24px;
@@ -124,6 +135,7 @@
 .register-text:hover {
     -fx-underline: true;
 }
+
 .register-text-raccomendations-mid:hover {
     -fx-underline: true;
 }
@@ -167,6 +179,56 @@ Button {
     -fx-text-fill: #F0ECFD;
 }
 
+/* Back button */
+.back-button {
+    -fx-text-fill: #F0ECFD;
+    -fx-font-size: 14px;
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+    -fx-cursor: hand;
+    -fx-alignment: CENTER_LEFT;
+}
+
+/* Back button hover effect - only underline */
+.back-button:hover {
+    -fx-underline: true;
+    -fx-text-fill: white;
+}
+
+/* ========== PASSWORD TOGGLE BUTTON ========== */
+
+/* Toggle password button styling */
+.toggle-password-button {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+    -fx-text-fill: #9E9E9E;
+    -fx-font-size: 16px;
+    -fx-pref-width: 30px;
+    -fx-pref-height: 30px;
+    -fx-min-width: 30px;
+    -fx-min-height: 30px;
+    -fx-max-width: 30px;
+    -fx-max-height: 30px;
+    -fx-border-radius: 16px;
+    -fx-background-radius:16px;
+    -fx-cursor: hand;
+    -fx-padding: 0;
+    -fx-effect: null;
+}
+
+/* Toggle password button hover effect */
+.toggle-password-button:hover {
+    -fx-background-color: rgba(255, 255, 255, 0.1);
+    -fx-text-fill: white;
+}
+
+/* Toggle password button pressed effect */
+.toggle-password-button:pressed {
+    -fx-background-color: rgba(115, 65, 190, 0.3);
+    -fx-text-fill: #F0ECFD;
+
+}
+
 /* Text fields general style */
 TextField, PasswordField {
     -fx-background-color: rgba(100, 100, 100, 0.7);
@@ -196,32 +258,12 @@ TextField, PasswordField {
 }
 
 /* Text field and password field focus effect */
-.text-field:focused, .password-field:focused, TextField:focused, PasswordField:focused {
+.text-field:focused,
+.password-field:focused,
+TextField:focused,
+PasswordField:focused,
+#passwordContainer TextField:focused,
+#passwordContainer PasswordField:focused {
     -fx-background-color: linear-gradient(to bottom right, #262626, #101010);
     -fx-border-color: #7341BE;
-}
-.register-box2 {
-    -fx-background-color: rgba(37, 37, 37, 0.97);
-    -fx-border-color: #262626;
-    -fx-border-width: 2px;
-    -fx-border-radius: 24px;
-    -fx-background-radius: 24px;
-    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.5), 15, 0, 0, 5);
-    -fx-alignment: center;
-}
-.back-button {
-    -fx-text-fill: #F0ECFD;
-    -fx-font-size: 14px;
-    -fx-background-color: transparent;
-    -fx-border-color: transparent;
-    -fx-cursor: hand;
-    -fx-alignment: CENTER_LEFT;
-}
-
-
-
-/* Back button hover effect - only underline */
-.back-button:hover {
-    -fx-underline: true;
-    -fx-text-fill: white;
 }

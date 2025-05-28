@@ -4,6 +4,8 @@ module com.esa.moviestar {
     requires jakarta.mail;
     requires java.sql;
     requires java.desktop;
+    requires jbcrypt;
+    requires javafx.graphics;
 
     opens com.esa.moviestar to javafx.fxml;
     exports com.esa.moviestar;
