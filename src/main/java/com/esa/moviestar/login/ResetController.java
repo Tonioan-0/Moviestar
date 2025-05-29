@@ -35,13 +35,19 @@ public class ResetController {
     private PasswordField newPasswordField;
 
     @FXML
+    private TextField newPasswordTextField; // For password visibility toggle
+
+    @FXML
     private PasswordField confirmPasswordField;
+
+    @FXML
+    private TextField confirmPasswordTextField; // For password visibility toggle
 
     @FXML
     private Button resetButton;
 
     @FXML
-    private Button backToLoginButton;
+    private StackPane backToLoginButton;
 
     @FXML
     private VBox mainContainer;
@@ -52,14 +58,28 @@ public class ResetController {
     @FXML
     private StackPane parentContainer;
 
+    @FXML
+    private StackPane newPasswordContainer; // Container for new password field with toggle
+
+    @FXML
+    private StackPane confirmPasswordContainer; // Container for confirm password field with toggle
+
+    @FXML
+    private Button toggleNewPasswordButton; // Toggle button for new password
+
+    @FXML
+    private Button toggleConfirmPasswordButton; // Toggle button for confirm password
+
     // Attributi per il reset della password
     private String userEmail;
     private String verificationCode;
 
-    // BCrypt work factor (cost parameter) - stesso valore utilizzato in Register
+    // Password visibility states
+    private boolean isNewPasswordVisible = false;
+    private boolean isConfirmPasswordVisible = false;
+
     private static final int BCRYPT_ROUNDS = 12;
 
-    // Valori di riferimento per il layout responsivo
     private final double REFERENCE_WIDTH = 1720.0;
     private final double REFERENCE_HEIGHT = 980.0;
     private final double REFERENCE_CONTAINER_WIDTH = 500.0;
@@ -68,43 +88,150 @@ public class ResetController {
     private final double MIN_VBOX_VISIBILITY_THRESHOLD = 400.0;
 
     public void initialize() {
-        // Make sure statusMessage is empty at start
+
         if (statusMessage != null) {
             statusMessage.setText("");
         }
 
         // Configure UI components
         if (codeField != null) {
-            codeField.setPromptText("Verifycation code");
+            codeField.setPromptText("Verification code");
         }
 
         if (newPasswordField != null) {
             newPasswordField.setPromptText("New password");
         }
 
+        if (newPasswordTextField != null) {
+            newPasswordTextField.setPromptText("New password");
+        }
+
         if (confirmPasswordField != null) {
             confirmPasswordField.setPromptText("Confirm new password");
         }
 
-        // Setup resetButton
+        if (confirmPasswordTextField != null) {
+            confirmPasswordTextField.setPromptText("Confirm new password");
+        }
+
         if (resetButton != null) {
             resetButton.setOnAction(event -> validatePasswordReset());
         }
 
-        // Setup backToLoginButton
         if (backToLoginButton != null) {
-            backToLoginButton.setOnAction(event -> navigateToLogin());
+            backToLoginButton.setOnMouseClicked(event -> navigateToLogin());
         }
 
-        // Add subtle animation to the elements when loaded
+        // Setup password toggle functionality
+        setupPasswordToggle();
+
         if (resetButton != null && newPasswordField != null &&
                 confirmPasswordField != null && codeField != null && backToLoginButton != null) {
-            Node[] formElements = {backToLoginButton, codeField, newPasswordField, confirmPasswordField, resetButton};
-            AnimationUtils.animateSimultaneously(formElements, 1);
+            Node[] formElements = {backToLoginButton, codeField, newPasswordContainer, confirmPasswordContainer, resetButton};
+            AnimationUtils.animateSimultaneously(formElements, 1, 0.3);
         }
 
-        // Setup responsive layout
         setupResponsiveLayout();
+    }
+
+    // Password toggle setup similar to Access class
+    private void setupPasswordToggle() {
+        // Setup new password toggle
+        if (newPasswordField != null && newPasswordTextField != null && toggleNewPasswordButton != null) {
+            newPasswordField.textProperty().addListener((obs, oldText, newText) -> {
+                if (!newPasswordTextField.isFocused()) {
+                    newPasswordTextField.setText(newText);
+                }
+            });
+
+            newPasswordTextField.textProperty().addListener((obs, oldText, newText) -> {
+                if (!newPasswordField.isFocused()) {
+                    newPasswordField.setText(newText);
+                }
+            });
+
+            toggleNewPasswordButton.setOnAction(event -> toggleNewPasswordVisibility());
+            StackPane.setAlignment(toggleNewPasswordButton, Pos.CENTER_RIGHT);
+            StackPane.setMargin(toggleNewPasswordButton, new Insets(0, 10, 0, 0));
+        }
+
+        // Setup confirm password toggle
+        if (confirmPasswordField != null && confirmPasswordTextField != null && toggleConfirmPasswordButton != null) {
+            confirmPasswordField.textProperty().addListener((obs, oldText, newText) -> {
+                if (!confirmPasswordTextField.isFocused()) {
+                    confirmPasswordTextField.setText(newText);
+                }
+            });
+
+            confirmPasswordTextField.textProperty().addListener((obs, oldText, newText) -> {
+                if (!confirmPasswordField.isFocused()) {
+                    confirmPasswordField.setText(newText);
+                }
+            });
+
+            toggleConfirmPasswordButton.setOnAction(event -> toggleConfirmPasswordVisibility());
+            StackPane.setAlignment(toggleConfirmPasswordButton, Pos.CENTER_RIGHT);
+            StackPane.setMargin(toggleConfirmPasswordButton, new Insets(0, 10, 0, 0));
+        }
+
+    }
+
+
+    private void toggleNewPasswordVisibility() {
+        isNewPasswordVisible = !isNewPasswordVisible;
+
+        if (isNewPasswordVisible) {
+            newPasswordTextField.setText(newPasswordField.getText());
+            newPasswordField.setVisible(false);
+            newPasswordField.setManaged(false);
+            newPasswordTextField.setVisible(true);
+            newPasswordTextField.setManaged(true);
+            newPasswordTextField.requestFocus();
+            newPasswordTextField.positionCaret(newPasswordTextField.getText().length());
+            toggleNewPasswordButton.setText("🙈");
+        } else {
+            newPasswordField.setText(newPasswordTextField.getText());
+            newPasswordTextField.setVisible(false);
+            newPasswordTextField.setManaged(false);
+            newPasswordField.setVisible(true);
+            newPasswordField.setManaged(true);
+            newPasswordField.requestFocus();
+            newPasswordField.positionCaret(newPasswordField.getText().length());
+            toggleNewPasswordButton.setText("👁");
+        }
+    }
+
+    private void toggleConfirmPasswordVisibility() {
+        isConfirmPasswordVisible = !isConfirmPasswordVisible;
+
+        if (isConfirmPasswordVisible) {
+            confirmPasswordTextField.setText(confirmPasswordField.getText());
+            confirmPasswordField.setVisible(false);
+            confirmPasswordField.setManaged(false);
+            confirmPasswordTextField.setVisible(true);
+            confirmPasswordTextField.setManaged(true);
+            confirmPasswordTextField.requestFocus();
+            confirmPasswordTextField.positionCaret(confirmPasswordTextField.getText().length());
+            toggleConfirmPasswordButton.setText("🙈");
+        } else {
+            confirmPasswordField.setText(confirmPasswordTextField.getText());
+            confirmPasswordTextField.setVisible(false);
+            confirmPasswordTextField.setManaged(false);
+            confirmPasswordField.setVisible(true);
+            confirmPasswordField.setManaged(true);
+            confirmPasswordField.requestFocus();
+            confirmPasswordField.positionCaret(confirmPasswordField.getText().length());
+            toggleConfirmPasswordButton.setText("👁");
+        }
+    }
+
+    // Get current password values considering visibility state
+    private String getCurrentNewPassword() {
+        return isNewPasswordVisible ? newPasswordTextField.getText() : newPasswordField.getText();
+    }
+
+    private String getCurrentConfirmPassword() {
+        return isConfirmPasswordVisible ? confirmPasswordTextField.getText() : confirmPasswordField.getText();
     }
 
     private void setupResponsiveLayout() {
@@ -143,7 +270,6 @@ public class ResetController {
                 mainContainer.setMaxWidth(containerWidth);
                 mainContainer.setMaxHeight(containerHeight);
 
-                // Dynamic padding and spacing
                 double padding = Math.max(10, 20 * scale);
                 double spacing = Math.max(5, 10 * scale);
                 mainContainer.setPadding(new Insets(padding));
@@ -177,13 +303,32 @@ public class ResetController {
                     codeField.setPrefWidth(fieldWidth);
                     codeField.setMaxWidth(fieldWidth);
                 }
+
+                // Update password containers and fields
+                if (newPasswordContainer != null) {
+                    newPasswordContainer.setPrefWidth(fieldWidth);
+                    newPasswordContainer.setMaxWidth(fieldWidth);
+                }
                 if (newPasswordField != null) {
                     newPasswordField.setPrefWidth(fieldWidth);
                     newPasswordField.setMaxWidth(fieldWidth);
                 }
+                if (newPasswordTextField != null) {
+                    newPasswordTextField.setPrefWidth(fieldWidth);
+                    newPasswordTextField.setMaxWidth(fieldWidth);
+                }
+
+                if (confirmPasswordContainer != null) {
+                    confirmPasswordContainer.setPrefWidth(fieldWidth);
+                    confirmPasswordContainer.setMaxWidth(fieldWidth);
+                }
                 if (confirmPasswordField != null) {
                     confirmPasswordField.setPrefWidth(fieldWidth);
                     confirmPasswordField.setMaxWidth(fieldWidth);
+                }
+                if (confirmPasswordTextField != null) {
+                    confirmPasswordTextField.setPrefWidth(fieldWidth);
+                    confirmPasswordTextField.setMaxWidth(fieldWidth);
                 }
 
                 // Dynamic margins
@@ -192,19 +337,18 @@ public class ResetController {
                 if (codeField != null) {
                     VBox.setMargin(codeField, new Insets((verticalMargin + 25), 0, verticalMargin, 0));
                 }
-                if (newPasswordField != null) {
-                    VBox.setMargin(newPasswordField, new Insets(verticalMargin, 0,0, 0));
+                if (newPasswordContainer != null) {
+                    VBox.setMargin(newPasswordContainer, new Insets(verticalMargin, 0,0, 0));
                 }
-                if (confirmPasswordField != null) {
-                    VBox.setMargin(confirmPasswordField, new Insets(0, 0, 0, 0));
+                if (confirmPasswordContainer != null) {
+                    VBox.setMargin(confirmPasswordContainer, new Insets(0, 0, 0, 0));
                 }
                 if (resetButton != null) {
                     VBox.setMargin(resetButton, new Insets((verticalMargin + 10), 0, 0, 0));
                 }
                 if (backToLoginButton != null) {
-                    VBox.setMargin(backToLoginButton, new Insets((verticalMargin), 0, verticalMargin - 30, 0));
+                    VBox.setMargin(backToLoginButton, new Insets((verticalMargin), 0, verticalMargin - 30, verticalMargin-200));
                 }
-
             }
         }
     }
@@ -224,40 +368,33 @@ public class ResetController {
     }
 
     private String hashPassword(String plainTextPassword) {
-
         return BCrypt.hashpw(plainTextPassword, BCrypt.gensalt(BCRYPT_ROUNDS));
-
     }
 
     private void validatePasswordReset() {
         String inputCode = codeField.getText();
-        String newPassword = newPasswordField.getText();
-        String confirmPassword = confirmPasswordField.getText();
+        String newPassword = getCurrentNewPassword();
+        String confirmPassword = getCurrentConfirmPassword();
 
-        // Controllo se i campi sono vuoti
         if (inputCode.isEmpty() || newPassword.isEmpty() || confirmPassword.isEmpty()) {
-            updateStatus("I campi non possono essere vuoti");
+            updateStatus("Fields cannot be empty");
             AnimationUtils.shake(statusMessage);
             return;
         }
-
-        // Controllo se il codice di verifica corrisponde
         if (!inputCode.equals(verificationCode)) {
-            updateStatus("Codice di verifica errato");
+            updateStatus("Incorrect verification code");
             AnimationUtils.shake(statusMessage);
             return;
         }
-
-        // Controllo se le password corrispondono
         if (!newPassword.equals(confirmPassword)) {
-            updateStatus("Le password non corrispondono");
+            updateStatus("Passwords do not match");
             AnimationUtils.shake(statusMessage);
             return;
         }
 
         Register tempRegister = new Register();
         if (!Pattern.matches(tempRegister.get_regex(), newPassword)) {
-            updateStatus("La password non rispetta i requisiti di sicurezza");
+            updateStatus("Password does not meet security requirements");
             AnimationUtils.shake(statusMessage);
             return;
         }
@@ -266,16 +403,17 @@ public class ResetController {
             String hashedPassword = hashPassword(newPassword);
 
             cambiaPassword(userEmail, hashedPassword);
-
-            updateStatus("Password cambiata con successo");
+            updateStatus("Password changed successfully");
             AnimationUtils.pulse(resetButton);
 
             PauseTransition pause = new PauseTransition(Duration.seconds(0.25));
             pause.setOnFinished(e -> navigateToLogin());
+
             pause.play();
+
         } catch (SQLException e) {
             e.printStackTrace();
-            updateStatus("Errore durante il reset della password: " + e.getMessage());
+            updateStatus("Error during password reset: " + e.getMessage());
         }
     }
 
@@ -291,11 +429,11 @@ public class ResetController {
             System.out.println("Status message label not found: " + message);
         }
     }
+
     public final ResourceBundle resourceBundle = ResourceBundle.getBundle("com.esa.moviestar.images.svg-paths.general-svg");
 
     private void navigateToLogin() {
         try {
-
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/esa/moviestar/login/access.fxml"),resourceBundle);
             Parent loginContent = loader.load();
             Scene currentScene = parentContainer.getScene();

@@ -78,17 +78,16 @@ public class Access {
         mainContainer.setMinWidth(1080);
         mainContainer.setMinHeight(700);
         passwordField.setPromptText("Password");
-        passwordTextField.setPromptText("Password"); // From first code
+        passwordTextField.setPromptText("Password");
         warningText.setText("");
         emailField.setMinWidth(200);
         passwordField.setMinWidth(200);
-        passwordTextField.setMinWidth(200); // From first code
-        welcomeText.setText("WELCOME"); // Set default text for welcomeText
-        access.setText("Access"); // Set default text for access button
-        register.setText("Don't have an account? Sign up"); // Set default text for register button
-        resetPassword.setText("Forgot password? Recover it"); // Set default text for resetPassword button
+        passwordTextField.setMinWidth(200);
+        welcomeText.setText("WELCOME");
+        access.setText("Access");
+        register.setText("Don't have an account? Sign up");
+        resetPassword.setText("Forgot password? Recover it");
 
-        // Inizializza il toggle password (from first code)
         setupPasswordToggle();
 
         register.setOnAction(event -> switchToRegistrationPage());
@@ -99,9 +98,9 @@ public class Access {
                 throw new RuntimeException(e);
             }
         });
-        resetPassword.setOnAction(event -> { // Renamed from recuperoPassword
+        resetPassword.setOnAction(event -> {
             try {
-                sendCredenziali(); // Renamed from invioCredenziali
+                sendCredenziali();
             } catch (SQLException | IOException | MessagingException e) {
                 throw new RuntimeException(e);
             }
@@ -111,35 +110,11 @@ public class Access {
         AnimationUtils.animateSimultaneously(formElements, 1);
 
         setupResponsiveLayout();
-        setupKeyboardNavigation(); // From first code
-    }
-
-    // From first code
-    private void syncPasswordFieldWidths() {
-        // Get email field dimensions
-        double emailWidth = emailField.getWidth();
-        double emailPrefWidth = emailField.getPrefWidth();
-        double emailMinWidth = emailField.getMinWidth();
-        double emailMaxWidth = emailField.getMaxWidth();
-
-        // Apply same dimensions to password fields
-        passwordField.setPrefWidth(emailPrefWidth);
-        passwordField.setMinWidth(emailMinWidth);
-        passwordField.setMaxWidth(emailMaxWidth);
-
-        passwordTextField.setPrefWidth(emailPrefWidth);
-        passwordTextField.setMinWidth(emailMinWidth);
-        passwordTextField.setMaxWidth(emailMaxWidth);
-
-        // Set container width to match email field
-        passwordContainer.setPrefWidth(emailPrefWidth);
-        passwordContainer.setMinWidth(emailMinWidth);
-        passwordContainer.setMaxWidth(emailMaxWidth);
+        setupKeyboardNavigation();
     }
 
     // From first code
     private void setupPasswordToggle() {
-        // Sincronizza i testi dei due campi password
         passwordField.textProperty().addListener((obs, oldText, newText) -> {
             if (!passwordTextField.isFocused()) {
                 passwordTextField.setText(newText);
@@ -152,27 +127,19 @@ public class Access {
             }
         });
 
-        // Gestisce il click del bottone toggle
         togglePasswordButton.setOnAction(event -> togglePasswordVisibility());
 
-        // Mantieni la posizione del bottone
         StackPane.setAlignment(togglePasswordButton, Pos.CENTER_RIGHT);
         StackPane.setMargin(togglePasswordButton, new Insets(0, 10, 0, 0));
 
-        // Sync widths initially
-        syncPasswordFieldWidths();
-
-        // Add listener to maintain width sync when email field changes
-        emailField.widthProperty().addListener((obs, oldWidth, newWidth) -> syncPasswordFieldWidths());
-        emailField.prefWidthProperty().addListener((obs, oldWidth, newWidth) -> syncPasswordFieldWidths());
     }
 
-    // From first code
     private void togglePasswordVisibility() {
+
         isPasswordVisible = !isPasswordVisible;
 
         if (isPasswordVisible) {
-            // Mostra la password come testo normale
+
             passwordTextField.setText(passwordField.getText());
             passwordField.setVisible(false);
             passwordField.setManaged(false);
@@ -180,9 +147,11 @@ public class Access {
             passwordTextField.setManaged(true);
             passwordTextField.requestFocus();
             passwordTextField.positionCaret(passwordTextField.getText().length());
-            togglePasswordButton.setText("🙈"); // Occhio barrato
-        } else {
-            // Nasconde la password
+            togglePasswordButton.setText("🙈");
+
+        }
+        else {
+
             passwordField.setText(passwordTextField.getText());
             passwordTextField.setVisible(false);
             passwordTextField.setManaged(false);
@@ -190,7 +159,7 @@ public class Access {
             passwordField.setManaged(true);
             passwordField.requestFocus();
             passwordField.positionCaret(passwordField.getText().length());
-            togglePasswordButton.setText("👁"); // Occhio aperto
+            togglePasswordButton.setText("👁");
         }
     }
 
@@ -308,8 +277,6 @@ public class Access {
                 passwordTextField.setMaxWidth(fieldWidth);
                 passwordContainer.setMaxWidth(fieldWidth);
 
-                // Force synchronization after layout changes (from first code)
-                syncPasswordFieldWidths();
 
                 double verticalMargin = 10 * scale;
                 VBox.setMargin(welcomeText, new Insets(0, 0, verticalMargin * 3, 0));
@@ -397,7 +364,7 @@ public class Access {
                 The MovieStar Team
                 """, verificationCode);
 
-            // Send email with the verification code
+            /* Send email with the verification code
             try {
                 emailService.sendEmail(email, subject, body);
                 warningText.setText("Verification code sent to your email"); // Added message for success
@@ -406,7 +373,7 @@ public class Access {
                 warningText.setText("Failed to send email. Please try again."); // Added message for email sending failure
                 AnimationUtils.shake(warningText);
                 return;
-            }
+            }*/
 
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/esa/moviestar/login/reset-password-view.fxml"), Main.resourceBundle);
             Parent resetContent = loader.load();

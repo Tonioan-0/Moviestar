@@ -191,11 +191,11 @@ public class AnimationUtils {
                     break;
 
                 case 3:
-                    slideInFromRight(node, durationMs / 2, 30); // Mantiene l'idea di "quick" ma con durata personalizzata
+                    slideInFromRight(node, durationMs / 2, 30);
                     break;
 
                 case 4:
-                    slideInFromLeft(node, durationMs / 2, 30); // Mantiene l'idea di "quick" ma con durata personalizzata
+                    slideInFromLeft(node, durationMs / 2, 30);
                     break;
 
             }
@@ -230,9 +230,5 @@ public class AnimationUtils {
         for (Node child : container.getChildrenUnmodifiable()) {
             child.setOpacity(1.0);
         }
-    }
-
-    public static void animateContainerWithChildren(javafx.scene.Parent container, int animationType) {
-        animateContainerWithChildren(container, animationType, 300);
     }
 }

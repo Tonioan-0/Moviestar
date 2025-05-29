@@ -5,7 +5,6 @@
     -fx-background-color: radial-gradient(focus-angle 254deg, focus-distance 20%, center 50% 50%, radius 55%, #7341BE, #101010);
     -fx-background-radius: 0;
     -fx-background-insets: 0;
-    -fx-fill-width: true;
     -fx-fill-height: true;
 }
 
@@ -66,7 +65,6 @@
     -fx-border-radius: 24px;
     -fx-background-radius: 24px;
     -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.5), 15, 0, 0, 5);
-    -fx-alignment: center;
 }
 
 /* ========== TEXT ELEMENTS ========== */
