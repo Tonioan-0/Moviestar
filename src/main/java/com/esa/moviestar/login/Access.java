@@ -20,7 +20,6 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.layout.*;
 import javafx.stage.Stage;
 
-// BCrypt import
 import org.mindrot.jbcrypt.BCrypt;
 
 import java.io.IOException;
@@ -321,7 +320,7 @@ public class Access {
      * @return true if the password matches, false otherwise
      */
     // From first code
-    private boolean verifyPassword(String plainTextPassword, String hashedPassword) {
+    private static boolean verifyPassword(String plainTextPassword, String hashedPassword) {
         try {
             return BCrypt.checkpw(plainTextPassword, hashedPassword);
         } catch (IllegalArgumentException e) {
@@ -331,13 +330,12 @@ public class Access {
         }
     }
 
-    // Renamed from invioCredenziali and adapted
     private void sendCredenziali() throws SQLException, IOException, MessagingException {
         String email = emailField.getText();
         AccountDao dao = new AccountDao();
 
         if (dao.cercaAccount(email) == null) {
-            warningText.setText("No account found for this email"); // Changed from Nessun account trovato per questa email.
+            warningText.setText("Insert your email");
             AnimationUtils.shake(warningText);
         } else {
             StringBuilder sb = new StringBuilder(6);

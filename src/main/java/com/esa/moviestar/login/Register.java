@@ -321,7 +321,7 @@ public class Register {
         return password_regex;
     }
 
-    private String hashPassword(String plainTextPassword) {
+    public static String hashPassword(String plainTextPassword) {
         return BCrypt.hashpw(plainTextPassword, BCrypt.gensalt(BCRYPT_ROUNDS));
     }
 

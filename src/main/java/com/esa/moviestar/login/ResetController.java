@@ -26,11 +26,18 @@ import java.sql.SQLException;
 import java.util.ResourceBundle;
 import java.util.regex.Pattern;
 
+import static com.esa.moviestar.login.Register.hashPassword;
+
 public class ResetController {
 
     @FXML
+    public Label titleText;
+    @FXML
+    public Label warningText;
+    @FXML
+    public Label warningText2;
+    @FXML
     private TextField codeField;
-
     @FXML
     private PasswordField newPasswordField;
 
@@ -225,7 +232,6 @@ public class ResetController {
         }
     }
 
-    // Get current password values considering visibility state
     private String getCurrentNewPassword() {
         return isNewPasswordVisible ? newPasswordTextField.getText() : newPasswordField.getText();
     }
@@ -275,12 +281,10 @@ public class ResetController {
                 mainContainer.setPadding(new Insets(padding));
                 mainContainer.setSpacing(spacing);
 
-                // Positioning
                 StackPane.setAlignment(mainContainer, compactMode ? Pos.CENTER : Pos.CENTER);
                 StackPane.setMargin(mainContainer, compactMode ? new Insets(0) : new Insets(0));
 
-                // Dynamic font sizes
-                double baseFontSize = 15 * scale;
+                double baseFontSize = 16 * scale;
                 double buttonScale = Math.max(scale, 0.7); // Never below 70% of original size
                 double statusTextScale = Math.max(scale, 0.7);
 
@@ -296,6 +300,15 @@ public class ResetController {
 
                 if (statusMessage != null) {
                     statusMessage.setStyle("-fx-font-size: " + (baseFontSize) + "px;");
+                }
+                if(warningText != null) {
+                    warningText.setStyle("-fx-font-size: " + (baseFontSize) + "px;");
+                }
+                if(warningText2 != null) {
+                    warningText2.setStyle("-fx-font-size: " + (baseFontSize) + "px;");
+                }
+                if(titleText != null) {
+                    titleText.setStyle("-fx-font-size: " + (baseFontSize * 1.5) + "px;");
                 }
 
                 double fieldWidth = (Math.min(containerWidth - padding * 2, containerWidth * 0.9) - 15);
@@ -367,9 +380,6 @@ public class ResetController {
         }
     }
 
-    private String hashPassword(String plainTextPassword) {
-        return BCrypt.hashpw(plainTextPassword, BCrypt.gensalt(BCRYPT_ROUNDS));
-    }
 
     private void validatePasswordReset() {
         String inputCode = codeField.getText();

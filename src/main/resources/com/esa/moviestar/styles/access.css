@@ -72,7 +72,7 @@
 /* Welcome text style */
 .welcome-text {
     -fx-text-fill: #F0ECFD;
-    -fx-font-size: 30px;
+    -fx-font-size: 32px;
     -fx-font-weight: bold;
     -fx-alignment: center;
     -fx-padding: 5px;
@@ -81,7 +81,7 @@
 /* Title text style */
 .title-text {
     -fx-text-fill: white;
-    -fx-font-size: 35px;
+    -fx-font-size: 32px;
     -fx-font-weight: bold;
     -fx-padding: 5px;
     -fx-font-family: "Arial";
@@ -89,7 +89,7 @@
 
 /* Warning text style */
 .warningText {
-    -fx-text-fill: #ff3333;
+    -fx-text-fill: #9E3536;
     -fx-font-size: 14px;
     -fx-font-weight: bold;
     -fx-alignment: center;
