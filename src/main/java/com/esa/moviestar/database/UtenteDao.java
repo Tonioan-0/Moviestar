@@ -50,6 +50,22 @@ public class UtenteDao {
         return false;
     }
 
+    public boolean rimuoviUtenteEmail(String email){
+        String sql = "DELETE FROM Utente WHERE Email = ?;";
+
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.setString(1, email);
+            int rowsAffected = stmt.executeUpdate();
+            if (rowsAffected == 0) {
+                throw new SQLException("Nessun utente trovato con email utente = " + email);
+            }
+            System.out.println("UtenteDao : utente eliminato : "+email);
+        } catch (SQLException e) {
+            System.err.println("utenteDao : errore di rimozione dell'utente "+e.getMessage());
+        }
+        return false;
+    }
+
     // Ricerca utente tramite codice
     public Utente cercaUtente(int idUtente) {
         String query = "SELECT * FROM Utente WHERE ID_Utente = ?;";
