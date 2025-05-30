@@ -17,7 +17,7 @@ import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.image.Image;
+// import javafx.scene.image.Image; // No longer used directly here
 import javafx.scene.image.ImageView;
 import javafx.scene.image.WritableImage;
 import javafx.scene.layout.*;
@@ -32,7 +32,7 @@ import java.util.concurrent.CompletableFuture;
 import static com.esa.moviestar.login.AnimationUtils.*;
 
 public class MainPagesController {
-    private static final double FADE_DURATION = 300; // milliseconds
+
 
     // FXML elements
     @FXML private AnchorPane body;
@@ -40,32 +40,34 @@ public class MainPagesController {
     @FXML private AnchorPane root;
 
     // Constants
-    public final ResourceBundle resourceBundle = ResourceBundle.getBundle("com.esa.moviestar.images.svg-paths.general-svg");
-    public final String PATH_WINDOW_CARD = "/com/esa/moviestar/movie_view/WindowCard.fxml";
-    public final String PATH_CARD_VERTICAL = "/com/esa/moviestar/movie_view/FilmCard_Vertical.fxml";
-    public final String PATH_CARD_HORIZONTAL = "/com/esa/moviestar/movie_view/FilmCard_Horizontal.fxml";
-
+    public static final ResourceBundle resourceBundle = ResourceBundle.getBundle("com.esa.moviestar.images.svg-paths.general-svg");
+    public static final String PATH_WINDOW_CARD = "/com/esa/moviestar/movie_view/WindowCard.fxml";
+    public static final String PATH_CARD_VERTICAL = "/com/esa/moviestar/movie_view/FilmCard_Vertical.fxml";
+    public static final String PATH_CARD_HORIZONTAL = "/com/esa/moviestar/movie_view/FilmCard_Horizontal.fxml";
+    public static final String FILM_SCENE_PATH ="/com/esa/moviestar/movie_view/filmScene.fxml";
     // UI Colors
-    public final Color FORE_COLOR = Color.rgb(240, 236, 253);
-    public final Color BACKGROUND_COLOR = Color.rgb(16, 16, 16);
-
-    // Page data containers
-    private record PageData(Node node, Object controller) {}
+    public static final Color FORE_COLOR = Color.rgb(240, 236, 253);
+    public static final Color BACKGROUND_COLOR = Color.rgb(16, 16, 16);
 
     // Instance variables
     private Utente user;
     private Account account;
+
+    // Page data containers
+    private record PageData(Node node, Object controller) {}
     private PageData header;
-    private Node savedScene;
     private PageData home;
     private PageData filter_film;
     private PageData filter_series;
     private PageData currentScene;
+    private PageData pageBeforeSearch; // For restoring state after search is cleared
+    private PageData savedPageData;    // For restoring state after film scene
+
     private boolean transitionInProgress = false;
     private BufferAnimation loadingSpinner;
     private StackPane loadingOverlay;
+    static final double FADE_DURATION = 300; // milliseconds
 
-    // Account setter - present in first file
     public void setAccount(Account account) {
         this.account = account;
     }
@@ -75,164 +77,150 @@ public class MainPagesController {
         showLoadingSpinner();
     }
 
-    /**
-     * Initializes the main page with the user's data
-     * @param user The current user
-     * @param account The current account
-     */
     public void first_load(Utente user, Account account) {
         this.user = user;
         this.account = account;
-        if (loadingOverlay == null)
+        if (loadingOverlay == null) { // Should be created by initialize()
             createLoadingOverlay();
+        }
 
-        // Load header if not already loaded
         if (header == null) {
             loadHeader();
         }
 
-        // Set profile icon
-        ((HeaderController) header.controller).setProfileIcon(user.getIcona());
+        // After attempting to load header, check if it's usable
+        if (this.header == null || this.header.controller() == null) {
+            System.err.println("MainPagesController: Critical error - Header or its controller failed to load. Aborting first_load.");
+            hideLoadingSpinner(); // Hide spinner as we can't proceed
+            return;
+        }
 
-        // Load home page asynchronously
+        ((HeaderController) this.header.controller()).setProfileIcon(user.getIcona());
+
         CompletableFuture.runAsync(() -> {
-            showLoadingSpinner();
-            PageData home = loadDynamicBody("home.fxml");
-            if (home != null) {
+            showLoadingSpinner(); // Show spinner for home page loading
+            PageData homeData = loadDynamicBody("home.fxml");
+            if (homeData != null) {
                 Platform.runLater(() -> {
-                    HomeController homeBodyController = (HomeController) home.controller;
+                    HomeController homeBodyController = (HomeController) homeData.controller();
                     homeBodyController.setRecommendations(user, MainPagesController.this);
-                    this.home = home;
-                    transitionToPage(home);
+                    this.home = homeData;
+                    transitionToPage(homeData);
+                });
+            } else {
+                Platform.runLater(() -> {
+                    hideLoadingSpinner();
+                    System.err.println("MainPagesController: Home page failed to load.");
+                    // Optionally, display an error message to the user
                 });
             }
         });
     }
 
-    /**
-     * Creates the loading overlay with spinner
-     */
     private void createLoadingOverlay() {
-        // Create loading spinner
         loadingSpinner = new BufferAnimation(128);
-
-        // Create overlay container
         loadingOverlay = new StackPane();
         loadingOverlay.setStyle("-fx-background-color: rgba(0, 0, 0, 0.7);");
         loadingOverlay.getChildren().add(loadingSpinner);
         loadingOverlay.setAlignment(Pos.CENTER);
 
-        // Set anchors for the overlay
         AnchorPane.setBottomAnchor(loadingOverlay, 0.0);
         AnchorPane.setTopAnchor(loadingOverlay, 0.0);
         AnchorPane.setLeftAnchor(loadingOverlay, 0.0);
         AnchorPane.setRightAnchor(loadingOverlay, 0.0);
 
-        // Initially invisible
         loadingOverlay.setVisible(false);
         loadingOverlay.setOpacity(0);
     }
 
-    /**
-     * Loads the header and configures its event handlers
-     */
     private void loadHeader() {
         header = loadDynamicBody("header.fxml");
-        if (header == null) {
-            System.err.println("MainPagesController: Error to load header");
+        if (header == null || header.controller() == null) {
+            System.err.println("MainPagesController: Error to load header or its controller");
             return;
         }
 
-        headerContainer.getChildren().add(header.node);
-        HeaderController headerController = (HeaderController) header.controller;
+        headerContainer.getChildren().add(header.node());
+        HeaderController headerController = (HeaderController) header.controller();
 
         if (user != null) {
-            // Updated to include account parameter
             headerController.setUpPopUpMenu(this, user, account);
         }
 
-        // Configure navigation buttons
         setupNavigationButtons(headerController);
 
-        // Configure search functionality - Updated method name
         headerController.getTbxSearch().textProperty().addListener((observableValue, oldV, newV) -> {
             if (newV.isEmpty()) {
-                try {
-                    body.getChildren().clear();
-                    body.getChildren().add(currentScene.node);
-                } catch (Exception e) {
-                    System.err.println("MainPagesController: tbxSearchListener error \n Error:" + e.getMessage());
+                if (currentScene != null && currentScene.controller() instanceof SearchController) {
+                    if (pageBeforeSearch != null && pageBeforeSearch != currentScene) {
+                        transitionToPage(pageBeforeSearch);
+                        pageBeforeSearch = null; // Consumed
+                    } else if (home != null && currentScene != home) { // Fallback to home
+                        transitionToPage(home);
+                    }
                 }
                 return;
             }
-            PageData search = loadDynamicBody("search.fxml");
-            if (search != null) {
-                try {
-                    ((SearchController) search.controller).set_paramcontroller((HeaderController) header.controller, user, resourceBundle, this);
-                    body.getChildren().clear();
-                    body.getChildren().add(search.node);
-                    currentScene = search;
-                } catch (Exception e) {
-                    System.err.println("MainPagesController: tbxSearchListener error \n Error:" + e.getMessage());
-                    e.printStackTrace();
+            if (currentScene == null || !(currentScene.controller() instanceof SearchController)) {
+                if (currentScene != null && (pageBeforeSearch == null || (pageBeforeSearch.node() != currentScene.node()))) {
+                    pageBeforeSearch = currentScene;
                 }
             }
+
+            loadPageAsync("search", () -> {
+                PageData searchResultPage = loadDynamicBody("search.fxml");
+                headerController.activeSearch();
+                if (searchResultPage != null) {
+                    try {
+                        ((SearchController) searchResultPage.controller()).set_paramcontroller(
+                                headerController, user, resourceBundle, this);
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+                return searchResultPage;
+            });
         });
 
-        // Add the loading overlay to the body
-        body.getChildren().add(loadingOverlay);
+        if (!body.getChildren().contains(loadingOverlay)) {
+            body.getChildren().add(loadingOverlay);
+        }
     }
 
-    /**
-     * Sets up the navigation buttons in the header
-     * @param headerController The header controller
-     */
     private void setupNavigationButtons(HeaderController headerController) {
-        // Home button
         headerController.homeButton.setOnMouseClicked(e -> {
-            if (currentScene == home || transitionInProgress) {
-                return;
-            }
-
+            if (currentScene == home || transitionInProgress) return;
             loadPageAsync("home", () -> {
                 if (home == null) {
                     home = loadDynamicBody("home.fxml");
                     if (home != null) {
-                        ((HomeController) home.controller).setRecommendations(user, this);
+                        ((HomeController) home.controller()).setRecommendations(user, this);
                     }
                 }
                 return home;
             });
         });
 
-        // Film button
         headerController.filmButton.setOnMouseClicked(e -> {
-            if (currentScene == filter_film || transitionInProgress) {
-                return;
-            }
-
+            if (currentScene == filter_film || transitionInProgress) return;
             loadPageAsync("film filter", () -> {
                 if (filter_film == null) {
                     filter_film = loadDynamicBody("filter.fxml");
                     if (filter_film != null) {
-                        ((FilterController) filter_film.controller).loadWithFilter(this, user, true);
+                        ((FilterController) filter_film.controller()).loadWithFilter(this, user, true);
                     }
                 }
                 return filter_film;
             });
         });
 
-        // Series button
         headerController.seriesButton.setOnMouseClicked(e -> {
-            if (currentScene == filter_series || transitionInProgress) {
-                return;
-            }
-
+            if (currentScene == filter_series || transitionInProgress) return;
             loadPageAsync("series filter", () -> {
                 if (filter_series == null) {
                     filter_series = loadDynamicBody("filter.fxml");
                     if (filter_series != null) {
-                        ((FilterController) filter_series.controller).loadWithFilter(this, user, false);
+                        ((FilterController) filter_series.controller()).loadWithFilter(this, user, false);
                     }
                 }
                 return filter_series;
@@ -240,27 +228,23 @@ public class MainPagesController {
         });
     }
 
-    /**
-     * Shows the loading spinner with a fade-in effect
-     */
     private void showLoadingSpinner() {
         Platform.runLater(() -> {
+            if (loadingSpinner == null || loadingOverlay == null) createLoadingOverlay(); // Defensive
             loadingSpinner.startAnimation();
             loadingOverlay.setVisible(true);
             FadeTransition fadeIn = new FadeTransition(Duration.millis(200), loadingOverlay);
-            fadeIn.setFromValue(0.0);
+            fadeIn.setFromValue(loadingOverlay.getOpacity()); // Fade from current opacity
             fadeIn.setToValue(1.0);
             fadeIn.play();
         });
     }
 
-    /**
-     * Hides the loading spinner with a fade-out effect
-     */
     private void hideLoadingSpinner() {
         Platform.runLater(() -> {
+            if (loadingSpinner == null || loadingOverlay == null) return; // Nothing to hide
             FadeTransition fadeOut = new FadeTransition(Duration.millis(200), loadingOverlay);
-            fadeOut.setFromValue(1.0);
+            fadeOut.setFromValue(loadingOverlay.getOpacity()); // Fade from current opacity
             fadeOut.setToValue(0.0);
             fadeOut.setOnFinished(e -> {
                 loadingOverlay.setVisible(false);
@@ -270,147 +254,152 @@ public class MainPagesController {
         });
     }
 
-    /**
-     * Asynchronously loads a page
-     * @param pageName The name of the page for logging
-     * @param pageSupplier A supplier that returns the page data
-     */
     private void loadPageAsync(String pageName, java.util.function.Supplier<PageData> pageSupplier) {
         CompletableFuture.runAsync(() -> {
+            HeaderController headerController = (HeaderController)header.controller();
             try {
+                switch(pageName){
+                    case "home":
+                        headerController.activeButton(headerController.homeButton);
+                        break;
+                    case "film filter":
+                        headerController.activeButton(headerController.filmButton);
+                        break;
+                    case "series filter":
+                        headerController.activeButton(headerController.seriesButton);
+                        break;
+                    case "search":
+                        headerController.activeSearch();
+                        break;
+                }
                 showLoadingSpinner();
                 PageData page = pageSupplier.get();
                 if (page != null) {
+
                     Platform.runLater(() -> transitionToPage(page));
                 } else {
-                    hideLoadingSpinner();
-                    System.err.println("MainPagesController: Failed to load " + pageName + " page");
+                    Platform.runLater(this::hideLoadingSpinner);
+                    System.err.println("MainPagesController: Failed to load " + pageName + " page (supplier returned null)");
                 }
             } catch (Exception e) {
-                hideLoadingSpinner();
-                System.err.println("MainPagesController: Error to load " + pageName + " page");
+                Platform.runLater(this::hideLoadingSpinner);
+                System.err.println("MainPagesController: Error to load " + pageName + " page: " + e.getMessage());
             }
         });
     }
 
-    /**
-     * Dynamically loads FXML content - Enhanced version from second file
-     * @param bodySource The FXML file to load
-     * @return A PageData object containing the node and controller
-     */
     private PageData loadDynamicBody(String bodySource) {
         try {
-            // Add more detailed logging
-            System.out.println("MainPagesController: Attempting to load: " + bodySource);
-
-            // Check if resource exists
             var resource = getClass().getResource(bodySource);
             if (resource == null) {
-                System.err.println("MainPagesController: Resource not found: " + bodySource);
-                System.err.println("MainPagesController: Looking in package: " + getClass().getPackageName());
+                System.err.println("MainPagesController: Resource not found: " + bodySource + " (relative to " + getClass().getPackageName() + ")");
                 return null;
             }
-
-            System.out.println("MainPagesController: Resource found at: " + resource.toString());
-
             FXMLLoader loader = new FXMLLoader(resource, resourceBundle);
             Node pageNode = loader.load();
-
-            // Set anchors for proper layout
             AnchorPane.setBottomAnchor(pageNode, 0.0);
             AnchorPane.setTopAnchor(pageNode, 0.0);
             AnchorPane.setLeftAnchor(pageNode, 0.0);
             AnchorPane.setRightAnchor(pageNode, 0.0);
-
-            System.out.println("MainPagesController: Successfully loaded: " + bodySource);
             return new PageData(pageNode, loader.getController());
-
         } catch (IOException e) {
-            System.err.println("MainPagesController: IOException while loading " + bodySource);
-            System.err.println("MainPagesController: Error details: " + e.getMessage());
+            System.err.println("MainPagesController: IOException while loading " + bodySource + ". Details: " + e.getMessage());
             return null;
         } catch (Exception e) {
-            System.err.println("MainPagesController: Unexpected error while loading " + bodySource);
-            System.err.println("MainPagesController: Error details: " + e.getMessage());
+            System.err.println("MainPagesController: Unexpected error while loading " + bodySource + ". Details: " + e.getMessage());
             return null;
         }
     }
 
     /**
-     * MISSING FUNCTION: Captures screenshot and prepares for film scene overlay
+     * Captures screenshot and prepares for film scene overlay.
      * @return ImageView containing the screenshot
      */
-
-    private ImageView deletedynamicbody() {
-
-        // Create a screenshot of the current scene
+    private ImageView captureScreenshotView() {
+        if (root.getScene() == null || root.getScene().getWindow() == null) {
+            System.err.println("MainPagesController: Cannot capture screenshot, scene or window not available.");
+            return new ImageView(); // Return empty image view to prevent NPE
+        }
         Stage stage = (Stage) root.getScene().getWindow();
         Scene scene = stage.getScene();
         double width = scene.getWidth();
         double height = scene.getHeight();
         WritableImage screenshot = new WritableImage((int) width, (int) height);
         scene.snapshot(screenshot);
-        ImageView screenshotView = new ImageView(screenshot);
-
-        return screenshotView;
+        return new ImageView(screenshot);
     }
 
     public void restorePreviousScene() {
-        if (currentScene != null) {
+        if (this.savedPageData != null) {
             System.out.println("Restoring previous scene with slide animation");
 
             root.getChildren().clear();
+            root.getChildren().add(body);
+            root.getChildren().add(headerContainer);
 
-            root= (AnchorPane) savedScene;
+            // Clear body and add the saved page node
+            body.getChildren().clear();
+            Node pageNodeToRestore = savedPageData.node();
+            pageNodeToRestore.setOpacity(1.0);
+            body.getChildren().add(pageNodeToRestore);
 
             if (loadingOverlay != null) {
-                body.getChildren().add(loadingOverlay);
+                if (!body.getChildren().contains(loadingOverlay))
+                    body.getChildren().add(loadingOverlay);
+                loadingOverlay.setOpacity(0);
+                loadingOverlay.setVisible(false);
+                if (loadingSpinner != null)
+                    loadingSpinner.stopAnimation();
             }
-            slideInFromLeft(root);
 
-            savedScene = null;
+            this.currentScene = this.savedPageData;
+            this.savedPageData = null;
+            this.transitionInProgress = false;
         } else {
-            System.err.println("Cannot restore scene: currentScene is null");
+            System.err.println("Cannot restore scene: savedPageData is null");
         }
     }
 
-    public void openFilmScene(String filmFxmlPath) {
+    // Updated to accept filmId
+    public void openFilmScene(int filmId) {
+        ImageView screenshotView = captureScreenshotView();
+        PageData filmDetail = loadDynamicBody(FILM_SCENE_PATH);
 
-        ImageView screenshotView = deletedynamicbody();
-
-        PageData filmDetail = loadDynamicBody(filmFxmlPath);
-
-        if (filmDetail != null) {
-            FilmSceneController filmController = ((FilmSceneController) filmDetail.controller());
+        if (filmDetail != null && filmDetail.controller() instanceof FilmSceneController filmController) {
             filmController.setProperties(screenshotView, this);
-            savedScene = root;
+            //filmController.loadFilmData(filmId);
+            this.savedPageData = this.currentScene;
+
             root.getChildren().clear();
-            root.getChildren().add(filmDetail.node);
+            root.getChildren().add(filmDetail.node());
+        } else {
+            System.err.println("MainPagesController: Failed to load film scene");
         }
     }
 
-
-
-    /**
-     * Transitions to a new page with a fade effect
-     * @param newPage The page to transition to
-     */
     private void transitionToPage(PageData newPage) {
-        if (newPage == null || transitionInProgress) {
+        if (newPage == null || newPage.node() == null || transitionInProgress) {
+            if (newPage == null || newPage.node() == null) hideLoadingSpinner();
             return;
         }
 
         transitionInProgress = true;
 
-        // If there's already content (besides the loading overlay), fade it out first
-        if (body.getChildren().size() > 1) {
-            FadeTransition fadeOut = new FadeTransition(Duration.millis(FADE_DURATION),
-                    body.getChildren().get(0));
+        Node currentNode = null;
+        for(Node child : body.getChildren()){
+            if(child != loadingOverlay){
+                currentNode = child;
+                break;
+            }
+        }
+
+        if (currentNode != null) {
+            FadeTransition fadeOut = new FadeTransition(Duration.millis(FADE_DURATION), currentNode);
             fadeOut.setFromValue(1.0);
             fadeOut.setToValue(0.0);
+            Node finalCurrentNode = currentNode;
             fadeOut.setOnFinished(e -> {
-                // Remove all children except the loading overlay
-                body.getChildren().removeIf(node -> node != loadingOverlay);
+                body.getChildren().remove(finalCurrentNode);
                 showNewPage(newPage);
             });
             fadeOut.play();
@@ -419,177 +408,123 @@ public class MainPagesController {
         }
     }
 
-    /**
-     * Shows a new page with a fade-in effect
-     * @param newPage The page to show
-     */
     private void showNewPage(PageData newPage) {
-        Node pageNode = newPage.node;
+        Node pageNode = newPage.node();
         pageNode.setOpacity(0);
+        if (pageNode != loadingOverlay)
+            body.getChildren().addFirst(pageNode);
 
-        // Add the new page below the loading overlay
-        body.getChildren().add(0, pageNode);
 
-        // Create fade-in animation
+
         FadeTransition fadeIn = new FadeTransition(Duration.millis(FADE_DURATION), pageNode);
         fadeIn.setFromValue(0.0);
         fadeIn.setToValue(1.0);
         fadeIn.setOnFinished(e -> {
             currentScene = newPage;
             transitionInProgress = false;
-            // Hide the loading spinner after page transition is complete
             hideLoadingSpinner();
         });
         fadeIn.play();
     }
 
-    /**
-     * Creates film card nodes from a list of content
-     * @param contentList List of content to create nodes for
-     * @param isVertical Whether to use vertical or horizontal layout
-     * @return List of content nodes
-     * @throws IOException If loading fails
-     */
     public List<Node> createFilmNodes(List<Content> contentList, boolean isVertical) throws IOException {
         List<Node> nodes = new ArrayList<>(contentList.size());
         String cardPath = isVertical ? PATH_CARD_VERTICAL : PATH_CARD_HORIZONTAL;
 
         for (Content content : contentList) {
-            try {
-                FXMLLoader fxmlLoader = new FXMLLoader(
-                        Objects.requireNonNull(getClass().getResource(cardPath)),
-                        resourceBundle
-                );
-
-                Node node = fxmlLoader.load();
-                FilmCardController filmCardController = fxmlLoader.getController();
-                filmCardController.setContent(content);
-
-                // Set click handler
-                node.setOnMouseClicked(e -> cardClicked(filmCardController.getCardId()));
-                nodes.add(node);
-            } catch (IOException e) {
-                System.err.println("MainPagesController: Failed to load content");
-                throw e; // Re-throw to maintain original behavior
-            }
+            FXMLLoader fxmlLoader = new FXMLLoader(
+                    Objects.requireNonNull(getClass().getResource(cardPath), "FXML resource for card not found: " + cardPath),
+                    resourceBundle
+            );
+            Node node = fxmlLoader.load();
+            FilmCardController filmCardController = fxmlLoader.getController();
+            filmCardController.setContent(content);
+            node.setOnMouseClicked(e -> cardClicked(filmCardController.getCardId()));
+            nodes.add(node);
         }
-
         return nodes;
     }
 
-    /**
-     * Handles card click events
-     * @param cardId The ID of the clicked card
-     */
     public void cardClicked(int cardId) {
-        openFilmScene("/com/esa/moviestar/movie_view/filmScene.fxml");
+        openFilmScene(cardId);
     }
 
-    /**
-     * Plays the content associated with the card
-     * @param cardId The ID of the card
-     */
     public void cardClickedPlay(int cardId) {
         // Implement playback functionality
+        System.out.println("Play card clicked (not implemented): " + cardId);
     }
 
-    /**
-     * Opens user settings - Updated to include account parameter
-     * @param user The current user
-     * @param account The current account
-     */
     public void settingsClick(Utente user, Account account) {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/esa/moviestar/settings/settings-view.fxml"), resourceBundle);
             Parent settingContent = loader.load();
-
             SettingsViewController settingsViewController = loader.getController();
             settingsViewController.setUtente(user);
-            settingsViewController.setAccount(account);
+            settingsViewController.setAccount(account); // Pass account
 
-            Scene currentScene = body.getScene();
-            Scene newScene = new Scene(settingContent, currentScene.getWidth(), currentScene.getHeight());
-
-            Stage stage = (Stage) body.getScene().getWindow();
+            Scene currentSceneNode = body.getScene(); // Use body.getScene() for consistency
+            Scene newScene = new Scene(settingContent, currentSceneNode.getWidth(), currentSceneNode.getHeight());
+            Stage stage = (Stage) currentSceneNode.getWindow();
             stage.setScene(newScene);
-
         } catch (IOException e) {
-            System.err.println("MainPagesController: Errore caricamento pagina dei setting" + e.getMessage());
+            System.err.println("MainPagesController: Errore caricamento pagina dei setting: " + e.getMessage());
         }
     }
 
-    /**
-     * Handles email click events
-     */
     public void emailClick() {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/esa/moviestar/login/access.fxml"), resourceBundle);
             Parent accessContent = loader.load();
-
-            Scene currentScene = body.getScene();
-            Scene newScene = new Scene(accessContent, currentScene.getWidth(), currentScene.getHeight());
-
-            Stage stage = (Stage) body.getScene().getWindow();
+            Scene currentSceneNode = body.getScene();
+            Scene newScene = new Scene(accessContent, currentSceneNode.getWidth(), currentSceneNode.getHeight());
+            Stage stage = (Stage) currentSceneNode.getWindow();
             stage.setScene(newScene);
         } catch (IOException ex) {
             System.err.println("MainPagesController: Errore caricamento pagina di accesso dell'account: " + ex.getMessage());
         }
     }
 
-    /**
-     * Changes the current profile
-     * @param user The user to switch to
-     */
-    public void profileClick(Utente user) {
-        // Evita problemi se già in transizione
-        if (transitionInProgress) {
-            return;
-        }
+    public void profileClick(Utente newUser) {
+        if (transitionInProgress) return;
 
-        // Ferma il loading se attivo
-        if (loadingSpinner != null) {
-            loadingSpinner.stopAnimation();
-        }
+        if (loadingSpinner != null) loadingSpinner.stopAnimation();
 
-        // Pulisci tutto
-        body.getChildren().clear();
-        headerContainer.getChildren().clear();
+        // Clear main containers
+        if (body != null) body.getChildren().clear();
+        if (headerContainer != null) headerContainer.getChildren().clear();
 
-        // Reset variabili - IMPORTANTE: resetta tutto
+        // Reset page data and state
         header = null;
-        savedScene = null;
         home = null;
         filter_film = null;
         filter_series = null;
         currentScene = null;
-        transitionInProgress = false;
-        loadingOverlay = null;
+        pageBeforeSearch = null;
+        savedPageData = null; // Reset this too
+        loadingOverlay = null; // Will be recreated by initialize
+        // transitionInProgress will be reset by initialize->showLoadingSpinner->transitionToPage flow
 
-        // Aggiorna utente PRIMA di ricaricare
-        this.user = user;
+        this.user = newUser; // Update to the new user
 
-        // Ricostruisci tutto da zero
-        initialize(); // Ricrea il loadingOverlay
-        first_load(user, account); // Questo ricaricherà header e home per il nuovo utente
+        initialize(); // Recreates loadingOverlay, shows spinner
+        first_load(this.user, this.account); // Reloads header and home for the new user
     }
 
     public void createProfileUser(Account account){
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/esa/moviestar/profile/create-profile-view.fxml"), resourceBundle);
             Parent createContent = loader.load();
-
             CreateProfileController createProfileController = loader.getController();
             createProfileController.setOrigine(CreateProfileController.Origine.HOME);
             createProfileController.setAccount(account);
-            createProfileController.setUtente(user);
+            createProfileController.setUtente(this.user); // Pass current user context
 
-            Scene currentScene = body.getScene();
-            Scene newScene = new Scene(createContent, currentScene.getWidth(), currentScene.getHeight());
-
-            Stage stage = (Stage) body.getScene().getWindow();
+            Scene currentSceneNode = body.getScene();
+            Scene newScene = new Scene(createContent, currentSceneNode.getWidth(), currentSceneNode.getHeight());
+            Stage stage = (Stage) currentSceneNode.getWindow();
             stage.setScene(newScene);
         }catch(IOException e){
-            System.err.println("MainPagesController : errore caricamento pagina di creazione profili"+e.getMessage());
+            System.err.println("MainPagesController : errore caricamento pagina di creazione profili: " + e.getMessage());
         }
     }
 }
