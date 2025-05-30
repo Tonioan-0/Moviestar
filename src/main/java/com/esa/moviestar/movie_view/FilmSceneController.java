@@ -391,7 +391,7 @@ public class FilmSceneController {
         seasonsContainer.setManaged(true);
 
         String currentSeasonName = seasonNames.get(currentSeasonIndex);
-        seasonsDropdownButton.setText(currentSeasonName + (isDropdownOpen ? " \u25B2" : " \u25BC")); // Up/Down arrows
+        seasonsDropdownButton.setText(currentSeasonName + (isDropdownOpen ? " ▲" : " ▼")); // Up/Down arrows
 
         seasonsDropdownMenu.getChildren().clear();
         for (int i = 0; i < seasonNames.size(); i++) {
@@ -646,8 +646,8 @@ public class FilmSceneController {
 
     private ColorAdjust setColorBackground() {
         ColorAdjust colorAdjust = new ColorAdjust();
-        colorAdjust.setBrightness(-0.65); // Darker
-        colorAdjust.setSaturation(-0.3); // Slightly desaturated
+        colorAdjust.setBrightness(-0.65);
+        colorAdjust.setSaturation(-0.3);
 
         GaussianBlur blur = new GaussianBlur(10); // More blur
         colorAdjust.setInput(blur);

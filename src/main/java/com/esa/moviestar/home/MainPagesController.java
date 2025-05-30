@@ -29,6 +29,8 @@ import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 
+import static com.esa.moviestar.login.AnimationUtils.*;
+
 public class MainPagesController {
     private static final double FADE_DURATION = 300; // milliseconds
 
@@ -54,7 +56,7 @@ public class MainPagesController {
     private Utente user;
     private Account account;
     private PageData header;
-    private Node savedSceneNode; // Missing in first file
+    private Node savedScene;
     private PageData home;
     private PageData filter_film;
     private PageData filter_series;
@@ -166,7 +168,6 @@ public class MainPagesController {
             PageData search = loadDynamicBody("search.fxml");
             if (search != null) {
                 try {
-                    // Updated method name from second file
                     ((SearchController) search.controller).set_paramcontroller((HeaderController) header.controller, user, resourceBundle, this);
                     body.getChildren().clear();
                     body.getChildren().add(search.node);
@@ -339,12 +340,9 @@ public class MainPagesController {
      * MISSING FUNCTION: Captures screenshot and prepares for film scene overlay
      * @return ImageView containing the screenshot
      */
-    private ImageView deletedynamicbody() {
-        // Store the current scene node for later restoration
-        Node savedNode = root;
 
-        // Add a new field to the class to store this for later
-        this.savedSceneNode = savedNode;
+    private ImageView deletedynamicbody() {
+
         // Create a screenshot of the current scene
         Stage stage = (Stage) root.getScene().getWindow();
         Scene scene = stage.getScene();
@@ -354,51 +352,38 @@ public class MainPagesController {
         scene.snapshot(screenshot);
         ImageView screenshotView = new ImageView(screenshot);
 
-        // Clear current contents to prepare for the new overlay
-        body.getChildren().clear();
-
         return screenshotView;
     }
 
-    /**
-     * MISSING FUNCTION: Restores the previously saved scene
-     */
     public void restorePreviousScene() {
-        if (savedSceneNode != null) {
-            System.out.println("Restoring previous scene");
-            // Apply fade-out transition
-            FadeTransition fadeOut = new FadeTransition(Duration.millis(FADE_DURATION), body);
-            fadeOut.setFromValue(1.0);
-            fadeOut.setToValue(0.0);
-            fadeOut.setOnFinished(e -> {
+        if (currentScene != null) {
+            System.out.println("Restoring previous scene with slide animation");
 
-                root = (AnchorPane) savedSceneNode;
+            root.getChildren().clear();
 
-                // Apply fade-in transition
-                FadeTransition fadeIn = new FadeTransition(Duration.millis(FADE_DURATION), body);
-                fadeIn.setFromValue(0.0);
-                fadeIn.setToValue(1.0);
-                fadeIn.play();
-            });
-            fadeOut.play();
+            root= (AnchorPane) savedScene;
+
+            if (loadingOverlay != null) {
+                body.getChildren().add(loadingOverlay);
+            }
+            slideInFromLeft(root);
+
+            savedScene = null;
+        } else {
+            System.err.println("Cannot restore scene: currentScene is null");
         }
     }
 
-    /**
-     * MISSING FUNCTION: Opens film scene with background screenshot
-     * @param filmFxmlPath Path to the film FXML file
-     */
     public void openFilmScene(String filmFxmlPath) {
-        // Capture screenshot and clean scene
-        ImageView screenshotView = deletedynamicbody();
 
-        // Load film detail
+        ImageView screenshotView = deletedynamicbody();
 
         PageData filmDetail = loadDynamicBody(filmFxmlPath);
 
         if (filmDetail != null) {
             FilmSceneController filmController = ((FilmSceneController) filmDetail.controller());
             filmController.setProperties(screenshotView, this);
+            savedScene = root;
             root.getChildren().clear();
             root.getChildren().add(filmDetail.node);
         }
@@ -497,35 +482,7 @@ public class MainPagesController {
      * @param cardId The ID of the clicked card
      */
     public void cardClicked(int cardId) {
-        if (transitionInProgress) {
-            return;
-        }
-
-        CompletableFuture.runAsync(() -> {
-            showLoadingSpinner();
-            try {
-                FXMLLoader loader = new FXMLLoader(
-                        getClass().getResource("/com/esa/moviestar/movie_view/filmInterface.fxml"),
-                        resourceBundle
-                );
-
-                Node filmInterface = loader.load();
-
-                // Set anchors
-                AnchorPane.setBottomAnchor(filmInterface, 0.0);
-                AnchorPane.setTopAnchor(filmInterface, 0.0);
-                AnchorPane.setLeftAnchor(filmInterface, 0.0);
-                AnchorPane.setRightAnchor(filmInterface, 0.0);
-
-                // Create film page data
-                PageData filmPage = new PageData(filmInterface, loader.getController());
-
-                Platform.runLater(() -> transitionToPage(filmPage));
-            } catch (IOException e) {
-                hideLoadingSpinner();
-                System.err.println("Failed to load film interface for card ID: " + cardId + "\n" + e.getMessage());
-            }
-        });
+        openFilmScene("/com/esa/moviestar/movie_view/filmScene.fxml");
     }
 
     /**
@@ -600,7 +557,7 @@ public class MainPagesController {
 
         // Reset variabili - IMPORTANTE: resetta tutto
         header = null;
-        savedSceneNode = null;
+        savedScene = null;
         home = null;
         filter_film = null;
         filter_series = null;

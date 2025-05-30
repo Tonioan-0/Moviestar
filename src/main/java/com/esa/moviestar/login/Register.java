@@ -134,34 +134,8 @@ public class Register {
         StackPane.setAlignment(togglePasswordButton, Pos.CENTER_RIGHT);
         StackPane.setMargin(togglePasswordButton, new Insets(0, 10, 0, 0));
 
-        syncPasswordFieldWidths();
-
-        // Add listener to maintain width sync when email field changes
-        emailField.widthProperty().addListener((obs, oldWidth, newWidth) -> syncPasswordFieldWidths());
-        emailField.prefWidthProperty().addListener((obs, oldWidth, newWidth) -> syncPasswordFieldWidths());
     }
 
-    private void syncPasswordFieldWidths() {
-        // Get email field dimensions
-        double emailWidth = emailField.getWidth();
-        double emailPrefWidth = emailField.getPrefWidth();
-        double emailMinWidth = emailField.getMinWidth();
-        double emailMaxWidth = emailField.getMaxWidth();
-
-        // Apply same dimensions to password fields
-        passwordField.setPrefWidth(emailPrefWidth);
-        passwordField.setMinWidth(emailMinWidth);
-        passwordField.setMaxWidth(emailMaxWidth);
-
-        passwordTextField.setPrefWidth(emailPrefWidth);
-        passwordTextField.setMinWidth(emailMinWidth);
-        passwordTextField.setMaxWidth(emailMaxWidth);
-
-        // Set container width to match email field
-        passwordContainer.setPrefWidth(emailPrefWidth);
-        passwordContainer.setMinWidth(emailMinWidth);
-        passwordContainer.setMaxWidth(emailMaxWidth);
-    }
 
     private void togglePasswordVisibility() {
         isPasswordVisible = !isPasswordVisible;
@@ -298,8 +272,6 @@ public class Register {
                 passwordTextField.setMaxWidth(fieldWidth);
                 passwordContainer.setMaxWidth(fieldWidth);
 
-                // Force synchronization after layout changes
-                syncPasswordFieldWidths();
 
                 double buttonWidth = Math.min(availableWidth, registerWidth * 0.6);
                 buttonWidth = Math.max(buttonWidth, 100);
@@ -349,7 +321,7 @@ public class Register {
         return password_regex;
     }
 
-    private String hashPassword(String plainTextPassword) {
+    public static String hashPassword(String plainTextPassword) {
         return BCrypt.hashpw(plainTextPassword, BCrypt.gensalt(BCRYPT_ROUNDS));
     }
 
