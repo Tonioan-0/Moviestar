@@ -25,6 +25,8 @@ import javafx.stage.Stage;
 import java.io.IOException;
 import java.util.ResourceBundle;
 
+import static com.esa.moviestar.login.Access.verifyPassword;
+
 public class AccountSettingController {
     @FXML
     private GridPane accountContentSetting;
@@ -96,10 +98,9 @@ public class AccountSettingController {
             contenitore.getChildren().add(userPopUp);
 
             userPopUp.getDeleteButton().setOnMouseClicked(e->{
-                if(userPopUp.getPasswordField().getText().equals(account.getPassword())){
+                if(verifyPassword(userPopUp.getPasswordField().getText(),(account.getPassword()))){
                     UtenteDao utenteDao = new UtenteDao();
                     utenteDao.rimuoviUtente(utente.getID());
-                    System.out.println("numero di profili che hai all'interno del tuo account : "+utenteDao.contaProfiliPerEmail(account.getEmail()));
                     if(utenteDao.contaProfiliPerEmail(account.getEmail())>0){
                         System.out.println("hai eliminato un profilo , te ne restano "+utenteDao.contaProfiliPerEmail(account.getEmail()));
                         try {
@@ -136,10 +137,15 @@ public class AccountSettingController {
                             System.err.println("AccountSettingController : errore nel ritornare alla pagina di creazione di un profilo "+ex.getMessage());
                         }
                     }
-                }else{
-                    System.err.println("password sbagliata");
-                    userPopUp.getPasswordBox().getChildren().add(passwordErrata);
+                }else {
+                    if (!userPopUp.getPasswordBox().getChildren().contains(passwordErrata)) {
+                        userPopUp.getPasswordBox().getChildren().add(passwordErrata);
+                    }
                     AnimationUtils.shake(passwordErrata);
+                    System.out.println("user debug "+account.getPassword());
+                    System.out.println("user debug "+userPopUp.getPasswordField().getText());
+
+                    System.out.println("Errore nell'eliminazione dell'account, password sbagliata.");
                 }
             });
 
@@ -162,9 +168,11 @@ public class AccountSettingController {
             contenitore.getChildren().add(accountPopUp);
 
             accountPopUp.getDeleteButton().setOnMouseClicked(e -> {
-                if (accountPopUp.getPasswordField().getText().equals(account.getPassword())) {
+                if (verifyPassword(accountPopUp.getPasswordField().getText(),(account.getPassword()))) {
                     AccountDao accountDao = new AccountDao();
                     accountDao.rimuoviAccount(account.getEmail());
+                    UtenteDao utenteDao = new UtenteDao();
+                    utenteDao.rimuoviUtenteEmail(account.getEmail());
                         try {
                             FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/esa/moviestar/login/access.fxml"), resourceBundle);
                             Parent accessContent = loader.load();
@@ -178,10 +186,14 @@ public class AccountSettingController {
                             System.err.println("AccountSettingController: Errore caricamento pagina di accesso dell'account: " + ex.getMessage());
                         }
                     } else {
-                        accountPopUp.getPasswordBox().getChildren().add(passwordErrata);
+                        if (!accountPopUp.getPasswordBox().getChildren().contains(passwordErrata)) {
+                            accountPopUp.getPasswordBox().getChildren().add(passwordErrata);
+                        }
                         AnimationUtils.shake(passwordErrata);
-                        System.out.println("Errore nell'eliminazione dell'account , password sbagliata.");
-                    }
+                        System.out.println("account debug "+account.getPassword());
+                        System.out.println("account debug "+accountPopUp.getPasswordField().getText());
+                        System.out.println("Errore nell'eliminazione dell'account, password sbagliata.");
+                }
             });
 
             accountPopUp.getCancelButton().setOnMouseClicked(e -> {
@@ -238,6 +250,7 @@ public class AccountSettingController {
             }
         });
     }
+
 
     private void setPasswordWarning(){
         passwordErrata  = new Label();

@@ -27,6 +27,9 @@ import java.sql.SQLException;
 import java.util.ResourceBundle;
 import java.util.regex.Pattern;
 
+import static com.esa.moviestar.login.Access.verifyPassword;
+import static com.esa.moviestar.login.ResetController.hashPassword;
+
 public class UpdatePasswordController {
     @FXML
     private PasswordField oldPasswordField;  // Qui vecchia password
@@ -117,12 +120,16 @@ public class UpdatePasswordController {
         }
 
         AccountDao dao = new AccountDao();
-        boolean oldPasswordCorrect = dao.checkPassword(account.getEmail(), oldPassword);
-        if (!oldPasswordCorrect) {
-            updateStatus("The old password is incorrect.");
-            warningText.setText("The old password is incorrect.");
-            AnimationUtils.shake(warningText);
-            return;
+        if(verifyPassword(account.getPassword(), oldPassword)){
+            boolean oldPasswordCorrect = dao.checkPassword(account.getEmail(), oldPassword);
+            if (!oldPasswordCorrect) {
+                updateStatus("The old password is incorrect.");
+                warningText.setText("The old password is incorrect.");
+                AnimationUtils.shake(warningText);
+                return;
+            }
+        }else{
+            System.out.println("errore");
         }
 
         if (!newPassword.equals(confirmPassword)) {
@@ -156,7 +163,7 @@ public class UpdatePasswordController {
 
     private void cambiaPassword(String email, String newPassword) throws SQLException {
         AccountDao dao = new AccountDao();
-        dao.updatePassword(email, newPassword);
+        dao.updatePassword(email, hashPassword(newPassword));
     }
 
     private void updateStatus(String message) {
