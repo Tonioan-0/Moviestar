@@ -389,6 +389,7 @@ public class Register {
                 CreateProfileController createProfileController = loader.getController();
 
                 createProfileController.setAccount(account);
+                createProfileController.setOrigine(CreateProfileController.Origine.REGISTER);
 
                 Scene currentScene = mainContainer.getScene();
                 Scene newScene = new Scene(homeContent, currentScene.getWidth(), currentScene.getHeight());
