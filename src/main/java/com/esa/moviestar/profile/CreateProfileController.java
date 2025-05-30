@@ -38,20 +38,23 @@ public class CreateProfileController {
     @FXML Button saveButton;
     @FXML Button cancelButton;
     @FXML Label warningText;
-    @FXML private Label errorText;
-    @FXML private VBox imageContainer;
+    @FXML Label errorText;
+    @FXML VBox imageContainer;
+    @FXML HBox buttonContainer;
 
     private Group originalProfileImage;
     private int codImmagineCorrente;
     private Account account;
     private Origine origine;
     private Utente utente;
+    private UtenteDao dao;
 
     public final ResourceBundle resourceBundle = ResourceBundle.getBundle("com.esa.moviestar.images.svg-paths.general-svg");
 
     public enum Origine{
         HOME,
         PROFILE,
+        REGISTER;
     }
 
     public void setAccount(Account account) {
@@ -127,9 +130,10 @@ public class CreateProfileController {
     }
 
     public void initialize() {
+        dao=new UtenteDao();
         impostaUI();
         creaGalleriaImmagini();
-        impostaBehaviorBottoni();
+        impostaBottoni();
     }
 
     private void impostaUI() {
@@ -192,12 +196,14 @@ public class CreateProfileController {
         setupImageProfile(imageScroll4);
     }
 
-    private void impostaBehaviorBottoni() {
-        cancelButton.setOnMouseClicked(e -> {//Se cliccato è un evento irreversibile
+    private void impostaBottoni() {
+        cancelButton.setOnMouseClicked(e -> {
             if(origine==Origine.HOME){
                 tornaAllaHome();
             }else if (origine==Origine.PROFILE) {
                 tornaAiProfili();
+            }else if (origine==Origine.REGISTER || dao.contaProfiliPerEmail(account.getEmail())==0) {
+                textName.setText("");
             }
         });
 

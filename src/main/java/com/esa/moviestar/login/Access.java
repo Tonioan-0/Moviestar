@@ -320,7 +320,7 @@ public class Access {
      * @return true if the password matches, false otherwise
      */
     // From first code
-    private static boolean verifyPassword(String plainTextPassword, String hashedPassword) {
+    public static boolean verifyPassword(String plainTextPassword, String hashedPassword) {
         try {
             return BCrypt.checkpw(plainTextPassword, hashedPassword);
         } catch (IllegalArgumentException e) {

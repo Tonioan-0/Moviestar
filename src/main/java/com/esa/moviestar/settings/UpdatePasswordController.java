@@ -28,7 +28,7 @@ import java.util.ResourceBundle;
 import java.util.regex.Pattern;
 
 import static com.esa.moviestar.login.Access.verifyPassword;
-import static com.esa.moviestar.login.ResetController.hashPassword;
+import static com.esa.moviestar.login.Register.hashPassword;
 
 public class UpdatePasswordController {
     @FXML

@@ -10,7 +10,7 @@
     <children>
         <BorderPane AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
             <left>
-                <VBox maxWidth="400.0" prefHeight="378.0" prefWidth="383.0" spacing="45.0" styleClass="surface-opaque" BorderPane.alignment="TOP_LEFT" VBox.vgrow="ALWAYS">
+                <VBox prefHeight="380.0" prefWidth="300.0" spacing="45.0" styleClass="surface-opaque" BorderPane.alignment="TOP_LEFT" VBox.vgrow="ALWAYS">
                <StackPane alignment="TOP_LEFT" prefHeight="129.0" prefWidth="383.0">
                   <children>
                       <SVGPath content="%icon-moviestar-bg" styleClass="surface-solid" />
@@ -20,9 +20,9 @@
                      <Insets left="20.0" top="40.0" />
                   </padding>
                </StackPane>
-                    <VBox spacing="15.0" VBox.vgrow="ALWAYS">
+                    <VBox spacing="25.0" VBox.vgrow="ALWAYS">
                         <children>
-                            <HBox fx:id="userContent" alignment="CENTER_LEFT" maxHeight="70.0" VBox.vgrow="ALWAYS">
+                            <HBox fx:id="userContent" alignment="CENTER_LEFT" minHeight="50.0" style="-fx-background-radius: 0 20 20 0;">
                                 <children>
                                     <SVGPath fx:id="userSVG" content="%user" fill="white" />
                                     <Label fx:id="userText" alignment="CENTER" prefHeight="26.0" prefWidth="73.0" text="Account">
@@ -42,11 +42,13 @@
                         <styleClass>
                            <String fx:value="chips" />
                            <String fx:value="surface-transparent" />
-                           <String fx:value="small-item" />
                            <String fx:value="hboxMenu" />
                         </styleClass>
+                        <VBox.margin>
+                           <Insets right="10.0" />
+                        </VBox.margin>
                             </HBox>
-                            <HBox fx:id="historyContent" alignment="CENTER_LEFT" maxHeight="70.0" VBox.vgrow="ALWAYS">
+                            <HBox fx:id="historyContent" alignment="CENTER_LEFT" minHeight="50.0" style="-fx-background-radius: 0 20 20 0;">
                                 <children>
                                     <SVGPath fx:id="historySVG" content="%history" fill="white" />
                                     <Label fx:id="historyText" prefHeight="26.0" prefWidth="94.0" text="History">
@@ -60,11 +62,33 @@
                         <styleClass>
                            <String fx:value="chips" />
                            <String fx:value="surface-transparent" />
-                           <String fx:value="small-item" />
                            <String fx:value="hboxMenu" />
                         </styleClass>
+                        <VBox.margin>
+                           <Insets right="10.0" />
+                        </VBox.margin>
                             </HBox>
-                            <HBox fx:id="privacy" alignment="CENTER_LEFT" maxHeight="70.0" VBox.vgrow="ALWAYS">
+                     <HBox fx:id="watchList" alignment="CENTER_LEFT" minHeight="50.0" style="-fx-background-radius: 0 20 20 0;">
+                        <children>
+                           <SVGPath fx:id="watchlistIcon" content="%watchlist" fill="white" />
+                           <Label fx:id="watchListText" prefHeight="26.0" prefWidth="94.0" text="Watchlist">
+                              <styleClass>
+                                 <String fx:value="bold-text" />
+                                 <String fx:value="medium-text" />
+                                 <String fx:value="on-primary" />
+                              </styleClass>
+                           </Label>
+                        </children>
+                        <styleClass>
+                           <String fx:value="chips" />
+                           <String fx:value="surface-transparent" />
+                           <String fx:value="hboxMenu" />
+                        </styleClass>
+                        <VBox.margin>
+                           <Insets right="10.0" />
+                        </VBox.margin>
+                     </HBox>
+                            <HBox fx:id="privacy" alignment="CENTER_LEFT" minHeight="50.0" style="-fx-background-radius: 0 20 20 0;">
                                 <children>
                                     <SVGPath content="%privacy" fill="white" />
                                     <Label prefHeight="26.0" prefWidth="166.0" text="Privacy &amp; Terms">
@@ -78,11 +102,13 @@
                         <styleClass>
                            <String fx:value="chips" />
                            <String fx:value="surface-transparent" />
-                           <String fx:value="small-item" />
                            <String fx:value="hboxMenu" />
                         </styleClass>
+                        <VBox.margin>
+                           <Insets right="10.0" />
+                        </VBox.margin>
                             </HBox>
-                            <HBox fx:id="about" alignment="CENTER_LEFT" maxHeight="70.0" VBox.vgrow="ALWAYS">
+                            <HBox fx:id="about" alignment="CENTER_LEFT" minHeight="50.0" style="-fx-background-radius: 0 20 20 0;">
                                 <children>
                                     <SVGPath content="%about" fill="white" />
                                     <Label text="About &amp; Support ">
@@ -96,15 +122,27 @@
                         <styleClass>
                            <String fx:value="chips" />
                            <String fx:value="surface-transparent" />
-                           <String fx:value="small-item" />
                            <String fx:value="hboxMenu" />
                         </styleClass>
+                        <VBox.margin>
+                           <Insets right="10.0" />
+                        </VBox.margin>
                             </HBox>
                         </children>
-                  <padding>
-                     <Insets right="20.0" />
-                  </padding>
                     </VBox>
+               <VBox alignment="CENTER_LEFT" styleClass="chips">
+                  <children>
+                     <Separator opacity="0.2" />
+                     <HBox fx:id="githubIcon" alignment="CENTER_LEFT">
+                        <children>
+                           <SVGPath content="%github" fill="white" />
+                        </children>
+                     </HBox>
+                  </children>
+                  <VBox.margin>
+                     <Insets bottom="10.0" />
+                  </VBox.margin>
+               </VBox>
                 </VBox>
             </left>
             <center>
