@@ -4,11 +4,13 @@ import com.esa.moviestar.database.UtenteDao;
 import com.esa.moviestar.components.PopupMenu;
 import com.esa.moviestar.model.Account;
 import com.esa.moviestar.model.Utente;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
 import javafx.scene.Group;
 import javafx.scene.Node;
 import javafx.scene.control.TextField;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
@@ -52,25 +54,24 @@ public class HeaderController {
         currentActive = homeButton;
         currentActive.getStyleClass().remove("surface-transparent");
         currentActive.getStyleClass().add("primary");
-        tbxSearch.setPromptText("Titoli, persone, generi");
+        tbxSearch.setPromptText("Titles, persons, genres");
         profileImage.setOnMouseClicked(e -> popupMenu.show(profileImage));
-        homeButton.setOnMouseReleased(e -> activeButton(homeButton));
-        filmButton.setOnMouseReleased(e -> activeButton(filmButton));
-        seriesButton.setOnMouseReleased(e -> activeButton(seriesButton));
-        searchButton.setOnMouseReleased(e -> {
-            if(currentActive==searchButton)
-                return;
-            currentActive.getStyleClass().remove("primary");
-            currentActive.getStyleClass().add("surface-transparent");
-            currentActive=searchButton;
-            searchButton.getStyleClass().remove("surface-transparent");
-            searchButton.getStyleClass().add("surface-dim");
-        });
         rootHeader.widthProperty().addListener((observable, oldValue, newValue) -> {
             titleImageContainer.setVisible(!(newValue.doubleValue() < 720));
         });
-
+        tbxSearch.onMouseClickedProperty().bindBidirectional(searchButton.onMouseClickedProperty());
     }
+
+    public void activeSearch() {
+        if(currentActive==searchButton)
+            return;
+        currentActive.getStyleClass().remove("primary");
+        currentActive.getStyleClass().add("surface-transparent");
+        currentActive=searchButton;
+        searchButton.getStyleClass().remove("surface-transparent");
+        searchButton.getStyleClass().add("surface-dim");
+    }
+
     public void setUpPopUpMenu(MainPagesController father, Utente user, Account account){
         UtenteDao utenteDao = new UtenteDao();
         List<Utente> users = utenteDao.recuperaTuttiGliUtenti(user.getEmail());
@@ -141,9 +142,9 @@ public class HeaderController {
         }};
         settingsItem.getChildren().addAll(profileIcon, text);
         settingsItem.setOnMouseClicked(e -> {
-            father.settingsClick(user,account);
-            popupMenu.close();
-        }
+                    father.settingsClick(user,account);
+                    popupMenu.close();
+                }
         );
 
         popupMenu.addItem(settingsItem);

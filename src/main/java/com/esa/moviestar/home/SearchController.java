@@ -98,7 +98,7 @@ public class SearchController {
                 // Bottone con titolo del contenuto
                 Button dynamicButton = new Button(suggestedContent.get(i).getTitle());
                 dynamicButton.getStyleClass().addAll("register-text-raccomendations-mid");
-                dynamicButton.setOnAction(event-> setupController.openFilmScene("/com/esa/moviestar/movie_view/filmScene.fxml"));
+                dynamicButton.setOnAction(event-> setupController.openFilmScene(1));///////////////////////////////////////////////////////////////////////////////////////////////////////////qiua serve l'id del contenuto
 
                 itemContainer.getChildren().add(dynamicButton);
 
