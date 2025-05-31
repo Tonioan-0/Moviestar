@@ -3,6 +3,8 @@ package com.esa.moviestar.database;
 import com.esa.moviestar.model.Utente;
 
 import java.sql.*;
+import java.time.LocalDate;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -19,13 +21,14 @@ public class UtenteDao {
 
     // Inserimento di un nuovo utente
     public void inserisciUtente(Utente utente){
-        String query = "INSERT INTO Utente (Nome, Gusti, Email, Icona) VALUES (?, ?, ?, ?);";
+        String query = "INSERT INTO Utente (Nome, Gusti, Email, Icona, DataRegistrazione) VALUES (?, ?, ?, ?, ?);";
 
         try (PreparedStatement stmt = connection.prepareStatement(query)) {
             stmt.setString(1, utente.getNome());
             stmt.setString(2, utente.getGusti());
             stmt.setString(3, utente.getEmail());
             stmt.setInt(4, utente.getIDIcona());
+            stmt.setString(5,utente.getDataRegistrazione().toString());
             stmt.executeUpdate();
             System.out.println("UtenteDao : utente inserito : "+utente.getNome()+"id utente : "+utente.getID());
         } catch (SQLException e) {
@@ -67,28 +70,6 @@ public class UtenteDao {
     }
 
     // Ricerca utente tramite codice
-    public Utente cercaUtente(int idUtente) {
-        String query = "SELECT * FROM Utente WHERE ID_Utente = ?;";
-
-        try (PreparedStatement stmt = connection.prepareStatement(query)) {
-            stmt.setInt(1, idUtente);
-            ResultSet rs = stmt.executeQuery();
-
-            if (rs.next()) {
-                return new Utente(
-                        rs.getInt("ID_Utente"),
-                        rs.getString("Nome"),
-                        rs.getString("Gusti"),
-                        rs.getInt("Icona"),
-                        rs.getString("Email")
-                );
-            } else {
-                return null;
-            }
-        } catch (SQLException e) {
-            System.err.println("utenteDao : errore di ricerca dell'utente "+e.getMessage());        }
-        return null;
-    }
 
     public int contaProfiliPerEmail(String email){
         String query = "SELECT COUNT(*) FROM Utente WHERE Email = ?;";
@@ -103,27 +84,6 @@ public class UtenteDao {
         return 0;
     }
 
-    public Utente recuperoUtente(String email,int idUtente)  {
-        String query = "SELECT * FROM Utente WHERE Email = ? AND ID_Utente = ?;";
-        try(PreparedStatement stmt = connection.prepareStatement(query)){
-            stmt.setString(1, email);
-            stmt.setInt(2,idUtente);
-            ResultSet rs = stmt.executeQuery();
-            if (rs.next()) {
-                return new Utente(
-                        rs.getInt("ID_Utente"),
-                        rs.getString("Nome"),
-                        rs.getString("Gusti"),
-                        rs.getInt("Icona"),
-                        rs.getString("Email")
-                );
-            }else {return null;}
-
-        }catch(SQLException e){
-            System.err.println("utenteDao : errore nel recupero delle informazioni dell'utente "+e.getMessage());
-        }
-        return null;
-    }
 
     public int recuperoCodiceUtente(String email) {
         String query = "SELECT ID_Utente FROM Utente WHERE Email = ?;";
@@ -145,24 +105,41 @@ public class UtenteDao {
         String query = "SELECT * FROM Utente WHERE Email = ?;";  // Recupera tutti gli utenti in base all'email
 
         try (PreparedStatement stmt = connection.prepareStatement(query)) {
-            stmt.setString(1,email);
+            stmt.setString(1, email);
             ResultSet rs = stmt.executeQuery();
+
             while (rs.next()) {
-                // Crea un oggetto Utente per ogni record nel risultato della query
+                String dataRegString = rs.getString("DataRegistrazione");
+                LocalDate dataRegistrazione = null;
+
+                if (dataRegString != null && !dataRegString.isEmpty()) {
+                    try {
+                        // Se la data è in formato "yyyy-MM-dd", questa linea va bene:
+                        dataRegistrazione = LocalDate.parse(dataRegString);
+
+                    } catch (DateTimeParseException e) {
+                        System.err.println("Errore parsing data: " + dataRegString + " - " + e.getMessage());
+                    }
+                }
+
                 Utente utente = new Utente(
                         rs.getInt("ID_Utente"),
                         rs.getString("Nome"),
                         rs.getString("Gusti"),
                         rs.getInt("Icona"),
-                        email
+                        email,
+                        dataRegistrazione
                 );
-                utenti.add(utente);  // Aggiungi l'utente alla lista
+                utenti.add(utente);
             }
+
             System.out.println("UtenteDao : Numero di utenti recuperati: " + utenti.size());
         } catch (SQLException e) {
-            System.err.println("utenteDao : errore di recupero lista utenti in base l'email dell'utente "+e.getMessage());}
-        return utenti;  // Restituisci la lista di utenti
+            System.err.println("utenteDao : errore di recupero lista utenti in base all'email dell'utente " + e.getMessage());
+        }
+        return utenti;
     }
+
 
     public boolean aggiornaUtente(Utente utente){
         String query = "UPDATE Utente SET Nome = ? , Icona = ? WHERE ID_Utente=?;";
