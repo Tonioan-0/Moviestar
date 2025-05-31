@@ -3,13 +3,11 @@ package com.esa.moviestar.settings;
 import com.esa.moviestar.home.MainPagesController;
 import com.esa.moviestar.model.Account;
 import com.esa.moviestar.model.Utente;
-import javafx.application.HostServices;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Group;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
@@ -112,7 +110,7 @@ public class SettingsViewController {
 
         historyContent.setOnMouseClicked(event -> {
             evidenziaMenu(historyContent);
-            caricaVista("/com/esa/moviestar/settings/cronologia-setting-view.fxml");
+            caricaVista("/com/esa/moviestar/settings/history-setting-view.fxml");
         });
 
         privacy.setOnMouseClicked(event -> {
@@ -157,7 +155,7 @@ public class SettingsViewController {
                 controller.setContenitore(contenitore);
             }
 
-            if (loader.getController() instanceof CronologiaSettingController controller) {
+            if (loader.getController() instanceof HistorySettingController controller) {
                 controller.setAccount(account);
                 controller.setUtente(utente);
             }

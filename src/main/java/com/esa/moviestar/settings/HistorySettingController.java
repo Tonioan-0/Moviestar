@@ -1,32 +1,24 @@
 package com.esa.moviestar.settings;
 
 
-import com.esa.moviestar.components.ScrollView;
 import com.esa.moviestar.model.Account;
+import com.esa.moviestar.model.Content;
 import com.esa.moviestar.model.Utente;
-import com.esa.moviestar.profile.IconSVG;
 import javafx.fxml.FXML;
-import javafx.scene.Group;
-import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.GridPane;
-import javafx.scene.text.Text;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Node;
+import javafx.scene.layout.VBox;
 
-import java.awt.*;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 import java.util.ResourceBundle;
 
-public class CronologiaSettingController {
-    @FXML
-    private GridPane gridPaneContent;
-    @FXML
-    private AnchorPane anchorPane1;
-    @FXML
-    private ScrollPane scrollPane;
-    @FXML
-    private AnchorPane anchorPane2;
-    @FXML
-    private Label label;
-    @FXML
-    private Text text;
+
+public class HistorySettingController {
+   @FXML
+   private VBox vboxContainer;
 
     private Utente utente;
     private Account account;
@@ -46,6 +38,16 @@ public class CronologiaSettingController {
     public void initialize(){
 
     }
+
+
+
+//
+//    public void addFilmToHistory(Content content) throws IOException {
+//        Node filmNode = createFilmNodes(List.of(content)).get(0);
+//        vboxContainer.getChildren().add(filmNode);
+//    }
+//
+
 
 
 }

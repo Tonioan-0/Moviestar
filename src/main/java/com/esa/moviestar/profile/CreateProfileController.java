@@ -1,6 +1,7 @@
 package com.esa.moviestar.profile;
 
 import java.io.IOException;
+import java.time.LocalDate;
 import java.util.ResourceBundle;
 
 import com.esa.moviestar.database.UtenteDao;
@@ -77,7 +78,8 @@ public class CreateProfileController {
 
     private Utente creaUtente(String nome, int immagine) {
         String gusto = "505050505050505050505050505050505050";
-        return new Utente(nome, immagine, gusto, account.getEmail());
+        LocalDate date = LocalDate.now();
+        return new Utente(nome, immagine, gusto, account.getEmail(),date);
     }
 
     private boolean salvaUtente(Utente utente) {

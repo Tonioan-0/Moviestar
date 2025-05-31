@@ -1,20 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import java.lang.String?>
-<?import javafx.geometry.Insets?>
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.control.ScrollPane?>
-<?import javafx.scene.layout.AnchorPane?>
-<?import javafx.scene.layout.ColumnConstraints?>
-<?import javafx.scene.layout.GridPane?>
-<?import javafx.scene.layout.RowConstraints?>
-<?import javafx.scene.layout.VBox?>
-<?import javafx.scene.text.Text?>
+<?import java.lang.*?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
 
-<GridPane fx:id="watchlistContentSetting" prefHeight="467.0" prefWidth="1228.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.esa.moviestar.settings.WatchListController">
+<GridPane fx:id="watchlistContentSetting" prefHeight="467.0" prefWidth="1228.0" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.esa.moviestar.settings.WatchListController">
     <columnConstraints>
         <ColumnConstraints hgrow="SOMETIMES" maxWidth="600.0" minWidth="0.0" percentWidth="20.0" prefWidth="235.5999755859375" />
-        <ColumnConstraints hgrow="SOMETIMES" minWidth="0.0" />
+        <ColumnConstraints hgrow="ALWAYS" minWidth="0.0" />
         <ColumnConstraints hgrow="SOMETIMES" maxWidth="600.0" minWidth="10.0" percentWidth="20.0" prefWidth="244.80004882812494" />
     </columnConstraints>
     <rowConstraints>
@@ -22,9 +17,9 @@
     </rowConstraints>
     <children>
         <AnchorPane GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.hgrow="NEVER" GridPane.valignment="CENTER" GridPane.vgrow="ALWAYS">
-            <ScrollPane hbarPolicy="NEVER" hmax="0.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+            <ScrollPane fitToWidth="true" hbarPolicy="NEVER" hmax="0.0" vbarPolicy="NEVER" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                 <content>
-                    <VBox alignment="CENTER_LEFT" prefHeight="200.0" prefWidth="100.0" spacing="5.0">
+                    <VBox fx:id="vboxContainer" alignment="CENTER_LEFT" prefHeight="200.0" prefWidth="100.0" spacing="20.0">
                         <children>
                             <Label text="WatchList">
                                 <styleClass>

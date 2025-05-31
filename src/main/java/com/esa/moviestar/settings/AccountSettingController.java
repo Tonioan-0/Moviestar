@@ -66,7 +66,7 @@ public class AccountSettingController {
         Group g = new Group(IconSVG.takeElement(codImmagineCorrente));
         profileImage.getChildren().add(g);
         userName.setText(utente.getNome());
-        registrationDate.setText("Registration Date : "+"21/01/2022");
+        registrationDate.setText(utente.getDataRegistrazione().toString());
         Email.setText("Email : "+utente.getEmail());
         System.out.println("AccountViewController : utente : "+utente.getNome()+" email dell'utente : "+utente.getEmail()+" id utente : "+utente.getID());
         }

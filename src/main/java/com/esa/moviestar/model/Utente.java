@@ -3,6 +3,8 @@ package com.esa.moviestar.model;
 import com.esa.moviestar.database.ContentDao;
 import com.esa.moviestar.profile.IconSVG;
 import javafx.scene.Group;
+
+import java.time.LocalDate;
 import  java.util.List;
 import java.util.Vector;
 
@@ -14,22 +16,25 @@ public class Utente {
     private int idImmagine;        // FOREIGN KEY verso tabella immagine
     private String email;          // FOREIGN KEY verso tabella Account
     private List<Integer> cronologia;
+    private LocalDate dataRegistrazione;
 
     // Costruttore completo (es. DB)
-    public Utente(int codUtente, String nome, String gusti, int idImmagine, String email) {
+    public Utente(int codUtente, String nome, String gusti, int idImmagine, String email,LocalDate dataRegistrazione) {
         this.codUtente = codUtente;
         this.nome = nome;
         this.gusti = gusti;
         this.idImmagine = idImmagine;
         this.email = email;
+        this.dataRegistrazione=dataRegistrazione;
     }
 
     // Costruttore senza codUtente (es.prima di inserimento nel DB)
-    public Utente(String nome, int idImmagine, String gusti, String email) {
+    public Utente(String nome, int idImmagine, String gusti, String email,LocalDate dataRegistrazione) {
         this.nome = nome;
         this.idImmagine = idImmagine;
         this.gusti = gusti;
         this.email = email;
+        this.dataRegistrazione=dataRegistrazione;
     }
 
     // Getter
@@ -42,6 +47,7 @@ public class Utente {
     public List<Integer> getCronologia(){
         return cronologia;
     }
+    public LocalDate getDataRegistrazione(){return dataRegistrazione;}
 
     // Setter
     public void setID(int codUtente) { this.codUtente = codUtente; }
@@ -50,6 +56,7 @@ public class Utente {
     public void setIcona(int idImmagine) { this.idImmagine = idImmagine; }
     public void setEmail(String email) { this.email = email; }
     public void setCronologia(List<Integer> cronologia) { this.cronologia = cronologia; }
+    public void setDataRegistrazione(LocalDate dataRegistrazione){this.dataRegistrazione=dataRegistrazione;}
 
     // Verifica del nome (rimasta invariata)
     public void verificaNomeValido() {
