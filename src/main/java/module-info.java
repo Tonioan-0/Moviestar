@@ -2,11 +2,15 @@ module com.esa.moviestar {
     requires javafx.controls;
     requires javafx.fxml;
     requires jakarta.mail;
-    requires java.sql;
     requires java.desktop;
     requires jbcrypt;
     requires javafx.graphics;
     requires javafx.media;
+    requires java.net.http;
+    requires okhttp3;
+    requires com.google.gson;
+    requires java.sql;
+    requires annotations;
 
     opens com.esa.moviestar to javafx.fxml;
     exports com.esa.moviestar;
@@ -35,4 +39,7 @@ module com.esa.moviestar {
 
     opens com.esa.moviestar.settings to javafx.fxml;
     exports com.esa.moviestar.settings;
+
+    exports com.esa.moviestar.libraries;
+    opens com.esa.moviestar.libraries to javafx.fxml;
 }

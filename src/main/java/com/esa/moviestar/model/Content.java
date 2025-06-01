@@ -10,11 +10,12 @@ public class Content {
     private String title;
     private String plot;
     private String imageUrl;
+    private String posterUrl;
     private String videoUrl;
-    private double duration;
+    private double time;
     private int year;
     private double rating;
-    private int clicks;
+    private int popularity;
     private String country;
     private String releaseDate;
     private boolean isSeries;
@@ -83,12 +84,12 @@ public class Content {
         this.videoUrl = videoUrl;
     }
 
-    public double getDuration() {
-        return duration;
+    public double getTime() {
+        return time;
     }
 
-    public void setDuration(double duration) {
-        this.duration = duration;
+    public void setTime(double time) {
+        this.time = time;
     }
 
     public int getYear() {
@@ -107,12 +108,12 @@ public class Content {
         this.rating = rating;
     }
 
-    public int getClicks() {
-        return clicks;
+    public int getPopularity() {
+        return popularity;
     }
 
-    public void setClicks(int clicks) {
-        this.clicks = clicks;
+    public void setPopularity(int popularity) {
+        this.popularity = popularity;
     }
 
     public String getCountry() {
@@ -171,10 +172,10 @@ public class Content {
                 ", plot='" + plot + '\'' +
                 ", imageUrl='" + imageUrl + '\'' +
                 ", videoUrl='" + videoUrl + '\'' +
-                ", duration=" + duration +
+                ", time=" + time +
                 ", year=" + year +
                 ", rating=" + rating +
-                ", clicks=" + clicks +
+                ", popularity=" + popularity +
                 ", country='" + country + '\'' +
                 ", releaseDate='" + releaseDate + '\'' +
                 ", isSeries=" + isSeries +
@@ -183,5 +184,13 @@ public class Content {
                 ", episodeCount=" + episodeCount +
                 ", categories=" + categories +
                 '}';
+    }
+
+    public String getPosterUrl() {
+        return posterUrl;
+    }
+
+    public void setPosterUrl(String posterUrl) {
+        this.posterUrl = posterUrl;
     }
 }

@@ -4,11 +4,11 @@ import com.esa.moviestar.model.Content;
 import javafx.animation.FadeTransition;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
-import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import javafx.util.Duration;
 
@@ -18,7 +18,7 @@ public class WindowCardController {
     @FXML
     private AnchorPane windowCardRoot;
     @FXML
-    private HBox controlsContainer;
+    private VBox controlsContainer;
     @FXML
     private ImageView imgView;
     @FXML
@@ -27,8 +27,8 @@ public class WindowCardController {
     private HBox infoButton;
     @FXML
     private Text titleLabel;
-    @FXML
-    private Label descriptionLabel;
+    //    @FXML
+//    private Text descriptionLabel;
     @FXML
     private Text ratingLabel;
     private int _id;
@@ -60,7 +60,7 @@ public class WindowCardController {
     public void setContent(Content film){
         _id= film.getId();
         titleLabel.setText(film.getTitle());
-        descriptionLabel.setText(film.getPlot());
+        // descriptionLabel.setText(film.getPlot());
         ratingLabel.setText(String.valueOf(film.getRating()));
         if(!Objects.equals(film.getImageUrl(), "error"))
             imgView.setImage(new Image(film.getImageUrl(),true));

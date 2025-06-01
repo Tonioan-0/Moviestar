@@ -31,6 +31,7 @@ public class CarouselSkin extends SkinBase<Carousel> {
     private static final double SCREEN_HEIGHT_PERCENTAGE = 0.6;
     private static final Duration AUTO_ROTATION_INTERVAL = Duration.seconds(10);
     private static final double DEFAULT_SIZE = 16;
+
     // --- UI Components ---
     private final VBox mainContainer;
     private final HBox cardsContainer;
@@ -150,7 +151,7 @@ public class CarouselSkin extends SkinBase<Carousel> {
 
     private void updateDynamicLayoutValues() {
         double width = cardWrappers.stream().mapToDouble(node -> node.getBoundsInLocal().getWidth()).max().orElse(0);
-        if (width <= 0) 
+        if (width <= 0)
             return;
         double dynamicCardOverlap = width * CARD_OVERLAP;
         cardsContainer.setSpacing(-dynamicCardOverlap);
@@ -399,9 +400,9 @@ public class CarouselSkin extends SkinBase<Carousel> {
                 targetTranslateX = goingRight ? 0 : dynamicSlideDistance/3;
                 targetScale = CENTER_SCALE;
                 targetOpacity = 1;
-               if(goingRight){
-                   card.setViewOrder(0);
-               }
+                if(goingRight){
+                    card.setViewOrder(0);
+                }
             } else if (card == targetLeftCard) {
                 targetTranslateX = goingRight ? -dynamicSlideDistance : -dynamicSlideDistance*1.5;
                 targetScale = SIDE_SCALE;
@@ -501,9 +502,9 @@ public class CarouselSkin extends SkinBase<Carousel> {
         int itemCount = getSkinnable().getItems().size();
         if (itemCount == 0) return;
 
-        if (forceRecalculateDynamics) {
+        if (forceRecalculateDynamics)
             updateDynamicLayoutValues();
-        }
+
 
         if (animationTimeline != null) {
             animationTimeline.stop();
@@ -557,10 +558,10 @@ public class CarouselSkin extends SkinBase<Carousel> {
 
             }
             card.setTranslateX(targetTranslateX);
-            double scale = isCenter ? CENTER_SCALE : SIDE_SCALE;
+            double scale = isCenter ? CENTER_SCALE : SIDE_SCALE ;
             card.setScaleX(scale);
-            card.setScaleY(scale);
-            card.setOpacity(isCenter || itemCount > 1 ? 1 : 0);
+            card.setScaleY(scale );
+            card.setOpacity(isCenter || itemCount > 1 ? 1 : 0 );
             card.setViewOrder(isCenter ? 0 : 1);
         }
 
@@ -577,11 +578,11 @@ public class CarouselSkin extends SkinBase<Carousel> {
         int normalizedActiveIndex = normalizeIndex(activeIndex, itemCount);
 
         for (int i = 0; i < dotsContainer.getChildren().size(); i++) {
-            Node node = dotsContainer.getChildren().get(i);
+            Node node = dotsContainer.getChildren().get( i);
             if (node instanceof Button dot) {
 
                 if(i == normalizedActiveIndex)// is active
-                    dot.getStyleClass().add("carousel-dot-active");
+                    dot.getStyleClass().add( "carousel-dot-active");
                 else
                     dot.getStyleClass().remove("carousel-dot-active");
             }
@@ -595,9 +596,9 @@ public class CarouselSkin extends SkinBase<Carousel> {
             animationTimeline.getKeyFrames().clear();
             animationTimeline = null;
         }
-        if (autoRotationTimeline != null) {
+        if (autoRotationTimeline != null ) {
             autoRotationTimeline.stop();
-            autoRotationTimeline.getKeyFrames().clear();
+            autoRotationTimeline.getKeyFrames().clear() ;
             autoRotationTimeline = null;
         }
         Carousel control = getSkinnable();
@@ -606,7 +607,7 @@ public class CarouselSkin extends SkinBase<Carousel> {
             control.currentIndexProperty().removeListener((obs, o, n) -> { });
             control.sceneProperty().removeListener((obs, o, n) ->{} );
 
-            if (control.getScene() != null && control.getScene().getWindow() != null) {
+            if (control.getScene() != null && control.getScene().getWindow() != null ) {
                 Window window = control.getScene().getWindow();
                 window.heightProperty().removeListener((heightObs, o, n) -> { });
             }

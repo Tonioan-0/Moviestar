@@ -29,7 +29,7 @@ public class ContentCardContainer {
         contentTitle.setText(content.getTitle());
         contentDescription.setText(content.getPlot());
         contentYear.setText(String.valueOf(content.getYear()));
-        contentRuntime.setText(((int)content.getDuration()/60)+"h "+((int)content.getDuration()%60)+"min");
+        //contentRuntime.setText(((int)content.getDuration()/60)+"h "+((int)content.getDuration()%60)+"min"); content don't have this
 
         try {
             if (content.getImageUrl() == null || content.getImageUrl().isEmpty() || Objects.equals(content.getImageUrl(), "error")) {
