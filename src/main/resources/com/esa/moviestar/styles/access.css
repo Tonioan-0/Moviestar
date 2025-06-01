@@ -119,13 +119,13 @@
     -fx-alignment: center;
 }
 
-.register-text-raccomendations-mid {
+.register-text-recommendation-mid {
     -fx-background-color: transparent;
     -fx-font-size: 16px;
     -fx-alignment: center;
 }
 
-.register-text-raccomendations-big {
+.register-text-recommendation-big {
     -fx-background-color: transparent;
     -fx-font-size: 24px;
 }
@@ -134,7 +134,7 @@
     -fx-underline: true;
 }
 
-.register-text-raccomendations-mid:hover {
+.register-text-recommendation-mid:hover {
     -fx-underline: true;
 }
 

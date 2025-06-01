@@ -1,4 +1,3 @@
-// ScrollView.java
 package com.esa.moviestar.components;
 
 import javafx.beans.property.*;
@@ -67,7 +66,11 @@ public class ScrollView extends Control {
         return  new ScrollViewSkin(this );
     }
 
-    //Main method to change the c
+    /* *************************************************************************
+     *                                                                         *
+     *                            Getters and Setters                          *
+     *                                                                         *
+     **************************************************************************/ //maybe this separator is too much
 
     public void setContent(List<Node> objects ) {
         items.clear( );
@@ -160,10 +163,10 @@ public class ScrollView extends Control {
     }
 
     public Paint getEdgeColor( ) {
-       return this.edgeColor.get( );
+        return this.edgeColor.get( );
     }
     public void setEdgeColor(Color c ) {
-       edgeColor.set(c );
+        edgeColor.set(c );
     }
     public ObjectProperty<Paint> edgeColorProperty() {
         return edgeColor;
@@ -173,11 +176,10 @@ public class ScrollView extends Control {
         return radius.get( );
     }
     public void setClipRadius(double n ) {
-         radius.set(n );
+        radius.set(n );
     }
     public DoubleProperty radiusProperty() {
         return radius;
     }
 
 }
-

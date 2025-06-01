@@ -55,7 +55,7 @@
     <!-- Content pane (initially hidden) -->
     <VBox fx:id="contentPane" alignment="BOTTOM_LEFT" opacity="0" spacing="5" styleClass="media-content" StackPane.alignment="BOTTOM_LEFT">
 
-        <Label fx:id="titleLabel" wrapText="true">
+        <Label fx:id="titleLabel"  wrapText="true">
             <styleClass>
                 <String fx:value="on-primary" />
                 <String fx:value="large-text" />

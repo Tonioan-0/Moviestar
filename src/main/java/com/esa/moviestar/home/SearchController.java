@@ -1,132 +1,111 @@
 package com.esa.moviestar.home;
+
 import com.esa.moviestar.database.ContentDao;
-import com.esa.moviestar.components.ScrollView;
 import com.esa.moviestar.model.Content;
 import com.esa.moviestar.model.Utente;
-import com.esa.moviestar.components.ScrollViewSkin;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
+import javafx.scene.paint.CycleMethod;
+import javafx.scene.paint.LinearGradient;
+import javafx.scene.paint.Stop;
 import javafx.scene.shape.Line;
 
 import java.io.IOException;
-import java.util.*;
 import java.util.List;
 
 public class SearchController {
+    //@FXML Objects
+    Button searchLabel;
     @FXML
-    public Button searchlabel;
+    Line separatorLine;
     @FXML
-    public Line separatorline;
+    Button findOutButton;
+    Button genre;
+    Button filmSeries;
     @FXML
-    private Button findout;
+    FlowPane filmSeriesRecommendations;
     @FXML
-    private Button genre;
-    @FXML
-    private Button filmSeries;
-    @FXML
-    private FlowPane filmseriesRaccomendations;
-    @FXML
-    private Pane pnl_separator1;
-    @FXML
-    private FlowPane raccomendations;
+    FlowPane recommendations;
+
     //private db
     private String searchText;
-
     private MainPagesController setupController;
-
     private HeaderController headerController;
-
-    private Utente p;
-
+    private Utente user;
     private ContentDao dbSearch;
-
-    public ResourceBundle resourcebundlesearch;
-
-    private List<Node> tryraccomendationlist;
-
+    private List<Node> tryRecommendationList;
     List<Content> suggestedContent;
 
-    private ScrollViewSkin separator;
-
-    private ScrollView useless;
-
     List<Content> content;
-
-    private List<Node> trylist;
+    private List<Node> tryList;
 
     public void initialize(){
-        useless = new ScrollView();
-        separator = new ScrollViewSkin(useless);
         setupController = new MainPagesController();
-        if (separatorline != null) {
-            separatorline.setStroke(separator.getLinearGradient(Color.WHITE));
-        }
+        separatorLine.setStroke(
+                new LinearGradient(
+                        0, 0,
+                        1, 0,
+                        true,
+                        CycleMethod.NO_CYCLE,
+                        new Stop(0.0, Color.TRANSPARENT),
+                        new Stop(0.5, Color.WHITE),
+                        new Stop(1.0, Color.TRANSPARENT)
+                ));
     }
 
-    public void set_paramcontroller(HeaderController h, Utente u, ResourceBundle bundle, MainPagesController mainPagesController) throws IOException {
-        this.headerController = h;
-        this.p = u;
-        this.resourcebundlesearch = bundle;
-        this.setupController = mainPagesController; // Use the passed instance
-        String searchText= headerController.getTbxSearch().getText();
-        if (dbSearch == null) {
-            dbSearch = new ContentDao();
-        }
-
-        content = dbSearch.take_film_tvseries(searchText, p);
-        suggestedContent = dbSearch.take_reccomendations(searchText, p);
-        trylist = setupController.createFilmNodes(content, false);
-        tryraccomendationlist = setupController.createFilmNodes(suggestedContent, false);
-        reccomendedList();
-        raccomendedSeriesFilms();
+    public void setParamController(HeaderController header, Utente user, MainPagesController mainPagesController) throws IOException {
+//        this.headerController = header;
+//        this.user = user;
+//        this.setupController = mainPagesController; // Use the passed instance
+//        String searchText= headerController.getTbxSearch().getText();
+//        if (dbSearch == null) {
+//            dbSearch = new ContentDao();
+//        }
+//
+//        content = dbSearch.take_film_series(searchText, user);
+//        suggestedContent = dbSearch.takeRecommendations(searchText, user);
+//        tryList = setupController.createFilmNodes(content, false);
+//        tryRecommendationList = setupController.createFilmNodes(suggestedContent, false);
+//        recommendedList();
+//        recommendedSeriesFilms();
     }
 
-    // Modifica al metodo reccomendedList() per usare FlowPane esistente
-    public void reccomendedList() {
-        if (!headerController.getTbxSearch().getText().isEmpty()) {
-
-            raccomendations.getChildren().clear();
-
-            for(int i = 0; i < tryraccomendationlist.size(); i++) {
-                HBox itemContainer = new HBox();
-                itemContainer.setAlignment(javafx.geometry.Pos.CENTER);
-                itemContainer.setSpacing(2);
-
-                // Bottone con titolo del contenuto
-                Button dynamicButton = new Button(suggestedContent.get(i).getTitle());
-                dynamicButton.getStyleClass().addAll("register-text-raccomendations-mid");
-                dynamicButton.setOnAction(event-> setupController.openFilmScene(1));///////////////////////////////////////////////////////////////////////////////////////////////////////////qiua serve l'id del contenuto
-
-                itemContainer.getChildren().add(dynamicButton);
-
-                if (i < tryraccomendationlist.size() - 1) {
-
-                    Line verticalSeparator = new Line();
-
-                    verticalSeparator.setStartY(0);
-                    verticalSeparator.setEndY(30);
-                    verticalSeparator.setStrokeWidth(1.5);
-
-                    verticalSeparator.setStroke(separator.getVerticalLinearGradient(Color.WHITE));
-
-                    HBox.setMargin(verticalSeparator, new javafx.geometry.Insets(0, 8, 0, 8));
-
-                    itemContainer.getChildren().add(verticalSeparator);
-                }
-                raccomendations.getChildren().add(itemContainer);
-            }
-        }
+    // Modifica al metodo recommendedList() per usare FlowPane esistente
+    public void recommendedList() {
+//        if (!headerController.getTbxSearch().getText().isEmpty()) {
+//            recommendations.getChildren().clear();
+//            for(int i = 0; i < tryRecommendationList.size(); i++) {
+//                HBox itemContainer = new HBox();
+//                itemContainer.setAlignment(javafx.geometry.Pos.CENTER);
+//                itemContainer.setSpacing(2);
+//
+//                // Bottone con titolo del contenuto
+//                Button dynamicButton = new Button(suggestedContent.get(i).getTitle());
+//                dynamicButton.getStyleClass().add("register-text-recommendations-mid");
+//                dynamicButton.setOnAction(event-> setupController.openFilmScene(1));
+//                itemContainer.getChildren().add(dynamicButton);
+//
+//                if (i < tryRecommendationList.size() - 1) {
+//                    Line verticalSeparator = new Line();
+//                    verticalSeparator.setStartY(0);
+//                    verticalSeparator.setEndY(30);
+//                    verticalSeparator.setStrokeWidth(1.5);
+//                    verticalSeparator.setStroke(Color.WHITE);
+//                    HBox.setMargin(verticalSeparator, new javafx.geometry.Insets(0, 8, 0, 8));
+//                    itemContainer.getChildren().add(verticalSeparator);
+//                }
+//                recommendations.getChildren().add(itemContainer);
+//            }
+//        }
     }
-    public void raccomendedSeriesFilms(){
+    public void recommendedSeriesFilms(){
         if (!headerController.getTbxSearch().getText().isEmpty()){
 
-            for(int i = 0;i<trylist.size() ; i++){
-
-                Node dynamicContent = trylist.get(i);
-                filmseriesRaccomendations.getChildren().add(dynamicContent);
+            for (Node dynamicContent : tryList) {
+                filmSeriesRecommendations.getChildren().add(dynamicContent);
             }
         }
     }

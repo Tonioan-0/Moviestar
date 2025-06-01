@@ -1,5 +1,6 @@
 package com.esa.moviestar.home;
 
+import com.esa.moviestar.Main;
 import com.esa.moviestar.profile.CreateProfileController;
 import com.esa.moviestar.settings.SettingsViewController;
 import com.esa.moviestar.components.BufferAnimation;
@@ -17,7 +18,6 @@ import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-// import javafx.scene.image.Image; // No longer used directly here
 import javafx.scene.image.ImageView;
 import javafx.scene.image.WritableImage;
 import javafx.scene.layout.*;
@@ -29,7 +29,6 @@ import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 
-import static com.esa.moviestar.login.AnimationUtils.*;
 
 public class MainPagesController {
 
@@ -40,8 +39,7 @@ public class MainPagesController {
     @FXML private AnchorPane root;
 
     // Constants
-    public static final ResourceBundle resourceBundle = ResourceBundle.getBundle("com.esa.moviestar.images.svg-paths.general-svg");
-    public static final String PATH_WINDOW_CARD = "/com/esa/moviestar/movie_view/WindowCard.fxml";
+    public static final String PATH_CARD_WINDOW = "/com/esa/moviestar/movie_view/WindowCard.fxml";
     public static final String PATH_CARD_VERTICAL = "/com/esa/moviestar/movie_view/FilmCard_Vertical.fxml";
     public static final String PATH_CARD_HORIZONTAL = "/com/esa/moviestar/movie_view/FilmCard_Horizontal.fxml";
     public static final String FILM_SCENE_PATH ="/com/esa/moviestar/movie_view/filmScene.fxml";
@@ -52,6 +50,8 @@ public class MainPagesController {
     // Instance variables
     private Utente user;
     private Account account;
+
+
 
     // Page data containers
     private record PageData(Node node, Object controller) {}
@@ -68,30 +68,27 @@ public class MainPagesController {
     private StackPane loadingOverlay;
     static final double FADE_DURATION = 300; // milliseconds
 
-    public void setAccount(Account account) {
-        this.account = account;
-    }
 
-    public void initialize() {
-        createLoadingOverlay();
-        showLoadingSpinner();
-    }
+
 
     public void first_load(Utente user, Account account) {
+        if (loadingOverlay == null) {
+            createLoadingOverlay();
+            body.getChildren().add(loadingOverlay);
+        }
+        showLoadingSpinner();
         this.user = user;
         this.account = account;
-        if (loadingOverlay == null) { // Should be created by initialize()
-            createLoadingOverlay();
-        }
 
-        if (header == null) {
+
+        if (header == null)
             loadHeader();
-        }
+
 
         // After attempting to load header, check if it's usable
         if (this.header == null || this.header.controller() == null) {
             System.err.println("MainPagesController: Critical error - Header or its controller failed to load. Aborting first_load.");
-            hideLoadingSpinner(); // Hide spinner as we can't proceed
+            hideLoadingSpinner();
             return;
         }
 
@@ -172,8 +169,8 @@ public class MainPagesController {
                 headerController.activeSearch();
                 if (searchResultPage != null) {
                     try {
-                        ((SearchController) searchResultPage.controller()).set_paramcontroller(
-                                headerController, user, resourceBundle, this);
+                        ((SearchController) searchResultPage.controller()).setParamController(
+                                headerController, user,  this);
                     } catch (IOException e) {
                         throw new RuntimeException(e);
                     }
@@ -181,10 +178,6 @@ public class MainPagesController {
                 return searchResultPage;
             });
         });
-
-        if (!body.getChildren().contains(loadingOverlay)) {
-            body.getChildren().add(loadingOverlay);
-        }
     }
 
     private void setupNavigationButtons(HeaderController headerController) {
@@ -207,7 +200,7 @@ public class MainPagesController {
                 if (filter_film == null) {
                     filter_film = loadDynamicBody("filter.fxml");
                     if (filter_film != null) {
-                        ((FilterController) filter_film.controller()).loadWithFilter(this, user, true);
+                        ((FilterController) filter_film.controller()).setContent(this, user, true);
                     }
                 }
                 return filter_film;
@@ -220,7 +213,7 @@ public class MainPagesController {
                 if (filter_series == null) {
                     filter_series = loadDynamicBody("filter.fxml");
                     if (filter_series != null) {
-                        ((FilterController) filter_series.controller()).loadWithFilter(this, user, false);
+                        ((FilterController) filter_series.controller()).setContent(this, user, false);
                     }
                 }
                 return filter_series;
@@ -295,7 +288,7 @@ public class MainPagesController {
                 System.err.println("MainPagesController: Resource not found: " + bodySource + " (relative to " + getClass().getPackageName() + ")");
                 return null;
             }
-            FXMLLoader loader = new FXMLLoader(resource, resourceBundle);
+            FXMLLoader loader = new FXMLLoader(resource, Main.resourceBundle);
             Node pageNode = loader.load();
             AnchorPane.setBottomAnchor(pageNode, 0.0);
             AnchorPane.setTopAnchor(pageNode, 0.0);
@@ -304,6 +297,7 @@ public class MainPagesController {
             return new PageData(pageNode, loader.getController());
         } catch (IOException e) {
             System.err.println("MainPagesController: IOException while loading " + bodySource + ". Details: " + e.getMessage());
+            e.printStackTrace();
             return null;
         } catch (Exception e) {
             System.err.println("MainPagesController: Unexpected error while loading " + bodySource + ". Details: " + e.getMessage());
@@ -427,18 +421,18 @@ public class MainPagesController {
         fadeIn.play();
     }
 
-    public List<Node> createFilmNodes(List<Content> contentList, boolean isVertical) throws IOException {
+    public  List<Node> createFilmNodes(List<Content> contentList, boolean isVertical) throws IOException {
         List<Node> nodes = new ArrayList<>(contentList.size());
         String cardPath = isVertical ? PATH_CARD_VERTICAL : PATH_CARD_HORIZONTAL;
 
         for (Content content : contentList) {
             FXMLLoader fxmlLoader = new FXMLLoader(
                     Objects.requireNonNull(getClass().getResource(cardPath), "FXML resource for card not found: " + cardPath),
-                    resourceBundle
+                    Main.resourceBundle
             );
             Node node = fxmlLoader.load();
             FilmCardController filmCardController = fxmlLoader.getController();
-            filmCardController.setContent(content);
+            filmCardController.setContent(content,isVertical);
             node.setOnMouseClicked(e -> cardClicked(filmCardController.getCardId()));
             nodes.add(node);
         }
@@ -456,7 +450,7 @@ public class MainPagesController {
 
     public void settingsClick(Utente user, Account account) {
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/esa/moviestar/settings/settings-view.fxml"), resourceBundle);
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/esa/moviestar/settings/settings-view.fxml"), Main.resourceBundle);
             Parent settingContent = loader.load();
             SettingsViewController settingsViewController = loader.getController();
             settingsViewController.setUtente(user);
@@ -473,7 +467,7 @@ public class MainPagesController {
 
     public void emailClick() {
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/esa/moviestar/login/access.fxml"), resourceBundle);
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/esa/moviestar/login/access.fxml"), Main.resourceBundle);
             Parent accessContent = loader.load();
             Scene currentSceneNode = body.getScene();
             Scene newScene = new Scene(accessContent, currentSceneNode.getWidth(), currentSceneNode.getHeight());
@@ -506,13 +500,12 @@ public class MainPagesController {
 
         this.user = newUser; // Update to the new user
 
-        initialize(); // Recreates loadingOverlay, shows spinner
         first_load(this.user, this.account); // Reloads header and home for the new user
     }
 
     public void createProfileUser(Account account){
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/esa/moviestar/profile/create-profile-view.fxml"), resourceBundle);
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/esa/moviestar/profile/create-profile-view.fxml"), Main.resourceBundle);
             Parent createContent = loader.load();
             CreateProfileController createProfileController = loader.getController();
             createProfileController.setOrigine(CreateProfileController.Origine.HOME);

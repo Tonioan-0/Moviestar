@@ -15,8 +15,9 @@ import javafx.util.Duration;
 import javafx.scene.image.PixelReader;
 
 import java.util.Objects;
-import java.util.ResourceBundle;
-
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class FilmCardController {
     @FXML
@@ -39,257 +40,244 @@ public class FilmCardController {
     Label timeLabel;
     @FXML
     Label ratingLabel;
-    @FXML
-    ResourceBundle resources;
 
     public int _id;
-    private Color color;
+    private Color color; // This will store the calculated color
 
-    public void setContent(Content content) {
-        // Clean up any previous shimmer if setContent is called again
-//        removeShimmerOverlay();
 
+    private static final ExecutorService imageProcessingExecutor =
+            Executors.newCachedThreadPool(r -> {
+                Thread t = Executors.defaultThreadFactory().newThread(r);
+                t.setDaemon(true);
+                return t;
+            });
+
+
+    public void setContent(Content content, boolean isVertical) {
         _id = content.getId();
         titleLabel.setText(content.getTitle());
-        descriptionLabel.setText(content.getPlot());
-        if(content.isSeasonDivided()){
-            timeLabel.setText(content.getSeasonCount()+" Seasons");
-            durationIcon.setContent(resources.getString("season"));
-        }
-        else if(content.isSeries()){
-            timeLabel.setText(content.getEpisodeCount() +" Episodes");
-            durationIcon.setContent(resources.getString("episodes"));
-        }
-        else{
-            timeLabel.setText(((int)content.getDuration()/60)+"h "+((int)content.getDuration()%60)+"min");
-            durationIcon.setContent(resources.getString("clock"));
-        }
-        ratingLabel.setText(String.valueOf(content.getRating()));
 
+        String plot = content.getPlot();
+        if (plot != null)
+            descriptionLabel.setText(plot.length() > 128 ? plot.substring(0, 128) + "..." : plot);
+        else
+            descriptionLabel.setText("");
 
+//it would be good have this data in the card but the api doesn't provide these information :(
+//        if(content.isSeasonDivided()){
+//            timeLabel.setText(content.getSeasonCount()+" Seasons");
+//            durationIcon.setContent(resources.getString("season"));
+//        }
+//        else if(content.isSeries()){
+//            timeLabel.setText(content.getEpisodeCount() +" Episodes");
+//            durationIcon.setContent(resources.getString("episodes"));
+//        }
+//        else{
+//            timeLabel.setText(((int)content.getTime()/60)+"h "+((int)content.getTime()%60)+"min" );
+//            durationIcon.setContent(resources.getString("clock"));}
+
+        ratingLabel.setText(String.valueOf(content.getRating()).substring(0, 3));
         try {
-            if (content.getImageUrl() == null || content.getImageUrl().isEmpty() || Objects.equals(content.getImageUrl(), "error")) {
-                // System.err.println("Error: Image URL is null or empty for content: " + content.getTitle());
-                imgView.setImage(null); // Clear previous image
-                //  Platform.runLater(this::displayErrorShimmer);
+            String imageUrl = isVertical ? content.getPosterUrl() : content.getImageUrl();
 
+            if (imageUrl == null || imageUrl.trim().isEmpty()) {
+                System.err.println("FilmCardController: Image URL is null or empty for content ID: " + content.getId());
+                // Optionally set a placeholder image here
+                Platform.runLater(() -> setupGradientOverlay(null)); // Setup default gradient
                 return;
             }
-            Image img = new Image(content.getImageUrl(), true);
+
+            Image img = new Image(imageUrl, true); // true for background loading
             img.errorProperty().addListener((observable, oldValue, newValue) -> {
-                Exception e = img.getException();
-                if (e != null) {
-                    System.err.println("Error loading image '" + content.getImageUrl());
-
-                } else {
-                    System.err.println("Error loading image '" + content.getImageUrl() + "': Unknown error.");
-                }
-                // Platform.runLater(this::displayErrorShimmer);
-            });
-            img.progressProperty().addListener((observable, oldValue, newValue) -> {
-                if (newValue.doubleValue() == 1.0) {
-                    imgView.setImage(img);
-                    Platform.runLater(() -> setupGradientOverlay(img));
+                if (newValue ) {
+                    System.err.println( "FilmCardController: Error loading image '" + imageUrl + "' for content ID: " + content.getId() + ". Exception: " + img.getException());
+                    Platform.runLater( () -> setupGradientOverlay(null) );
                 }
             });
 
+            img.progressProperty().addListener(( observable, oldValue,  newValue) -> {
+                if (newValue.doubleValue() == 1.0 && !img.isError()) { // Image fully loaded and no error
+                    imgView.setImage(img );
+                    CompletableFuture.supplyAsync(() -> getMixedColorFromImage(img), imageProcessingExecutor)
+                            .thenAcceptAsync(calculatedColor -> {
+                                this.color = calculatedColor;
+                                setupGradientOverlay(img);
+                            }, Platform::runLater)
+                            .exceptionally(ex -> {
+                                System.err.println( "FilmCardController: Error processing image color: " + ex.getMessage());
+                                Platform.runLater( () ->  {
+                                    this.color = null;
+                                    setupGradientOverlay(null);
+                                });
+                                return null;
+                            });
+                }
+            });
         } catch (Exception e) {
-            System.err.println("FilmCardController: "+e.getMessage());
+            System.err.println("FilmCardController: Exception in setContent during image loading for content ID " + content.getId() + ": " + e.getMessage());
+            Platform.runLater(() -> setupGradientOverlay(null));
         } finally {
             Platform.runLater(this::setupHoverTransitions);
         }
     }
 
-//    private void displayErrorShimmer() {
-//        removeShimmerOverlay();
-//        double overlayWidth = imgView.getFitWidth();
-//        double overlayHeight = imgView.getFitHeight();
-//
-//        if (overlayWidth <= 0 && cardContainer.getWidth() > 0) overlayWidth = cardContainer.getWidth();
-//        if (overlayHeight <= 0 && cardContainer.getHeight() > 0) overlayHeight = cardContainer.getHeight();
-//
-//        // Default sizes if everything is uninitialized
-//        if (overlayWidth <= 0|| overlayHeight <= 0)
-//            return;
-//        Region shimmerOverlay = new Region();
-//        shimmerOverlay.setBackground(Background.fill(Color.rgb(62,62,62)));
-//        shimmerOverlay.setPrefSize(cardContainer.getWidth(), cardContainer.getHeight());
-//        shimmerOverlay.setClip(new Rectangle(cardContainer.getWidth(), cardContainer.getHeight()) {{
-//            setArcWidth(48);
-//            setArcHeight(48);
-//        }});
-//        SequentialTransition completeAnimation = getSequentialTransition(shimmerOverlay);
-//        cardContainer.getChildren().add(1, shimmerOverlay);
-//        completeAnimation.play();
-//    }
-//
-//    private static SequentialTransition getSequentialTransition(Region shimmerOverlay) {
-//        FadeTransition shimmerFadeIn = new FadeTransition(Duration.seconds(10), shimmerOverlay);
-//        shimmerFadeIn.setFromValue(0);
-//        shimmerFadeIn.setToValue(1);
-//
-//        FadeTransition shimmerFadeOut = new FadeTransition(Duration.seconds(10), shimmerOverlay);
-//        shimmerFadeOut.setFromValue(1);
-//        shimmerFadeOut.setToValue(0);
-//        SequentialTransition completeAnimation = new SequentialTransition(shimmerFadeIn, shimmerFadeOut);
-//        completeAnimation.setCycleCount(10); // Repeat the entire fade-in and fade-out sequence
-//        return completeAnimation;
-//    }
-//
-//    private void removeShimmerOverlay() {
-//        cardContainer.getChildren().removeIf(node -> node instanceof Rectangle);
-//    }
 
     private void setupGradientOverlay(Image image) {
-        // Extract dominant color from image if available
-        if (image != null) {
-            color = getMixedColorFromImage(image);
-        }
-
-        // Set default gradient overlay
-        if (color != null) {
-            gradientOverlay.setBackground(Background.fill(
-                    new LinearGradient(0, 0, 0, 1, true, CycleMethod.NO_CYCLE,
-                            new Stop(0.6, Color.TRANSPARENT),
-                            new Stop(1, color))));
-        } else {
-            gradientOverlay.setBackground(Background.fill(
-                    new LinearGradient(0, 0, 0, 1, true, CycleMethod.NO_CYCLE,
-                            new Stop(0.6, Color.TRANSPARENT),
-                            new Stop(1, Color.rgb(115, 65, 190)))));
-        }
+        Color effectiveColor = this.color;
+        LinearGradient gradient;
+        gradient = new LinearGradient(0, 0, 0, 1, true, CycleMethod.NO_CYCLE,
+                new Stop(0.6, Color.TRANSPARENT),
+                new Stop(1, Objects.requireNonNullElseGet(effectiveColor, () -> Color.rgb(115, 65, 190))));
+        gradientOverlay.setBackground(Background.fill(gradient));
     }
 
     private void setupHoverTransitions() {
-        // Set initial positions and states
         contentPane.setOpacity(0);
+        contentPane.setTranslateY(50);
 
-        // Set default gradient if not already set
+
         if (gradientOverlay.getBackground() == null) {
-            gradientOverlay.setBackground(Background.fill(
-                    new LinearGradient(0, 0, 0, 1, true, CycleMethod.NO_CYCLE,
-                            new Stop(0.6, Color.TRANSPARENT),
-                            new Stop(1, Color.rgb(115, 65, 190)))));
+
+            LinearGradient initialGradient;
+            initialGradient = new LinearGradient(0, 0, 0, 1, true, CycleMethod.NO_CYCLE,
+                    new Stop(0.6, Color.TRANSPARENT),
+                    new Stop(1, Objects.requireNonNullElseGet(this.color, () -> Color.rgb(115, 65, 190))));
+            gradientOverlay.setBackground(Background.fill(initialGradient));
         }
 
-        // Create a clip for the card to ensure animations stay within bounds
         Rectangle clip = new Rectangle();
         clip.widthProperty().bind(cardContainer.widthProperty());
         clip.heightProperty().bind(cardContainer.heightProperty());
+        //the cards are medium item so have a radius of 24px, to have the same radius for the clip we need arc at radius*2
         clip.setArcWidth(48);
         clip.setArcHeight(48);
         cardContainer.setClip(clip);
 
-        // Create transitions for hover animation
         Duration duration = Duration.millis(250);
+
         TranslateTransition contentEnterTransition = new TranslateTransition(duration, contentPane);
-        contentEnterTransition.setToY(0); // Move up into view
+        contentEnterTransition.setToY(0);
         FadeTransition metadataFadeOut = new FadeTransition(duration, metadataPane);
         metadataFadeOut.setToValue(0);
         FadeTransition contentFadeIn = new FadeTransition(duration, contentPane);
         contentFadeIn.setToValue(1);
 
-        // Define transitions for mouse exit
-        TranslateTransition metadataReturnTransition = new TranslateTransition(duration, metadataPane);
-        metadataReturnTransition.setToY(0); // Return to original position
         TranslateTransition contentExitTransition = new TranslateTransition(duration, contentPane);
-        contentExitTransition.setToY(50); // Move down out of view
+        contentExitTransition.setToY(50);
         FadeTransition metadataFadeIn = new FadeTransition(duration, metadataPane);
         metadataFadeIn.setToValue(1);
         FadeTransition contentFadeOut = new FadeTransition(duration, contentPane);
         contentFadeOut.setToValue(0);
 
-        // Apply hover listener
-        cardContainer.hoverProperty().addListener((observable, oldValue, newValue) -> {
-            if (newValue) {
-                // Mouse entered - stop any running animations and play enter transition
-                contentEnterTransition.stop();
-                metadataFadeOut.stop();
-                contentFadeIn.stop();
+        ParallelTransition onHover = new ParallelTransition(contentEnterTransition, metadataFadeOut, contentFadeIn);
+        ParallelTransition onExit = new ParallelTransition(contentExitTransition, metadataFadeIn, contentFadeOut);
 
-                // Update gradient on hover
-                if (color != null) {
-                    gradientOverlay.setBackground(Background.fill(
-                            new LinearGradient(0, 0, 0, 1, true, CycleMethod.NO_CYCLE,
-                                    new Stop(0, Color.TRANSPARENT),
-                                    new Stop(0.4, color))));
-                }
 
-                // Play animations
-                contentEnterTransition.play();
-                metadataFadeOut.play();
-                contentFadeIn.play();
+        cardContainer.hoverProperty().addListener((observable, oldValue, isHovering) -> {
+            Color currentDominantColor = this.color; // Use the member variable
+
+            if (isHovering) {
+                onExit.stop();
+                LinearGradient hoverGradient= new LinearGradient(0, 0, 0, 1, true, CycleMethod.NO_CYCLE,
+                        new Stop(0, Color.TRANSPARENT),
+                        new Stop(0.4,
+                                currentDominantColor==null  ?
+                                        Color.rgb(115, 65, 190, 0.7) :
+                                        currentDominantColor.deriveColor(0, 1, 1, 0.9)
+                        ),
+                        new Stop(1,
+                                currentDominantColor==null  ?
+                                        Color.rgb(115, 65, 190) :
+                                        currentDominantColor
+                        )
+                );
+
+                gradientOverlay.setBackground(Background.fill(hoverGradient));
+                onHover.play();
             } else {
-                // Mouse exited - stop any running animations and play exit transition
-                metadataReturnTransition.stop();
-                contentExitTransition.stop();
-                metadataFadeIn.stop();
-                contentFadeOut.stop();
-
-                // Return gradient to original state
-                if (color != null) {
-                    gradientOverlay.setBackground(Background.fill(
-                            new LinearGradient(0, 0, 0, 1, true, CycleMethod.NO_CYCLE,
-                                    new Stop(0.6, Color.TRANSPARENT),
-                                    new Stop(1, color))));
-                }
-
-                // Play animations
-                metadataReturnTransition.play();
-                contentExitTransition.play();
-                metadataFadeIn.play();
-                contentFadeOut.play();
+                onHover.stop(); // Stop hover animations if any
+                LinearGradient normalGradient = new LinearGradient(0, 0, 0, 1, true, CycleMethod.NO_CYCLE,
+                        new Stop(0.6, Color.TRANSPARENT),
+                        new Stop(1, Objects.requireNonNullElseGet(currentDominantColor, () -> Color.rgb(115, 65, 190))));
+                gradientOverlay.setBackground(Background.fill(normalGradient));
+                onExit.play();
             }
         });
     }
 
+    // This method now runs on a background thread
     public Color getMixedColorFromImage(Image image) {
-        // Get pixel reader for the image
-        PixelReader pixelReader = image.getPixelReader();
+        if (image == null || image.isError() || image.getWidth() == 0 || image.getHeight() == 0)
+            return null;
 
-        // Image dimensions
+        PixelReader pixelReader = image.getPixelReader();
+        if (pixelReader == null)
+            return null;
+
         int width = (int) image.getWidth();
         int height = (int) image.getHeight();
 
-        // Variables to store total RGB values
         double totalRed = 0;
         double totalGreen = 0;
         double totalBlue = 0;
-        int sampleStride = Math.max(1, (width * height) / 5000);
+
+
+        int numPixels = width * height;
+        int desiredSamples = Math.min(numPixels, 2000);
+        int sampleStride = numPixels > 0 ? Math.max(1, (int) Math.sqrt((double)numPixels / desiredSamples)) : 1;
+
         int samplesCount = 0;
 
-        // Iterate through pixels with stride
         for (int y = 0; y < height; y += sampleStride) {
             for (int x = 0; x < width; x += sampleStride) {
-                Color pixelColor = pixelReader.getColor(x, y);
-                totalRed +=  pixelColor.getRed();
-                totalGreen +=  pixelColor.getGreen();
-                totalBlue +=  pixelColor.getBlue();
-                samplesCount++;
+                try {
+                    Color pixelColor = pixelReader.getColor(x, y);
+                    totalRed += pixelColor.getRed();
+                    totalGreen += pixelColor.getGreen();
+                    totalBlue += pixelColor.getBlue();
+                    samplesCount++;
+                } catch (Exception e) {
+                    System.err.println("FilmCardController: Error processing image color");
+                }
             }
         }
 
-        // Calculate average color
+        if (samplesCount == 0)
+            return null;
+
+
         double avgRed = totalRed / samplesCount;
         double avgGreen = totalGreen / samplesCount;
         double avgBlue = totalBlue / samplesCount;
 
-        // Calculate brightness using a common formula
         double brightness = 0.299 * avgRed + 0.587 * avgGreen + 0.114 * avgBlue;
 
-        // Adjust brightness if it's too high (above 0.7 on a 0-1 scale)
-        if (brightness > 0.7) {
-            double reductionFactor = 0.7 / brightness;
-            avgRed *=  reductionFactor;
+        if (brightness > 0.75) {
+            double reductionFactor = 0.75 / brightness;
+            avgRed *= reductionFactor;
             avgGreen *= reductionFactor;
             avgBlue *= reductionFactor;
         }
+        avgRed = Math.max(0, Math.min(1, avgRed));
+        avgGreen = Math.max(0, Math.min(1, avgGreen));
+        avgBlue = Math.max(0, Math.min(1, avgBlue));
 
-        // Return the balanced color
         return Color.color(avgRed, avgGreen, avgBlue);
     }
 
     public int getCardId() {
         return _id;
+    }
+
+    public static void shutdownExecutor() {
+        imageProcessingExecutor.shutdown();
+        try {
+            if (!imageProcessingExecutor.awaitTermination(800, java.util.concurrent.TimeUnit.MILLISECONDS)) {
+                imageProcessingExecutor.shutdownNow();
+            }
+        } catch (InterruptedException e) {
+            imageProcessingExecutor.shutdownNow();
+            Thread.currentThread().interrupt();
+        }
     }
 }

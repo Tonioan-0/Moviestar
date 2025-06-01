@@ -61,7 +61,7 @@ public class ScrollViewSkin extends SkinBase<ScrollView> {
         // Initialize UI components
         titleBox = createTitleBox();
         sliderContainer = createSlider();
-        
+
         setupHoverBehavior();
 
         VBox root = new VBox();
@@ -83,8 +83,8 @@ public class ScrollViewSkin extends SkinBase<ScrollView> {
     private void setupHoverBehavior() {
         sliderContainer.setOnMouseEntered(e -> {
             if(!isHovering&& container.getWidth()>scrollPane.getWidth()){
-            isHovering = true;
-            updateButtonVisibility(scrollPane.getHvalue());
+                isHovering = true;
+                updateButtonVisibility(scrollPane.getHvalue());
             }
         });
 
@@ -218,7 +218,7 @@ public class ScrollViewSkin extends SkinBase<ScrollView> {
             double targetValue;
             if (isLeft)
                 targetValue = Math.max(0.0, currentHValue - hValueChange);
-             else
+            else
                 targetValue = Math.min(1.0, currentHValue + hValueChange);
 
             if (Math.abs(targetValue - currentHValue) > 0.001)
@@ -573,17 +573,6 @@ public class ScrollViewSkin extends SkinBase<ScrollView> {
         );
     }
 
-    public LinearGradient getVerticalLinearGradient (Color color) {
-        return new LinearGradient(
-                0, 0,
-                0, 1,
-                true,
-                CycleMethod.NO_CYCLE,
-                new Stop(0.0, Color.TRANSPARENT),
-                new Stop(0.5, color),
-                new Stop(1.0, Color.TRANSPARENT)
-        );
-    }
     /**
      * Return the color of the overlays
      * @param color the edge color, if null the background color
@@ -591,12 +580,12 @@ public class ScrollViewSkin extends SkinBase<ScrollView> {
     public Background getOverlayGradientBackgroundFill(Color color, boolean isLeft) {
         return Background.fill(
                 new LinearGradient(isLeft? 0:1,0,
-                isLeft? 1:0, 0,
-                true,
-                CycleMethod.NO_CYCLE,
-                new Stop(0, color),
-                new Stop(0.4, color),
-                new Stop(1, Color.TRANSPARENT)));
+                        isLeft? 1:0, 0,
+                        true,
+                        CycleMethod.NO_CYCLE,
+                        new Stop(0, color),
+                        new Stop(0.4, color),
+                        new Stop(1, Color.TRANSPARENT)));
     }
 
     /**

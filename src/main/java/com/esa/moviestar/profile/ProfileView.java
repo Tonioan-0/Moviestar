@@ -1,9 +1,13 @@
 package com.esa.moviestar.profile;
 
+import com.esa.moviestar.Main;
+import com.esa.moviestar.database.ContentDao;
 import com.esa.moviestar.database.UtenteDao;
 import com.esa.moviestar.home.MainPagesController;
+import com.esa.moviestar.libraries.TMDbApiManager;
 import com.esa.moviestar.model.Account;
 import com.esa.moviestar.model.Utente;
+import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
@@ -39,12 +43,36 @@ public class ProfileView {
 
 
     private Account account;
-    private final ResourceBundle resourceBundle = ResourceBundle.getBundle("com.esa.moviestar.images.svg-paths.general-svg");
 
     // Metodo di inizializzazione che viene eseguito subito all'avvio
     public void initialize() {
         testo.setText("Who wants to watch Moviestar?");  // Impostazione del testo della label iniziale
         griglia.setSpacing(40);  // Impostazione della spaziatura tra gli elementi nella griglia
+
+        // --- tonioan part for TMDb database update ---
+        Task<Void> updateDbTask = new Task<>() {
+            @Override
+            protected Void call() {updateMessage("Starting database content update..."); // For Task progress
+                System.out.println("ProfileView Task: Attempting to update all content in database.");
+
+                TMDbApiManager tmdbApiManager = TMDbApiManager.getInstance();
+                TMDbApiManager.getInstance().setContentDao(new ContentDao());
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////uncommenting the app will send request to the api, for now is better to disable that
+//                try {
+//                    tmdbApiManager.updateAllContentInDatabase().join();
+//                } catch (Exception e) {
+//                    System.err.println("ProfileView Task: Exception during TMDb content update: " + e.getMessage());
+//                }
+                return null;
+            }
+        };
+        updateDbTask.setOnSucceeded(event -> System.out.println("ProfileView: Database update task succeeded."));
+        updateDbTask.setOnFailed(event -> System.err.println("ProfileView: Database update task failed."));
+
+        Thread taskThread = new Thread(updateDbTask);
+        taskThread.setDaemon(true);
+        taskThread.start();
+        // --- end of tonioan part ---
     }
 
     public void setAccount(Account account) {
@@ -121,20 +149,16 @@ public class ProfileView {
         modifica.setPrefWidth(100);
 
         SVGPath pencilModify = new SVGPath();
-        pencilModify.setContent(resourceBundle.getString("pencil"));
+        pencilModify.setContent(Main.resourceBundle.getString("pencil"));
         pencilModify.setScaleY(0.5);
         pencilModify.setScaleX(0.5);
         pencilModify.setStyle("-fx-fill: #E6E3DC;");
 
         modifica.getChildren().add(pencilModify);
 
-        modifica.setOnMouseEntered(event -> {
-            pencilModify.setTranslateY(-3.5);
-        });
+        modifica.setOnMouseEntered(event -> pencilModify.setTranslateY(-3.5));
 
-        modifica.setOnMouseExited(event -> {
-            pencilModify.setTranslateY(0);
-        });
+        modifica.setOnMouseExited(event -> pencilModify.setTranslateY(0));
         return modifica;
     }
 
@@ -147,7 +171,7 @@ public class ProfileView {
                 "-fx-border-radius: 48px;");
 
         SVGPath crossAggiungi = new SVGPath();
-        crossAggiungi.setContent(resourceBundle.getString("plusButton"));
+        crossAggiungi.setContent(Main.resourceBundle.getString("plusButton"));
         crossAggiungi.setScaleX(1.8);
         crossAggiungi.setScaleY(1.8);
         crossAggiungi.setStyle("-fx-fill: #F0ECFD;");
@@ -165,13 +189,9 @@ public class ProfileView {
         creazioneUtente.setSpacing(20);
         creazioneUtente.setAlignment(Pos.CENTER);
 
-        creazione.setOnMouseEntered(event -> {
-            crossAggiungi.setStyle("-fx-fill: #121212;");
-        });
+        creazione.setOnMouseEntered(event -> crossAggiungi.setStyle("-fx-fill: #121212;"));
 
-        creazione.setOnMouseExited(event -> {
-            crossAggiungi.setStyle("-fx-fill: #F0ECFD;");
-        });
+        creazione.setOnMouseExited(event -> crossAggiungi.setStyle("-fx-fill: #F0ECFD;"));
 
         creazione.setOnMouseClicked(e -> paginaCreazioneUtente());
 
@@ -182,21 +202,19 @@ public class ProfileView {
     //passaggio alla pagina Home
     private void paginaHome(Utente user) {
         try{
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/esa/moviestar/home/main.fxml"),resourceBundle);
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/esa/moviestar/home/main.fxml"),Main.resourceBundle);
             Parent homeContent = loader.load();
 
             MainPagesController mainPagesController = loader.getController();
             mainPagesController.first_load(user,account);
-
             Scene currentScene = ContenitorePadre.getScene();
             Scene newScene = new Scene(homeContent, currentScene.getWidth(), currentScene.getHeight());
-
-            // Ottieni lo Stage corrente e imposta la nuova scena
             Stage stage = (Stage) ContenitorePadre.getScene().getWindow();
             stage.setScene(newScene);
+
         }catch(IOException e){
-            warningText.setText("Errore durante il caricamento della pagina home: " + e.getMessage());  // Gestione errore
-            System.err.println("ProfileView : Errore caricamento pagina home"+e.getMessage());
+            warningText.setText("Error to load the home page");  // The user no need to see the error message
+            System.err.println("ProfileView: Error to load the home page"+e.getMessage());
         }
     }
 
@@ -204,7 +222,7 @@ public class ProfileView {
     private void paginaModifica(Utente user) {
         if (griglia.getChildren().size() > 1) {  // Verifica che ci sia almeno un utente nella griglia
             try {
-                FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/esa/moviestar/profile/modify-profile-view.fxml"),resourceBundle);  // Carica il FXML per la modifica
+                FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/esa/moviestar/profile/modify-profile-view.fxml"),Main.resourceBundle);  // Carica il FXML per la modifica
                 Parent modifyContent = loader.load();  // Carica la vista della pagina
 
                 ModifyProfileController modifyProfileController = loader.getController();
@@ -233,7 +251,7 @@ public class ProfileView {
     //  passaggio alla pagina di creazione utente
     private void paginaCreazioneUtente() {
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/esa/moviestar/profile/create-profile-view.fxml"),resourceBundle);  // Carica il FXML per la modifica
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/esa/moviestar/profile/create-profile-view.fxml"),Main.resourceBundle);  // Carica il FXML per la modifica
             Parent createContent = loader.load();  // Carica la vista della pagina
 
             CreateProfileController createProfileController = loader.getController();
