@@ -1,14 +1,15 @@
 package com.esa.moviestar.settings;
 
+import com.esa.moviestar.Main;
 import com.esa.moviestar.database.AccountDao;
-import com.esa.moviestar.database.UtenteDao;
+import com.esa.moviestar.database.UserDao;
 import com.esa.moviestar.login.AnimationUtils;
+import com.esa.moviestar.model.User;
 import com.esa.moviestar.profile.CreateProfileController;
 import com.esa.moviestar.profile.IconSVG;
 import com.esa.moviestar.profile.ModifyProfileController;
 import com.esa.moviestar.profile.ProfileView;
 import com.esa.moviestar.model.Account;
-import com.esa.moviestar.model.Utente;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
@@ -23,7 +24,6 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
 import java.io.IOException;
-import java.util.ResourceBundle;
 
 import static com.esa.moviestar.login.Access.verifyPassword;
 
@@ -48,37 +48,39 @@ public class AccountSettingController {
     private Label Email;
 
 
-    private Utente utente;
-    private AnchorPane contenitore;
+    private User user;
+    private AnchorPane container;
     private Account account;
-    private Label passwordErrata;
+    private Label wrongPassword;
 
-    public void setAccount(Account account){
-        this.account=account;
-        System.out.println("AccountViewController: email "+account.getEmail());
+    public void setAccount(Account account) {
+        this.account = account;
+        System.out.println("AccountViewController: email " + account.getEmail());
     }
 
-    public void setUtente(Utente utente){
-        this.utente=utente;
-        if(utente!=null){
-        int codImmagineCorrente = utente.getIDIcona();
-        profileImage.getChildren().clear();
-        Group g = new Group(IconSVG.takeElement(codImmagineCorrente));
-        profileImage.getChildren().add(g);
-        userName.setText(utente.getNome());
-        registrationDate.setText(utente.getDataRegistrazione().toString());
-        Email.setText("Email : "+utente.getEmail());
-        System.out.println("AccountViewController : utente : "+utente.getNome()+" email dell'utente : "+utente.getEmail()+" id utente : "+utente.getID());
+    public void setUtente(User user) {
+        this.user = user;
+        if (user != null) {
+            int codImmagineCorrente = user.getIDIcona();
+            profileImage.getChildren().clear();
+            Group g = new Group(IconSVG.takeElement(codImmagineCorrente));
+            profileImage.getChildren().add(g);
+            userName.setText(user.getName());
+            if (user.getRegistrationDate() != null) {
+                registrationDate.setText(user.getRegistrationDate().toString());
+            } else {
+                registrationDate.setText("Not available");
+            }
+            Email.setText("Email : " + user.getEmail());
+            System.out.println("AccountViewController : user : " + user.getName() + " email user : " + user.getEmail() + " id user : " + user.getID());
         }
     }
 
-    public void setContenitore(AnchorPane contenitore) {
-        this.contenitore = contenitore;
+    public void setContainer(AnchorPane container) {
+        this.container = container;
     }
 
-    public final ResourceBundle resourceBundle = ResourceBundle.getBundle("com.esa.moviestar.images.svg-paths.general-svg");
-
-    public void initialize(){
+    public void initialize() {
         modifyUser();
         deleteAccount();
         updatePassword();
@@ -86,23 +88,22 @@ public class AccountSettingController {
         setPasswordWarning();
     }
 
-    public void deleteUser(){
+    public void deleteUser() {
         deleteUserButton.setOnMouseClicked(event -> {
-            DeletePopUp userPopUp = new DeletePopUp(false,account);
+            DeletePopUp userPopUp = new DeletePopUp(false, account);
 
             AnchorPane.setBottomAnchor(userPopUp, 0.0);
             AnchorPane.setTopAnchor(userPopUp, 0.0);
             AnchorPane.setLeftAnchor(userPopUp, 0.0);
             AnchorPane.setRightAnchor(userPopUp, 0.0);
 
-            contenitore.getChildren().add(userPopUp);
+            container.getChildren().add(userPopUp);
 
-            userPopUp.getDeleteButton().setOnMouseClicked(e->{
-                if(verifyPassword(userPopUp.getPasswordField().getText(),(account.getPassword()))){
-                    UtenteDao utenteDao = new UtenteDao();
-                    utenteDao.rimuoviUtente(utente.getID());
-                    if(utenteDao.contaProfiliPerEmail(account.getEmail())>0){
-                        System.out.println("hai eliminato un profilo , te ne restano "+utenteDao.contaProfiliPerEmail(account.getEmail()));
+            userPopUp.getDeleteButton().setOnMouseClicked(e -> {
+                if (verifyPassword(userPopUp.getPasswordField().getText(), (account.getPassword()))) {
+                    UserDao userDao = new UserDao();
+                    userDao.deleteUser(user.getID());
+                    if (userDao.countProfilesbyEmail(account.getEmail()) > 0) {
                         try {
                             FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/esa/moviestar/profile/profile-view.fxml"));
                             Parent profileView = loader.load();
@@ -115,14 +116,13 @@ public class AccountSettingController {
                             Stage stage = (Stage) accountContentSetting.getScene().getWindow();
                             stage.setScene(newScene);
 
-                        }catch (IOException m ){
-                            System.err.println("AccountSettingController : errore nel ritornare alla pagina dei profili "+m.getMessage());
+                        } catch (IOException m) {
+                            System.err.println("AccountSettingController : Error returning to the profiles page " + m.getMessage());
                         }
 
-                    }else if ((utenteDao.contaProfiliPerEmail(account.getEmail())==0)){
-                        System.out.println("sei rimasto con 0 profili per questo account , la prova : "+utenteDao.contaProfiliPerEmail(account.getEmail()));
+                    } else if ((userDao.countProfilesbyEmail(account.getEmail()) == 0)) {
                         try {
-                            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/esa/moviestar/profile/create-profile-view.fxml"),resourceBundle);
+                            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/esa/moviestar/profile/create-profile-view.fxml"), Main.resourceBundle);
                             Parent createView = loader.load();
                             CreateProfileController createProfileController = loader.getController();
                             createProfileController.setAccount(account);
@@ -134,86 +134,80 @@ public class AccountSettingController {
                             stage.setScene(newScene);
 
                         } catch (IOException ex) {
-                            System.err.println("AccountSettingController : errore nel ritornare alla pagina di creazione di un profilo "+ex.getMessage());
+                            System.err.println("AccountSettingController : Error returning to the profile creation page " + ex.getMessage());
                         }
                     }
-                }else {
-                    if (!userPopUp.getPasswordBox().getChildren().contains(passwordErrata)) {
-                        userPopUp.getPasswordBox().getChildren().add(passwordErrata);
+                } else {
+                    if (!userPopUp.getPasswordBox().getChildren().contains(wrongPassword)) {
+                        userPopUp.getPasswordBox().getChildren().add(wrongPassword);
                     }
-                    AnimationUtils.shake(passwordErrata);
-                    System.out.println("user debug "+account.getPassword());
-                    System.out.println("user debug "+userPopUp.getPasswordField().getText());
-
-                    System.out.println("Errore nell'eliminazione dell'account, password sbagliata.");
+                    AnimationUtils.shake(wrongPassword);
                 }
             });
 
-            userPopUp.getCancelButton().setOnMouseClicked(event2->{
-                contenitore.getChildren().remove(userPopUp);
+            userPopUp.getCancelButton().setOnMouseClicked(event2 -> {
+                container.getChildren().remove(userPopUp);
             });
 
         });
-    };
+    }
+
+    ;
 
     public void deleteAccount() {
         deleteAccountButton.setOnMouseClicked(event -> {
-            DeletePopUp accountPopUp = new DeletePopUp(true,account);
+            DeletePopUp accountPopUp = new DeletePopUp(true, account);
 
             AnchorPane.setBottomAnchor(accountPopUp, 0.0);
             AnchorPane.setTopAnchor(accountPopUp, 0.0);
             AnchorPane.setLeftAnchor(accountPopUp, 0.0);
             AnchorPane.setRightAnchor(accountPopUp, 0.0);
 
-            contenitore.getChildren().add(accountPopUp);
+            container.getChildren().add(accountPopUp);
 
             accountPopUp.getDeleteButton().setOnMouseClicked(e -> {
-                if (verifyPassword(accountPopUp.getPasswordField().getText(),(account.getPassword()))) {
+                if (verifyPassword(accountPopUp.getPasswordField().getText(), (account.getPassword()))) {
                     AccountDao accountDao = new AccountDao();
-                    accountDao.rimuoviAccount(account.getEmail());
-                    UtenteDao utenteDao = new UtenteDao();
-                    utenteDao.rimuoviUtenteEmail(account.getEmail());
-                        try {
-                            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/esa/moviestar/login/access.fxml"), resourceBundle);
-                            Parent accessContent = loader.load();
+                    accountDao.deleteAccount(account.getEmail());
+                    UserDao userDao = new UserDao();
+                    userDao.deleteUserbyEmail(account.getEmail());
+                    try {
+                        FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/esa/moviestar/login/access.fxml"), Main.resourceBundle);
+                        Parent accessContent = loader.load();
 
-                            Scene currentScene = accountContentSetting.getScene();
-                            Scene newScene = new Scene(accessContent, currentScene.getWidth(), currentScene.getHeight());
+                        Scene currentScene = accountContentSetting.getScene();
+                        Scene newScene = new Scene(accessContent, currentScene.getWidth(), currentScene.getHeight());
 
-                            Stage stage = (Stage) accountContentSetting.getScene().getWindow();
-                            stage.setScene(newScene);
-                        } catch (IOException ex) {
-                            System.err.println("AccountSettingController: Errore caricamento pagina di accesso dell'account: " + ex.getMessage());
-                        }
-                    } else {
-                        if (!accountPopUp.getPasswordBox().getChildren().contains(passwordErrata)) {
-                            accountPopUp.getPasswordBox().getChildren().add(passwordErrata);
-                        }
-                        AnimationUtils.shake(passwordErrata);
-                        System.out.println("account debug "+account.getPassword());
-                        System.out.println("account debug "+accountPopUp.getPasswordField().getText());
-                        System.out.println("Errore nell'eliminazione dell'account, password sbagliata.");
+                        Stage stage = (Stage) accountContentSetting.getScene().getWindow();
+                        stage.setScene(newScene);
+                    } catch (IOException ex) {
+                        System.err.println("AccountSettingController: Error loading the account login page: " + ex.getMessage());
+                    }
+                } else {
+                    if (!accountPopUp.getPasswordBox().getChildren().contains(wrongPassword)) {
+                        accountPopUp.getPasswordBox().getChildren().add(wrongPassword);
+                    }
+                    AnimationUtils.shake(wrongPassword);
                 }
             });
 
             accountPopUp.getCancelButton().setOnMouseClicked(e -> {
-                contenitore.getChildren().remove(accountPopUp); // Rimuove il popup
+                container.getChildren().remove(accountPopUp); // Rimuove il popup
             });
         });
     }
 
 
-    public void modifyUser(){
+    public void modifyUser() {
         modifyUserButton.setOnMouseClicked(event -> {
 
             try {
-                FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/esa/moviestar/profile/modify-profile-view.fxml"),resourceBundle);
+                FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/esa/moviestar/profile/modify-profile-view.fxml"), Main.resourceBundle);
                 Parent modifyContent = loader.load();
                 ModifyProfileController modifyProfileController = loader.getController();
-                modifyProfileController.setUtente(utente);
-                modifyProfileController.setOrigine(ModifyProfileController.Origine.SETTINGS);
+                modifyProfileController.setUser(user);
+                modifyProfileController.setSource(ModifyProfileController.Origine.SETTINGS);
                 modifyProfileController.setAccount(account);
-                System.out.println("email passata alla pagina di modifica dai setting : "+account.getEmail());
 
                 Scene currentScene = accountContentSetting.getScene();
 
@@ -223,19 +217,19 @@ public class AccountSettingController {
                 stage.setScene(newScene);
 
             } catch (IOException e) {
-                System.err.println("AccountSettingController: Errore caricamento pagina di modifica dell'utente"+e.getMessage());
+                System.err.println("AccountSettingController: Error loading the user edit page" + e.getMessage());
             }
         });
     }
 
-    public void updatePassword(){
+    public void updatePassword() {
         modifyPasswordButton.setOnMouseClicked(event -> {
             try {
-                FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/esa/moviestar/settings/update-password-view.fxml"),resourceBundle);
+                FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/esa/moviestar/settings/update-password-view.fxml"), Main.resourceBundle);
                 Parent updateContent = loader.load();
 
                 UpdatePasswordController updatePasswordController = loader.getController();
-                updatePasswordController.setUtente(utente);
+                updatePasswordController.setUtente(user);
                 updatePasswordController.setAccount(account);
 
                 Scene currentScene = accountContentSetting.getScene();
@@ -246,20 +240,20 @@ public class AccountSettingController {
                 stage.setScene(newScene);
 
             } catch (IOException e) {
-                System.err.println("AccountSettingController: Errore caricamento pagina di aggiornamento della password"+e.getMessage());
+                System.err.println("AccountSettingController: Error loading the password update page" + e.getMessage());
             }
         });
     }
 
 
-    private void setPasswordWarning(){
-        passwordErrata  = new Label();
+    private void setPasswordWarning() {
+        wrongPassword = new Label();
 
-        passwordErrata.setText("Password Errata");
+        wrongPassword.setText("Wrong Password");
 
-        passwordErrata.getStyleClass().addAll("warningText");
+        wrongPassword.getStyleClass().addAll("warningText");
 
-        VBox.setMargin(passwordErrata, new Insets(0, 0, 0, 40.0));
+        VBox.setMargin(wrongPassword, new Insets(0, 0, 0, 40.0));
     }
 
 }

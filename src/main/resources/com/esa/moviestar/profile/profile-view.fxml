@@ -6,7 +6,7 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
 
-<StackPane fx:id="ContenitorePadre" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.esa.moviestar.profile.ProfileView">
+<StackPane fx:id="fatherContainer" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.esa.moviestar.profile.ProfileView">
     <stylesheets>
         <URL value="@../styles/general.css" />
     </stylesheets>
@@ -17,7 +17,7 @@
         </padding>
 
 
-        <Label fx:id="testo" alignment="TOP_CENTER" text="Label" textAlignment="CENTER" textFill="WHITE" wrapText="true">
+        <Label fx:id="text" alignment="TOP_CENTER" text="Label" textAlignment="CENTER" textFill="WHITE" wrapText="true">
             <font>
                 <Font name="Arial Bold" size="50.0" />
             </font>
@@ -29,7 +29,7 @@
          </VBox.margin>
         </Label>
 
-        <HBox fx:id="griglia" alignment="CENTER" prefHeight="100.0" prefWidth="200.0">
+        <HBox fx:id="grid" alignment="CENTER" prefHeight="100.0" prefWidth="200.0">
 
         </HBox>
 

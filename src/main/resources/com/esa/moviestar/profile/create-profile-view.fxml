@@ -8,7 +8,7 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.shape.*?>
 
-<VBox fx:id="ContenitorePaginaCreazione" alignment="CENTER" styleClass="bg-color" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.esa.moviestar.profile.CreateProfileController">
+<VBox fx:id="createPageContainer" alignment="CENTER" styleClass="bg-color" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.esa.moviestar.profile.CreateProfileController">
     <stylesheets>
         <URL value="@../styles/general.css" />
     </stylesheets>

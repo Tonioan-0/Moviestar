@@ -5,7 +5,7 @@ import com.esa.moviestar.database.ContentDao;
 import com.esa.moviestar.components.Carousel;
 import com.esa.moviestar.components.ScrollView;
 import com.esa.moviestar.model.Content;
-import com.esa.moviestar.model.Utente;
+import com.esa.moviestar.model.User;
 import com.esa.moviestar.movie_view.WindowCardController;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -25,7 +25,7 @@ public class HomeController {
     /**
      * Set all recommendation lists for a user profile
      */
-    public void setRecommendations(Utente user,MainPagesController mainPagesController) {
+    public void setRecommendations(User user, MainPagesController mainPagesController) {
         try {
             scrollViewContainer.getChildren().clear();
             List<List<Content>> contentList= new ContentDao().getHomePageContents(user);
@@ -53,41 +53,41 @@ public class HomeController {
 
             scrollViewContainer.getChildren().addAll(top10Scroll,latest10Scroll);
 
-            if(!contentList.get(4).isEmpty()) {
-                ScrollView similarToLastWatchedScroll = new ScrollView("Similar at " + contentList.get(4).getFirst().getTitle() + " :", Color.TRANSPARENT, MainPagesController.FORE_COLOR, MainPagesController.BACKGROUND_COLOR);
-                similarToLastWatchedScroll.setContent(mainPagesController.createFilmNodes(contentList.get(4), false));
-                scrollViewContainer.getChildren().add(similarToLastWatchedScroll);
-            }
-
-            if (!contentList.get(5).isEmpty()) {
-                ScrollView watchedScroll =new ScrollView("Continue to watch:", Color.TRANSPARENT, MainPagesController.FORE_COLOR, MainPagesController.BACKGROUND_COLOR, 32.0);
-                watchedScroll.setContent(mainPagesController.createFilmNodes( contentList.get(5), true));
-                scrollViewContainer.getChildren().add(watchedScroll);
-            }
-
-            if(!contentList.get(3).isEmpty()) {
-                ScrollView favouriteCategoryScroll = new ScrollView("We think you'll like them:", Color.TRANSPARENT, MainPagesController.FORE_COLOR, MainPagesController.BACKGROUND_COLOR);
-                favouriteCategoryScroll.setContent(mainPagesController.createFilmNodes(contentList.get(3), false));
-                scrollViewContainer.getChildren().add(favouriteCategoryScroll);
-            }
-
-            if (!contentList.get(6).isEmpty()) {
-                ScrollView recommendSeriesScroll = new ScrollView("Series that you may like:", Color.TRANSPARENT, MainPagesController.FORE_COLOR, MainPagesController.BACKGROUND_COLOR);
-                recommendSeriesScroll.setContent(mainPagesController.createFilmNodes(contentList.get(6), true));
-                scrollViewContainer.getChildren().add(recommendSeriesScroll);
-            }
-
-            if (!contentList.get(7).isEmpty()) {
-                ScrollView favouriteScroll = new ScrollView("Favourites:", Color.rgb(155, 155, 155), MainPagesController.BACKGROUND_COLOR, null, 32.0);
-                favouriteScroll.setContent(mainPagesController.createFilmNodes( contentList.get(7), true));
-                scrollViewContainer.getChildren().add(favouriteScroll);
-            }
-
-            ScrollView bottom7Scroll = new ScrollView("New Experiences:", Color.TRANSPARENT, MainPagesController.FORE_COLOR, MainPagesController.BACKGROUND_COLOR);
-            bottom7Scroll.setContent(mainPagesController.createFilmNodes( contentList.get(8), false));
-            scrollViewContainer.getChildren().addAll(bottom7Scroll);
-
-
+//            if(!contentList.get(4).isEmpty()) {
+//                ScrollView similarToLastWatchedScroll = new ScrollView("Similar at " + contentList.get(4).getFirst().getTitle() + " :", Color.TRANSPARENT, MainPagesController.FORE_COLOR, MainPagesController.BACKGROUND_COLOR);
+//                similarToLastWatchedScroll.setContent(mainPagesController.createFilmNodes(contentList.get(4), false));
+//                scrollViewContainer.getChildren().add(similarToLastWatchedScroll);
+//            }
+//
+//            if (!contentList.get(5).isEmpty()) {
+//                ScrollView watchedScroll =new ScrollView("Continue to watch:", Color.TRANSPARENT, MainPagesController.FORE_COLOR, MainPagesController.BACKGROUND_COLOR, 32.0);
+//                watchedScroll.setContent(mainPagesController.createFilmNodes( contentList.get(5), true));
+//                scrollViewContainer.getChildren().add(watchedScroll);
+//            }
+//
+//            if(!contentList.get(3).isEmpty()) {
+//                ScrollView favouriteCategoryScroll = new ScrollView("We think you'll like them:", Color.TRANSPARENT, MainPagesController.FORE_COLOR, MainPagesController.BACKGROUND_COLOR);
+//                favouriteCategoryScroll.setContent(mainPagesController.createFilmNodes(contentList.get(3), false));
+//                scrollViewContainer.getChildren().add(favouriteCategoryScroll);
+//            }
+//
+//            if (!contentList.get(6).isEmpty()) {
+//                ScrollView recommendSeriesScroll = new ScrollView("Series that you may like:", Color.TRANSPARENT, MainPagesController.FORE_COLOR, MainPagesController.BACKGROUND_COLOR);
+//                recommendSeriesScroll.setContent(mainPagesController.createFilmNodes(contentList.get(6), true));
+//                scrollViewContainer.getChildren().add(recommendSeriesScroll);
+//            }
+//
+//            if (!contentList.get(7).isEmpty()) {
+//                ScrollView favouriteScroll = new ScrollView("Favourites:", Color.rgb(155, 155, 155), MainPagesController.BACKGROUND_COLOR, null, 32.0);
+//                favouriteScroll.setContent(mainPagesController.createFilmNodes( contentList.get(7), true));
+//                scrollViewContainer.getChildren().add(favouriteScroll);
+//            }
+//
+//            ScrollView bottom7Scroll = new ScrollView("New Experiences:", Color.TRANSPARENT, MainPagesController.FORE_COLOR, MainPagesController.BACKGROUND_COLOR);
+//            bottom7Scroll.setContent(mainPagesController.createFilmNodes( contentList.get(8), false));
+//            scrollViewContainer.getChildren().addAll(bottom7Scroll);
+//
+//
 
 
 

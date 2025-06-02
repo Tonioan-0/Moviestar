@@ -16,7 +16,7 @@ public class DataBaseManager {
         try {
             URL dbUrl = DataBaseManager.class.getResource("/" + DB_NAME);  //cerca il file nel classpath grazie a getResource , poi usiamo /+DB_NAME perche nella parte prima dello / si trova tutto il path e poi nella parte dopo il nome del file del database
             if (dbUrl == null) { //se il percorso è nullo
-                throw new RuntimeException("database non trovato nel classpath."); //manda questo errore
+                throw new RuntimeException("Database not found in the classpath"); //manda questo errore
             }
 
             String jdbcUrl = "jdbc:sqlite:" + Paths.get(dbUrl.toURI()).toString();
@@ -30,7 +30,7 @@ public class DataBaseManager {
             return DriverManager.getConnection(jdbcUrl); //la vera e propria connessione avviene qui
 
         } catch (URISyntaxException e) { //errore nella conversione del percorso file da url a uri
-            throw new RuntimeException("Errore nella conversione del percorso DB.", e);
+            throw new RuntimeException("Error converting the DB path.", e);
         }
     }
 
@@ -39,11 +39,11 @@ public class DataBaseManager {
         try (Connection conn = getConnection()) {
             // Se conn non è null, significa che la connessione è riuscita
             if (conn != null) {
-                System.out.println("Connesso al database con successo!");
+                System.out.println("Successfully connected to the database");
             }
         }
         catch (SQLException e) {
-            System.err.println("Connessione fallita: " + e.getMessage());
+            System.err.println("Connection failed: " + e.getMessage());
             // Stampa un messaggio di errore con il dettaglio fornito dall’eccezione
         }
         // Fine del metodo main; la connessione è già chiusa dal try-with-resources

@@ -24,7 +24,6 @@ import org.mindrot.jbcrypt.BCrypt;
 
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.Objects;
 import java.util.Random;
 
 public class Access {
@@ -334,7 +333,7 @@ public class Access {
         String email = emailField.getText();
         AccountDao dao = new AccountDao();
 
-        if (dao.cercaAccount(email) == null) {
+        if (dao.searchAccount(email) == null) {
             warningText.setText("Insert your email");
             AnimationUtils.shake(warningText);
         } else {
@@ -401,7 +400,7 @@ public class Access {
         try {
             AccountDao dao = new AccountDao();
             AnimationUtils.pulse(access);
-            Account temp_acc = dao.cercaAccount(email);
+            Account temp_acc = dao.searchAccount(email);
 
             if (temp_acc == null) {
                 emailField.setText("");

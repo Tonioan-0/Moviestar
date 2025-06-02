@@ -3,7 +3,7 @@ package com.esa.moviestar.home;
 import com.esa.moviestar.database.ContentDao;
 import com.esa.moviestar.components.ScrollView;
 import com.esa.moviestar.model.Content;
-import com.esa.moviestar.model.Utente;
+import com.esa.moviestar.model.User;
 import javafx.fxml.FXML;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
@@ -18,7 +18,7 @@ public class FilterController {
 
 
 
-    public void setContent(MainPagesController mainPagesController,Utente user, boolean isFilm) {
+    public void setContent(MainPagesController mainPagesController, User user, boolean isFilm) {
         try {
             List<List<Content>> contentList = new ContentDao().getFilterPageContents(user,isFilm);
             scrollViewContainer.getChildren().clear();

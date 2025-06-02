@@ -6,7 +6,7 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.shape.*?>
 
-<AnchorPane fx:id="contenitore" stylesheets="@../styles/general.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.esa.moviestar.settings.SettingsViewController">
+<AnchorPane fx:id="container" stylesheets="@../styles/general.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.esa.moviestar.settings.SettingsViewController">
     <children>
         <BorderPane AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
             <left>
@@ -68,7 +68,7 @@
                            <Insets right="10.0" />
                         </VBox.margin>
                             </HBox>
-                     <HBox fx:id="watchList" alignment="CENTER_LEFT" minHeight="50.0" style="-fx-background-radius: 0 20 20 0;">
+                     <HBox fx:id="watchListContent" alignment="CENTER_LEFT" minHeight="50.0" style="-fx-background-radius: 0 20 20 0;">
                         <children>
                            <SVGPath fx:id="watchlistIcon" content="%watchlist" fill="white" />
                            <Label fx:id="watchListText" prefHeight="26.0" prefWidth="94.0" text="Watchlist">
@@ -88,7 +88,7 @@
                            <Insets right="10.0" />
                         </VBox.margin>
                      </HBox>
-                            <HBox fx:id="privacy" alignment="CENTER_LEFT" minHeight="50.0" style="-fx-background-radius: 0 20 20 0;">
+                            <HBox fx:id="privacyContent" alignment="CENTER_LEFT" minHeight="50.0" style="-fx-background-radius: 0 20 20 0;">
                                 <children>
                                     <SVGPath content="%privacy" fill="white" />
                                     <Label prefHeight="26.0" prefWidth="166.0" text="Privacy &amp; Terms">
@@ -108,7 +108,7 @@
                            <Insets right="10.0" />
                         </VBox.margin>
                             </HBox>
-                            <HBox fx:id="about" alignment="CENTER_LEFT" minHeight="50.0" style="-fx-background-radius: 0 20 20 0;">
+                            <HBox fx:id="aboutContent" alignment="CENTER_LEFT" minHeight="50.0" style="-fx-background-radius: 0 20 20 0;">
                                 <children>
                                     <SVGPath content="%about" fill="white" />
                                     <Label text="About &amp; Support ">

@@ -379,7 +379,7 @@ public class Register {
             Account account = new Account(email, hashedPassword);
             AccountDao dao = new AccountDao();
 
-            if (dao.inserisciAccount(account)) {
+            if (dao.insertAccount(account)) {
                 welcomeText.setText("User registered successfully!");
                 AnimationUtils.pulse(welcomeText);
 
@@ -389,7 +389,7 @@ public class Register {
                 CreateProfileController createProfileController = loader.getController();
 
                 createProfileController.setAccount(account);
-                createProfileController.setOrigine(CreateProfileController.Origine.REGISTER);
+                createProfileController.setSource(CreateProfileController.Origine.REGISTER);
 
                 Scene currentScene = mainContainer.getScene();
                 Scene newScene = new Scene(homeContent, currentScene.getWidth(), currentScene.getHeight());
@@ -397,7 +397,7 @@ public class Register {
                 Stage stage = (Stage) mainContainer.getScene().getWindow();
                 stage.setScene(newScene);
             } else {
-                welcomeText.setText("Utente già esistente");
+                welcomeText.setText("User già esistente");
                 AnimationUtils.shake(welcomeText);
             }
         }catch (IOException e) {
