@@ -7,6 +7,7 @@ import com.esa.moviestar.login.AnimationUtils;
 import com.esa.moviestar.login.Register;
 import com.esa.moviestar.model.Account;
 import com.esa.moviestar.model.User;
+import com.esa.moviestar.libraries.CredentialCryptManager;
 import javafx.animation.PauseTransition;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -25,8 +26,6 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.regex.Pattern;
 
-import static com.esa.moviestar.login.Access.verifyPassword;
-import static com.esa.moviestar.login.Register.hashPassword;
 
 public class UpdatePasswordController {
     @FXML
@@ -117,7 +116,7 @@ public class UpdatePasswordController {
         }
 
         AccountDao dao = new AccountDao();
-        if (verifyPassword(account.getPassword(), oldPassword)) {
+        if (CredentialCryptManager.verifyPassword(account.getPassword(), oldPassword)) {
             boolean oldPasswordCorrect = dao.checkPassword(account.getEmail(), oldPassword);
             if (!oldPasswordCorrect) {
                 updateStatus("The old password is incorrect.");
@@ -160,7 +159,7 @@ public class UpdatePasswordController {
 
     private void changePassword(String email, String newPassword) throws SQLException {
         AccountDao dao = new AccountDao();
-        dao.updatePassword(email, hashPassword(newPassword));
+        dao.updatePassword(email, CredentialCryptManager.hashPassword(newPassword));
     }
 
     private void updateStatus(String message) {

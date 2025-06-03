@@ -10,6 +10,7 @@ import com.esa.moviestar.profile.IconSVG;
 import com.esa.moviestar.profile.ModifyProfileController;
 import com.esa.moviestar.profile.ProfileView;
 import com.esa.moviestar.model.Account;
+import com.esa.moviestar.libraries.CredentialCryptManager;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
@@ -25,7 +26,6 @@ import javafx.stage.Stage;
 
 import java.io.IOException;
 
-import static com.esa.moviestar.login.Access.verifyPassword;
 
 public class AccountSettingController {
     @FXML
@@ -100,7 +100,7 @@ public class AccountSettingController {
             container.getChildren().add(userPopUp);
 
             userPopUp.getDeleteButton().setOnMouseClicked(e -> {
-                if (verifyPassword(userPopUp.getPasswordField().getText(), (account.getPassword()))) {
+                if (CredentialCryptManager.verifyPassword(userPopUp.getPasswordField().getText(), (account.getPassword()))) {
                     UserDao userDao = new UserDao();
                     userDao.deleteUser(user.getID());
                     if (userDao.countProfilesbyEmail(account.getEmail()) > 0) {
@@ -166,7 +166,7 @@ public class AccountSettingController {
             container.getChildren().add(accountPopUp);
 
             accountPopUp.getDeleteButton().setOnMouseClicked(e -> {
-                if (verifyPassword(accountPopUp.getPasswordField().getText(), (account.getPassword()))) {
+                if (CredentialCryptManager.verifyPassword(accountPopUp.getPasswordField().getText(), (account.getPassword()))) {
                     AccountDao accountDao = new AccountDao();
                     accountDao.deleteAccount(account.getEmail());
                     UserDao userDao = new UserDao();

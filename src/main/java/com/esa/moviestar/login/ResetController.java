@@ -1,6 +1,7 @@
 package com.esa.moviestar.login;
 
 import com.esa.moviestar.database.AccountDao;
+import com.esa.moviestar.libraries.CredentialCryptManager;
 import javafx.animation.PauseTransition;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -18,15 +19,10 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 
-// BCrypt import
-import org.mindrot.jbcrypt.BCrypt;
-
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ResourceBundle;
 import java.util.regex.Pattern;
-
-import static com.esa.moviestar.login.Register.hashPassword;
 
 public class ResetController {
 
@@ -410,7 +406,7 @@ public class ResetController {
         }
 
         try {
-            String hashedPassword = hashPassword(newPassword);
+            String hashedPassword = CredentialCryptManager.hashPassword(newPassword);
 
             cambiaPassword(userEmail, hashedPassword);
             updateStatus("Password changed successfully");

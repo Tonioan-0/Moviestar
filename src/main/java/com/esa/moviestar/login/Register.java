@@ -4,6 +4,7 @@ import com.esa.moviestar.database.AccountDao;
 import com.esa.moviestar.Main;
 import com.esa.moviestar.profile.CreateProfileController;
 import com.esa.moviestar.model.Account;
+import  com.esa.moviestar.libraries.CredentialCryptManager;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
@@ -20,11 +21,9 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
-// BCrypt import
-import org.mindrot.jbcrypt.BCrypt;
-
 import java.io.IOException;
 import java.util.regex.Pattern;
+
 
 public class Register {
 
@@ -67,8 +66,6 @@ public class Register {
     // Regex patterns for email and password validation
     private String email_regex = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$";
     private String password_regex = "^(?=.*[A-Z])(?=.*[!@#$%^&*()_+{}\\[\\]:;<>,.?~\\-])(?=.*\\d)[A-Za-z\\d!@#$%^&*()_+{}\\[\\]:;<>,.?~\\-]{8,}$";
-
-    private static final int BCRYPT_ROUNDS = 12;
 
     // Valori di riferimento per il layout responsivo
     private final double REFERENCE_WIDTH = 1720.0;
@@ -321,9 +318,6 @@ public class Register {
         return password_regex;
     }
 
-    public static String hashPassword(String plainTextPassword) {
-        return BCrypt.hashpw(plainTextPassword, BCrypt.gensalt(BCRYPT_ROUNDS));
-    }
 
     private void saveUser() {
 
@@ -373,7 +367,7 @@ public class Register {
 
         try {
 
-            String hashedPassword = hashPassword(password);
+            String hashedPassword = CredentialCryptManager.hashPassword(password);
 
             // Create account with hashed password
             Account account = new Account(email, hashedPassword);

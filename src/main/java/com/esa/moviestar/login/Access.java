@@ -4,6 +4,7 @@ import com.esa.moviestar.database.AccountDao;
 import com.esa.moviestar.Main;
 import com.esa.moviestar.profile.ProfileView;
 import com.esa.moviestar.model.Account;
+import  com.esa.moviestar.libraries.CredentialCryptManager;
 import jakarta.mail.MessagingException;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -19,8 +20,6 @@ import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.*;
 import javafx.stage.Stage;
-
-import org.mindrot.jbcrypt.BCrypt;
 
 import java.io.IOException;
 import java.sql.SQLException;
@@ -312,23 +311,6 @@ public class Access {
         return isPasswordVisible ? passwordTextField.getText() : passwordField.getText();
     }
 
-    /**
-     * Verifies a plain text password against a BCrypt hashed password
-     * @param plainTextPassword The plain text password to verify
-     * @param hashedPassword The BCrypt hashed password from the database
-     * @return true if the password matches, false otherwise
-     */
-    // From first code
-    public static boolean verifyPassword(String plainTextPassword, String hashedPassword) {
-        try {
-            return BCrypt.checkpw(plainTextPassword, hashedPassword);
-        } catch (IllegalArgumentException e) {
-            // This happens if the stored password is not a valid BCrypt hash
-            // For backward compatibility, fall back to plain text comparison
-            return plainTextPassword.equals(hashedPassword);
-        }
-    }
-
     private void sendCredenziali() throws SQLException, IOException, MessagingException {
         String email = emailField.getText();
         AccountDao dao = new AccountDao();
@@ -412,7 +394,7 @@ public class Access {
             }
 
             // Use BCrypt to verify the password (from first code)
-            if (verifyPassword(password, temp_acc.getPassword())) {
+            if (CredentialCryptManager.verifyPassword(password, temp_acc.getPassword())) {
                 this.account = temp_acc;
                 FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/esa/moviestar/profile/profile-view.fxml"), Main.resourceBundle);
                 Parent homeContent = loader.load();
