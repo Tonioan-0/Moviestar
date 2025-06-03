@@ -1,16 +1,15 @@
 package com.esa.moviestar.settings;
 
+import com.esa.moviestar.Main;
 import com.esa.moviestar.database.AccountDao;
 import com.esa.moviestar.login.Access;
 import com.esa.moviestar.login.AnimationUtils;
 import com.esa.moviestar.login.Register;
 import com.esa.moviestar.model.Account;
-import com.esa.moviestar.model.Utente;
+import com.esa.moviestar.model.User;
 import javafx.animation.PauseTransition;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
-import javafx.geometry.Insets;
-import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -24,7 +23,6 @@ import javafx.util.Duration;
 
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.ResourceBundle;
 import java.util.regex.Pattern;
 
 import static com.esa.moviestar.login.Access.verifyPassword;
@@ -32,7 +30,7 @@ import static com.esa.moviestar.login.Register.hashPassword;
 
 public class UpdatePasswordController {
     @FXML
-    private PasswordField oldPasswordField;  // Qui vecchia password
+    private PasswordField oldPasswordField;
 
     @FXML
     private PasswordField newPasswordField;
@@ -60,19 +58,19 @@ public class UpdatePasswordController {
 
     private String userEmail;
 
-    private Utente utente;
-    public void setUtente(Utente utente){
-        this.utente=utente;
-        System.out.println("UpdatePasswordController : utente passato : "+utente.getNome());
+    private User user;
+
+    public void setUtente(User user) {
+        this.user = user;
+        System.out.println("UpdatePasswordController : user  : " + user.getName());
     }
+
     private Account account;
+
     public void setAccount(Account account) {
-        this.account=account;
-        System.out.println("UpdatePasswordController : email passata : "+account.getEmail());
+        this.account = account;
+        System.out.println("UpdatePasswordController : email  : " + account.getEmail());
     }
-
-
-    private final ResourceBundle resourceBundle = ResourceBundle.getBundle("com.esa.moviestar.images.svg-paths.general-svg");
 
 
     public void initialize() {
@@ -91,7 +89,7 @@ public class UpdatePasswordController {
         }
 
         if (updateButton != null) {
-            updateButton.setOnAction(event -> validatePasswordReset());
+            updateButton.setOnAction(event -> validatePasswordUpdate());
         }
         if (backToSettingButton != null) {
             backToSettingButton.setOnAction(event -> navigateToSetting());
@@ -106,8 +104,7 @@ public class UpdatePasswordController {
     }
 
 
-
-    private void validatePasswordReset() {
+    private void validatePasswordUpdate() {
         String oldPassword = oldPasswordField.getText();
         String newPassword = newPasswordField.getText();
         String confirmPassword = confirmPasswordField.getText();
@@ -120,7 +117,7 @@ public class UpdatePasswordController {
         }
 
         AccountDao dao = new AccountDao();
-        if(verifyPassword(account.getPassword(), oldPassword)){
+        if (verifyPassword(account.getPassword(), oldPassword)) {
             boolean oldPasswordCorrect = dao.checkPassword(account.getEmail(), oldPassword);
             if (!oldPasswordCorrect) {
                 updateStatus("The old password is incorrect.");
@@ -128,8 +125,8 @@ public class UpdatePasswordController {
                 AnimationUtils.shake(warningText);
                 return;
             }
-        }else{
-            System.out.println("errore");
+        } else {
+            System.out.println("error");
         }
 
         if (!newPassword.equals(confirmPassword)) {
@@ -148,7 +145,7 @@ public class UpdatePasswordController {
         }
 
         try {
-            cambiaPassword(account.getEmail(), newPassword);
+            changePassword(account.getEmail(), newPassword);
             updateStatus("Password cambiata con successo");
             AnimationUtils.pulse(updateButton);
 
@@ -161,7 +158,7 @@ public class UpdatePasswordController {
         }
     }
 
-    private void cambiaPassword(String email, String newPassword) throws SQLException {
+    private void changePassword(String email, String newPassword) throws SQLException {
         AccountDao dao = new AccountDao();
         dao.updatePassword(email, hashPassword(newPassword));
     }
@@ -174,9 +171,9 @@ public class UpdatePasswordController {
         }
     }
 
-    private void navigateToAccess(){
+    private void navigateToAccess() {
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/esa/moviestar/login/access.fxml"),resourceBundle);
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/esa/moviestar/login/access.fxml"), Main.resourceBundle);
             Parent accountSettingContent = loader.load();
             Access access = loader.getController();
             access.setAccount(account);
@@ -196,10 +193,10 @@ public class UpdatePasswordController {
 
     private void navigateToSetting() {
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/esa/moviestar/settings/settings-view.fxml"),resourceBundle);
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/esa/moviestar/settings/settings-view.fxml"), Main.resourceBundle);
             Parent accountSettingContent = loader.load();
             SettingsViewController settingsViewController = loader.getController();
-            settingsViewController.setUtente(utente);
+            settingsViewController.setUtente(user);
             settingsViewController.setAccount(account);
 
             Scene currentScene = parentContainer.getScene();

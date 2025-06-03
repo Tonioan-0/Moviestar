@@ -1,8 +1,9 @@
 package com.esa.moviestar.settings;
 
+import com.esa.moviestar.Main;
 import com.esa.moviestar.home.MainPagesController;
 import com.esa.moviestar.model.Account;
-import com.esa.moviestar.model.Utente;
+import com.esa.moviestar.model.User;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Group;
@@ -18,14 +19,13 @@ import javafx.stage.Stage;
 import java.awt.*;
 import java.io.IOException;
 import java.net.URI;
-import java.util.ResourceBundle;
 
 public class SettingsViewController {
 
     @FXML
     private StackPane contentArea;
     @FXML
-    private AnchorPane contenitore;
+    private AnchorPane container;
     @FXML
     private HBox userContent;
     @FXML
@@ -39,11 +39,11 @@ public class SettingsViewController {
     @FXML
     private Label historyText;
     @FXML
-    private HBox privacy;
+    private HBox privacyContent;
     @FXML
-    private HBox watchList;
+    private HBox watchListContent;
     @FXML
-    private HBox about;
+    private HBox aboutContent;
     @FXML
     private StackPane backToHome;
     @FXML
@@ -53,24 +53,24 @@ public class SettingsViewController {
     @FXML
     private Group profileImage;
 
-    private Utente utente;
+    private User user;
     private Account account;
-    public void setAccount(Account account){
-        this.account=account;
-        caricaVista("/com/esa/moviestar/settings/account-setting-view.fxml");
-        System.out.println("SettingsViewController: email "+account.getEmail());
+
+    public void setAccount(Account account) {
+        this.account = account;
+        loadView("/com/esa/moviestar/settings/account-setting-view.fxml");
+        System.out.println("SettingsViewController: email " + account.getEmail());
     }
 
-    public void setUtente(Utente utente){
-        this.utente=utente;
-        System.out.println("SettingsViewController = utente : "+utente.getNome()+" email dell'utente : "+utente.getEmail()+" id utente : "+utente.getID());
+    public void setUtente(User user) {
+        this.user = user;
+        System.out.println("SettingsViewController = user : " + user.getName() + " email user : " + user.getEmail() + " id user : " + user.getID());
     }
 
-    public final ResourceBundle resourceBundle = ResourceBundle.getBundle("com.esa.moviestar.images.svg-paths.general-svg");
 
     public void initialize() {
         backToHome();
-        evidenziaMenu(userContent);
+        highlightMenu(userContent);
         menuClick();
         goToGithubPage();
     }
@@ -80,98 +80,98 @@ public class SettingsViewController {
         backToHome.setOnMouseClicked(event -> {
             // Controllo sicurezza per dati NULL
             if (account == null) {
-                System.err.println("Account è NULL, impossibile navigare alla home");
+                System.err.println("Account is NULL, unable to navigate to home");
                 return;
             }
 
             try {
-                FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/esa/moviestar/home/main.fxml"), resourceBundle);
+                FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/esa/moviestar/home/main.fxml"), Main.resourceBundle);
                 Parent backHomeView = loader.load();
 
                 MainPagesController mainPagesController = loader.getController();
-                mainPagesController.first_load(utente, account);
+                mainPagesController.first_load(user, account);
 
-                Scene currentScene = contenitore.getScene();
+                Scene currentScene = container.getScene();
                 Scene newScene = new Scene(backHomeView, currentScene.getWidth(), currentScene.getHeight());
 
                 Stage stage = (Stage) currentScene.getWindow();
                 stage.setScene(newScene);
             } catch (IOException e) {
-                System.err.println("SettingsViewController : Errore nel tornare alla home"+e.getMessage());
+                System.err.println("SettingsViewController : Error returning to home" + e.getMessage());
             }
         });
     }
 
     private void menuClick() {
         userContent.setOnMouseClicked(event -> {
-            evidenziaMenu(userContent);
-            caricaVista("/com/esa/moviestar/settings/account-setting-view.fxml");
+            highlightMenu(userContent);
+            loadView("/com/esa/moviestar/settings/account-setting-view.fxml");
         });
 
         historyContent.setOnMouseClicked(event -> {
-            evidenziaMenu(historyContent);
-            caricaVista("/com/esa/moviestar/settings/history-setting-view.fxml");
+            highlightMenu(historyContent);
+            loadView("/com/esa/moviestar/settings/history-setting-view.fxml");
         });
 
-        privacy.setOnMouseClicked(event -> {
-            evidenziaMenu(privacy);
-            caricaVista("/com/esa/moviestar/settings/privacy-setting-view.fxml");
+        privacyContent.setOnMouseClicked(event -> {
+            highlightMenu(privacyContent);
+            loadView("/com/esa/moviestar/settings/privacy-setting-view.fxml");
         });
 
-        about.setOnMouseClicked(event -> {
-            evidenziaMenu(about);
-            caricaVista("/com/esa/moviestar/settings/about-setting-view.fxml");
+        aboutContent.setOnMouseClicked(event -> {
+            highlightMenu(aboutContent);
+            loadView("/com/esa/moviestar/settings/about-setting-view.fxml");
         });
 
-        watchList.setOnMouseClicked(event -> {
-            evidenziaMenu(watchList);
-            caricaVista("/com/esa/moviestar/settings/watchlist-setting-view.fxml");
+        watchListContent.setOnMouseClicked(event -> {
+            highlightMenu(watchListContent);
+            loadView("/com/esa/moviestar/settings/watchlist-setting-view.fxml");
         });
     }
 
-    private void evidenziaMenu(HBox selezionato) {
+    private void highlightMenu(HBox selectedMenu) {
         // Rimuove la classe selezionata da tutti
         userContent.getStyleClass().remove("menu-button-selected");
         historyContent.getStyleClass().remove("menu-button-selected");
-        privacy.getStyleClass().remove("menu-button-selected");
-        about.getStyleClass().remove("menu-button-selected");
-        watchList.getStyleClass().remove("menu-button-selected");
+        privacyContent.getStyleClass().remove("menu-button-selected");
+        aboutContent.getStyleClass().remove("menu-button-selected");
+        watchListContent.getStyleClass().remove("menu-button-selected");
 
         // Aggiunge la classe selezionata a quello cliccato
-        if (!selezionato.getStyleClass().contains("menu-button-selected")) {
-            selezionato.getStyleClass().add("menu-button-selected");
+        if (!selectedMenu.getStyleClass().contains("menu-button-selected")) {
+            selectedMenu.getStyleClass().add("menu-button-selected");
         }
     }
 
-    private void caricaVista(String percorsoFXML) {
+    private void loadView(String pathFXML) {
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource(percorsoFXML), resourceBundle);
+            FXMLLoader loader = new FXMLLoader(getClass().getResource(pathFXML), Main.resourceBundle);
             Parent view = loader.load();
 
-            // Passa l'utente solo alla vista account
+            // Passa l'user solo alla vista account
             if (loader.getController() instanceof AccountSettingController controller) {
                 controller.setAccount(account);
-                controller.setUtente(utente);
-                controller.setContenitore(contenitore);
+                controller.setUtente(user);
+                controller.setContainer(container);
             }
 
             if (loader.getController() instanceof HistorySettingController controller) {
                 controller.setAccount(account);
-                controller.setUtente(utente);
+                controller.setUtente(user);
             }
 
             if (loader.getController() instanceof WatchListController controller) {
                 controller.setAccount(account);
-                controller.setUtente(utente);
+                controller.setUtente(user);
             }
 
             contentArea.getChildren().setAll(view);
         } catch (IOException e) {
-            System.err.println("Errore nel caricamento della vista: " + percorsoFXML);
+            System.err.println("Errore nel caricamento della vista: " + pathFXML);
         }
     }
 
-    private void goToGithubPage(){
+    private void goToGithubPage() {
         githubIcon.setOnMouseClicked(event -> {
             try {
                 URI uri = new URI("https://github.com/Tonioan-0/Moviestar");

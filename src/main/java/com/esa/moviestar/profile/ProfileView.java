@@ -2,11 +2,11 @@ package com.esa.moviestar.profile;
 
 import com.esa.moviestar.Main;
 import com.esa.moviestar.database.ContentDao;
-import com.esa.moviestar.database.UtenteDao;
+import com.esa.moviestar.database.UserDao;
 import com.esa.moviestar.home.MainPagesController;
 import com.esa.moviestar.libraries.TMDbApiManager;
 import com.esa.moviestar.model.Account;
-import com.esa.moviestar.model.Utente;
+import com.esa.moviestar.model.User;
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -24,30 +24,40 @@ import javafx.stage.Stage;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.ResourceBundle;
 
 public class ProfileView {
 
     // FXML Components
     @FXML
-    Label testo;
+    Label text;
 
-    @FXML   // HBox per la griglia che contiene gli utenti
-    HBox griglia;
+    @FXML
+    HBox grid;
 
-    @FXML   // StackPane che contiene l'intera schermata
-    StackPane ContenitorePadre;
+    @FXML
+    StackPane fatherContainer;
 
-    @FXML   // Label per eventuali messaggi di errore o avviso
+    @FXML
     Label warningText;
 
 
     private Account account;
 
-    // Metodo di inizializzazione che viene eseguito subito all'avvio
+    private static final int GRID_SPACING = 40;
+    private static final int BOX_USER_SPACING = 10;
+    private static final int BOX_USER_PADDING = 10;
+    private static final int SVG_SIZE = 8;
+    private static final int SVG_SIZE_HOVER = 8;
+    private static final double PENCIL_SIZE = 0.5;
+    private static final double PENCIL_HOVER = -2.5;
+    private static final int PENCIL_POS = 0;
+    private static final double CROSS_SIZE = 1.8 ;
+
+
+
     public void initialize() {
-        testo.setText("Who wants to watch Moviestar?");  // Impostazione del testo della label iniziale
-        griglia.setSpacing(40);  // Impostazione della spaziatura tra gli elementi nella griglia
+        text.setText("Who wants to watch Moviestar?");
+        grid.setSpacing(GRID_SPACING);
 
         // --- tonioan part for TMDb database update ---
         Task<Void> updateDbTask = new Task<>() {
@@ -78,138 +88,134 @@ public class ProfileView {
     public void setAccount(Account account) {
         this.account = account;
         System.out.println("ProfileView : email "+account.getEmail());
-        caricaUtenti();
+        loadUser();
     }
 
 
-    private void caricaUtenti() {
-        griglia.getChildren().clear(); // Pulisci sempre la griglia prima di ricaricare
-        UtenteDao dao = new UtenteDao();
-        List<Utente> utenti = dao.recuperaTuttiGliUtenti(account.getEmail());
+    private void loadUser() {
+        grid.getChildren().clear();
+        UserDao dao = new UserDao();
+        List<User> user = dao.findAllUsers(account.getEmail());
 
-        for (Utente utente : utenti) {
-            VBox userBox = creaBoxUtente(utente);
-            griglia.getChildren().add(userBox);
+        for (User utente : user) {
+            VBox userBox = createUserBox(utente);
+            grid.getChildren().add(userBox);
         }
 
-        //creazione e settaggio del bottone aggiungi
-        if (utenti.size() < 4) {
-            VBox addUserBox = creaBoxAggiungiUtente();
-            griglia.getChildren().add(addUserBox);
+
+        if (user.size() < 4) {
+            VBox addUserBox = createAddUserBox();
+            grid.getChildren().add(addUserBox);
         }
     }
 
 
-    private VBox creaBoxUtente(Utente utente) {
+    private VBox createUserBox(User user) {
         VBox box = new VBox();
-        box.setSpacing(10);
-        box.setPadding(new Insets(10));
+        box.setSpacing(BOX_USER_SPACING);
+        box.setPadding(new Insets(BOX_USER_PADDING));
         box.setAlignment(Pos.CENTER);
 
-        Label name = new Label(utente.getNome());
+        Label name = new Label(user.getName());
         name.getStyleClass().addAll("on-primary", "bold-text", "large-text");
 
-        Group icon = new Group(IconSVG.takeElement(utente.getIDIcona()));
-        icon.setScaleY(8);
-        icon.setScaleX(8);
+        Group icon = new Group(IconSVG.takeElement(user.getIDIcona()));
+        icon.setScaleY(SVG_SIZE);
+        icon.setScaleX(SVG_SIZE);
 
         StackPane iconBox = new StackPane(icon);
         StackPane.setAlignment(icon, Pos.CENTER);
         iconBox.setMinSize(204, 204);
 
-        StackPane modifica = creaBottoneModifica();
+        StackPane edit = createEditButton();
 
         // Event Handlers
         setupUserBoxEvents(box, icon, name);
-        icon.setOnMouseClicked(e -> paginaHome(utente));
-        modifica.setOnMouseClicked(e -> paginaModifica(utente));
+        icon.setOnMouseClicked(e -> homePage(user));
+        edit.setOnMouseClicked(e -> editPage(user));
 
-        box.getChildren().addAll(iconBox, name, modifica);
+        box.getChildren().addAll(iconBox, name, edit);
         return box;
     }
 
     private void setupUserBoxEvents(VBox box, Group icon, Label name) {
         box.setOnMouseEntered(event -> {
-            icon.setScaleX(8.2);
-            icon.setScaleY(8.2);
-            name.getStyleClass().remove("on-primary");
-            name.getStyleClass().addAll("on-primary","bold-text", "large-text");
+            icon.setScaleX(SVG_SIZE_HOVER);
+            icon.setScaleY(SVG_SIZE_HOVER);
         });
 
         box.setOnMouseExited(event -> {
-            icon.setScaleX(8);
-            icon.setScaleY(8);
-            name.getStyleClass().remove("on-primary");
-            name.getStyleClass().addAll("on-primary", "bold-text", "large-text");
+            icon.setScaleX(SVG_SIZE);
+            icon.setScaleY(SVG_SIZE);
         });
     }
 
-    private StackPane creaBottoneModifica() {
-        StackPane modifica = new StackPane();
-        modifica.setPrefWidth(100);
+    private StackPane createEditButton() {
+        StackPane editContainer = new StackPane();
+        editContainer.setPrefWidth(100);
 
         SVGPath pencilModify = new SVGPath();
         pencilModify.setContent(Main.resourceBundle.getString("pencil"));
-        pencilModify.setScaleY(0.5);
-        pencilModify.setScaleX(0.5);
+        pencilModify.setScaleY(PENCIL_SIZE);
+        pencilModify.setScaleX(PENCIL_SIZE);
         pencilModify.setStyle("-fx-fill: #E6E3DC;");
 
-        modifica.getChildren().add(pencilModify);
+        editContainer.getChildren().add(pencilModify);
 
-        modifica.setOnMouseEntered(event -> pencilModify.setTranslateY(-3.5));
+        editContainer.setOnMouseEntered(event -> pencilModify.setTranslateY(PENCIL_HOVER));
 
-        modifica.setOnMouseExited(event -> pencilModify.setTranslateY(0));
-        return modifica;
+        editContainer.setOnMouseExited(event -> pencilModify.setTranslateY(PENCIL_POS));
+        return editContainer;
     }
 
-    private VBox creaBoxAggiungiUtente() {
-        StackPane creazione = new StackPane();
-        creazione.setMinSize(190,190);
-        creazione.setTranslateY(-20);
-        creazione.setStyle("-fx-background-color: #333333;" +
+    private VBox createAddUserBox() {
+        StackPane crossContainer = new StackPane();
+        crossContainer.setMinSize(190,190);
+        crossContainer.setTranslateY(-20);
+        crossContainer.setStyle("-fx-background-color: #333333;" +
                 "-fx-background-radius: 48px;" +
                 "-fx-border-radius: 48px;");
 
-        SVGPath crossAggiungi = new SVGPath();
-        crossAggiungi.setContent(Main.resourceBundle.getString("plusButton"));
-        crossAggiungi.setScaleX(1.8);
-        crossAggiungi.setScaleY(1.8);
-        crossAggiungi.setStyle("-fx-fill: #F0ECFD;");
+        SVGPath cross = new SVGPath();
+        cross.setContent(Main.resourceBundle.getString("plusButton"));
+        cross.setScaleX(CROSS_SIZE);
+        cross.setScaleY(CROSS_SIZE);
+        cross.setStyle("-fx-fill: #F0ECFD;");
 
         // Aggiungi al pane
-        creazione.getChildren().add(crossAggiungi);
+        crossContainer.getChildren().add(cross);
 
-        VBox creazioneUtente = new VBox();
+        VBox creationContainer = new VBox();
         Label plusText = new Label();
         plusText.setText("Add");
         plusText.setTranslateY(-18);
         plusText.getStyleClass().addAll("on-primary", "bold-text", "large-text");
 
-        creazioneUtente.getChildren().addAll(creazione,plusText);
-        creazioneUtente.setSpacing(20);
-        creazioneUtente.setAlignment(Pos.CENTER);
+        creationContainer.getChildren().addAll(crossContainer,plusText);
+        creationContainer.setSpacing(20);
+        creationContainer.setAlignment(Pos.CENTER);
 
-        creazione.setOnMouseEntered(event -> crossAggiungi.setStyle("-fx-fill: #121212;"));
+        creationContainer.setOnMouseEntered(event -> cross.setStyle("-fx-fill: #121212;"));
 
-        creazione.setOnMouseExited(event -> crossAggiungi.setStyle("-fx-fill: #F0ECFD;"));
+        creationContainer.setOnMouseExited(event -> cross.setStyle("-fx-fill: #F0ECFD;"));
 
-        creazione.setOnMouseClicked(e -> paginaCreazioneUtente());
+        creationContainer.setOnMouseClicked(e -> userCreationPage());
 
-        return creazioneUtente;
+        return creationContainer;
     }
 
 
     //passaggio alla pagina Home
-    private void paginaHome(Utente user) {
+    private void homePage(User user) {
         try{
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/esa/moviestar/home/main.fxml"),Main.resourceBundle);
             Parent homeContent = loader.load();
 
             MainPagesController mainPagesController = loader.getController();
             mainPagesController.first_load(user,account);
-            Scene currentScene = ContenitorePadre.getScene();
+            Scene currentScene = fatherContainer.getScene();
             Scene newScene = new Scene(homeContent, currentScene.getWidth(), currentScene.getHeight());
-            Stage stage = (Stage) ContenitorePadre.getScene().getWindow();
+            Stage stage = (Stage) fatherContainer.getScene().getWindow();
             stage.setScene(newScene);
 
         }catch(IOException e){
@@ -219,57 +225,57 @@ public class ProfileView {
     }
 
     //  passaggio alla pagina di modifica
-    private void paginaModifica(Utente user) {
-        if (griglia.getChildren().size() > 1) {  // Verifica che ci sia almeno un utente nella griglia
+    private void editPage(User user) {
+        if (grid.getChildren().size() > 1) {
             try {
                 FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/esa/moviestar/profile/modify-profile-view.fxml"),Main.resourceBundle);  // Carica il FXML per la modifica
                 Parent modifyContent = loader.load();  // Carica la vista della pagina
 
                 ModifyProfileController modifyProfileController = loader.getController();
                 modifyProfileController.setAccount(account);
-                modifyProfileController.setUtente(user);
-                modifyProfileController.setOrigine(ModifyProfileController.Origine.PROFILI);
+                modifyProfileController.setUser(user);
+                modifyProfileController.setSource(ModifyProfileController.Origine.PROFILE);
 
                 //Ottieni la scena corrente
-                Scene currentScene = ContenitorePadre.getScene();
+                Scene currentScene = fatherContainer.getScene();
 
                 // Crea una nuova scena con il nuovo contenuto
                 Scene newScene = new Scene(modifyContent, currentScene.getWidth(), currentScene.getHeight());
 
                 // Ottieni lo Stage corrente e imposta la nuova scena
-                Stage stage = (Stage) ContenitorePadre.getScene().getWindow();
+                Stage stage = (Stage) fatherContainer.getScene().getWindow();
                 stage.setScene(newScene);
             } catch (IOException e) {
-                warningText.setText("Errore durante il caricamento della pagina di modifica: " + e.getMessage());  // Gestione errore
-                System.err.println("ProfileView : Errore caricamento pagina di modifica"+e.getMessage());
+                warningText.setText("Error loading the edit page:" + e.getMessage());
+                System.err.println("ProfileView : Error loading the edit page:"+e.getMessage());
             }
         } else {
-            warningText.setText("Nessun elemento selezionato da modificare.");  // Se non c'è nessun utente, mostra avviso
+            warningText.setText("No item has been selected for editing.");
         }
     }
 
     //  passaggio alla pagina di creazione utente
-    private void paginaCreazioneUtente() {
+    private void userCreationPage() {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/esa/moviestar/profile/create-profile-view.fxml"),Main.resourceBundle);  // Carica il FXML per la modifica
             Parent createContent = loader.load();  // Carica la vista della pagina
 
             CreateProfileController createProfileController = loader.getController();
             createProfileController.setAccount(account);
-            createProfileController.setOrigine(CreateProfileController.Origine.PROFILE);
+            createProfileController.setSource(CreateProfileController.Origine.PROFILE);
 
             //Ottieni la scena corrente
-            Scene currentScene = ContenitorePadre.getScene();
+            Scene currentScene = fatherContainer.getScene();
 
             // Crea una nuova scena con il nuovo contenuto
             Scene newScene = new Scene(createContent, currentScene.getWidth(), currentScene.getHeight());
 
             // Ottieni lo Stage corrente e imposta la nuova scena
-            Stage stage = (Stage) ContenitorePadre.getScene().getWindow();
+            Stage stage = (Stage) fatherContainer.getScene().getWindow();
             stage.setScene(newScene);
         } catch (IOException e) {
-            warningText.setText("Errore durante il caricamento della pagina di creazione: " + e.getMessage());  // Gestione errore
-            System.err.println("ProfileView : Errore caricamento pagina di creazione"+e.getMessage());
+            warningText.setText("Error loading the creation page: " + e.getMessage());
+            System.err.println("ProfileView : Error loading creation page."+e.getMessage());
         }
     }
 }

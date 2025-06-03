@@ -2,7 +2,7 @@ package com.esa.moviestar.home;
 
 import com.esa.moviestar.database.ContentDao;
 import com.esa.moviestar.model.Content;
-import com.esa.moviestar.model.Utente;
+import com.esa.moviestar.model.User;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
@@ -34,7 +34,7 @@ public class SearchController {
     private String searchText;
     private MainPagesController setupController;
     private HeaderController headerController;
-    private Utente user;
+    private User user;
     private ContentDao dbSearch;
     private List<Node> tryRecommendationList;
     List<Content> suggestedContent;
@@ -56,7 +56,7 @@ public class SearchController {
                 ));
     }
 
-    public void setParamController(HeaderController header, Utente user, MainPagesController mainPagesController) throws IOException {
+    public void setParamController(HeaderController header, User user, MainPagesController mainPagesController) throws IOException {
 //        this.headerController = header;
 //        this.user = user;
 //        this.setupController = mainPagesController; // Use the passed instance

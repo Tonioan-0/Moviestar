@@ -16,7 +16,7 @@ public class AccountDao {
             this.connection = DataBaseManager.getConnection();
         }
         catch (SQLException e) {
-            System.err.println("accountDao : errore di connessione con il database "+e.getMessage());
+            System.err.println("accountDao : Database connection error "+e.getMessage());
         }
     }
 
@@ -24,39 +24,38 @@ public class AccountDao {
 
 
     //Metodo per inserire un Account
-    public boolean inserisciAccount(Account account) {
-        String sql = "INSERT INTO Account (Email,Password) Values (?,?);";
+    public boolean insertAccount(Account account) {
+        String query = "INSERT INTO Account (Email,Password) Values (?,?);";
 
-        try(PreparedStatement stmt = connection.prepareStatement(sql)){
+        try(PreparedStatement stmt = connection.prepareStatement(query)){
             stmt.setString(1, account.getEmail());
             stmt.setString(2, account.getPassword());
             stmt.execute();
-            System.out.println("AccountDao : account aggiunto : "+account.getEmail());
+            System.out.println("AccountDao : Account added : "+account.getEmail());
             return true;
         }catch (SQLException e) {
             if (e.getMessage().contains("UNIQUE constraint failed")) {
-                // Email già esistente
                 return false;
             } else {
-                System.err.println("accountDao : errore di inserimento dell'account"+e.getMessage());
+                System.err.println("accountDao :Account insertion error"+e.getMessage());
                 return false;
             }
         }
     }
 
     //Metodo per eliminare l'account
-    public boolean rimuoviAccount(String email) {
+    public boolean deleteAccount(String email) {
         String query = "DELETE FROM Account WHERE Email = ?;";
         try (PreparedStatement stmt = connection.prepareStatement(query)) {
             stmt.setString(1, email);
             int rowsAffected = stmt.executeUpdate();
             if (rowsAffected == 0) {
-                System.err.println("Nessun account trovato con email = " + email);
+                System.err.println("No account found with email =" + email);
 
             }
-            System.out.println("AccountDao : account rimosso : "+email);
+            System.out.println("AccountDao : account deleted : "+email);
         } catch (SQLException e) {
-            System.err.println("accountDao: errore di rimozione dell'account - " + e.getMessage());
+            System.err.println("accountDao: Error removing account – " + e.getMessage());
 
         }
         return false;
@@ -64,7 +63,7 @@ public class AccountDao {
 
 
     //Metodo per cercare l'account dall'email
-    public  Account cercaAccount(String email) {
+    public  Account searchAccount(String email) {
         String query = "SELECT * FROM Account WHERE Email = ?;";
 
         try (PreparedStatement stmt = connection.prepareStatement(query)) {
@@ -81,7 +80,7 @@ public class AccountDao {
             }
 
         } catch (SQLException e) {
-            System.err.println("accountDao : errore di ricerca dell'account"+e.getMessage());
+            System.err.println("accountDao : Account search error"+e.getMessage());
         }
         return null;
     }
@@ -91,11 +90,11 @@ public class AccountDao {
         try (PreparedStatement stmt = connection.prepareStatement(query)) {
             stmt.setString(1, password);
             stmt.setString(2, email);
-            int righeModificate = stmt.executeUpdate();
-            System.out.println("AccountDao : account a cui è stata aggiornata la password : "+email);
-            return righeModificate > 0;  // ritorna true se almeno una riga è stata modificata
+            int rowsAffected = stmt.executeUpdate();
+            System.out.println("AccountDao :account with updated password : "+email);
+            return rowsAffected > 0;  // ritorna true se almeno una riga è stata modificata
         } catch (SQLException e) {
-            System.err.println("accountDao : errore di aggiornamento della password dell'account"+e.getMessage());
+            System.err.println("accountDao : Account password update error"+e.getMessage());
 
         }
         return false;
@@ -112,9 +111,9 @@ public class AccountDao {
                     return storedPassword.equals(password);
                 }
             }
-            System.out.println("AccountDao : account a cui è stata verificata la password : "+email);
+            System.out.println("AccountDao : account with verified password: "+email);
         }catch (SQLException e){
-            System.err.println("accountDao : errore di verifica della password dell'account"+e.getMessage());
+            System.err.println("accountDao : Account password verification error"+e.getMessage());
         }
         return false;
     }

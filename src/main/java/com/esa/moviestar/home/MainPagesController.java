@@ -1,12 +1,12 @@
 package com.esa.moviestar.home;
 
 import com.esa.moviestar.Main;
+import com.esa.moviestar.model.User;
 import com.esa.moviestar.profile.CreateProfileController;
 import com.esa.moviestar.settings.SettingsViewController;
 import com.esa.moviestar.components.BufferAnimation;
 import com.esa.moviestar.model.Account;
 import com.esa.moviestar.model.Content;
-import com.esa.moviestar.model.Utente;
 import com.esa.moviestar.movie_view.FilmCardController;
 import com.esa.moviestar.movie_view.FilmSceneController;
 
@@ -48,7 +48,7 @@ public class MainPagesController {
     public static final Color BACKGROUND_COLOR = Color.rgb(16, 16, 16);
 
     // Instance variables
-    private Utente user;
+    private User user;
     private Account account;
 
 
@@ -71,7 +71,7 @@ public class MainPagesController {
 
 
 
-    public void first_load(Utente user, Account account) {
+    public void first_load(User user, Account account) {
         if (loadingOverlay == null) {
             createLoadingOverlay();
             body.getChildren().add(loadingOverlay);
@@ -448,7 +448,7 @@ public class MainPagesController {
         System.out.println("Play card clicked (not implemented): " + cardId);
     }
 
-    public void settingsClick(Utente user, Account account) {
+    public void settingsClick(User user, Account account) {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/esa/moviestar/settings/settings-view.fxml"), Main.resourceBundle);
             Parent settingContent = loader.load();
@@ -478,7 +478,7 @@ public class MainPagesController {
         }
     }
 
-    public void profileClick(Utente newUser) {
+    public void profileClick(User newUser) {
         if (transitionInProgress) return;
 
         if (loadingSpinner != null) loadingSpinner.stopAnimation();
@@ -508,9 +508,9 @@ public class MainPagesController {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/esa/moviestar/profile/create-profile-view.fxml"), Main.resourceBundle);
             Parent createContent = loader.load();
             CreateProfileController createProfileController = loader.getController();
-            createProfileController.setOrigine(CreateProfileController.Origine.HOME);
+            createProfileController.setSource(CreateProfileController.Origine.HOME);
             createProfileController.setAccount(account);
-            createProfileController.setUtente(this.user); // Pass current user context
+            createProfileController.setUser(this.user); // Pass current user context
 
             Scene currentSceneNode = body.getScene();
             Scene newScene = new Scene(createContent, currentSceneNode.getWidth(), currentSceneNode.getHeight());

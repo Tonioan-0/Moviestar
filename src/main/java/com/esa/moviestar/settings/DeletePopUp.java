@@ -21,7 +21,7 @@ public class DeletePopUp extends StackPane {
     private PasswordField passwordField;
     private VBox passwordVBox;
 
-    public DeletePopUp(boolean isAccount , Account account) {
+    public DeletePopUp(boolean isAccount, Account account) {
         page(isAccount, account);
         passwordProperty();
     }
@@ -31,26 +31,26 @@ public class DeletePopUp extends StackPane {
 
         // StackPane per l'UI principale
         mainPane.setMaxHeight(340.0);
-        mainPane.setMaxWidth(551.0);
+        mainPane.setMaxWidth(550.0);
         mainPane.getStylesheets().add(Objects.requireNonNull(getClass().getResource("/com/esa/moviestar/styles/general.css")).toExternalForm());
         mainPane.getStyleClass().addAll("surface-dim-opaque", "very-large-item");
-        mainPane.setPadding(new Insets(24.0));
-        StackPane.setAlignment(mainPane,Pos.CENTER);
+        mainPane.setPadding(new Insets(25.0));
+        StackPane.setAlignment(mainPane, Pos.CENTER);
 
         // VBox principale
         VBox mainVBox = new VBox();
         mainVBox.setAlignment(Pos.CENTER);
-        StackPane.setAlignment(mainVBox,Pos.CENTER);
-        mainVBox.setSpacing(24.0);
+        StackPane.setAlignment(mainVBox, Pos.CENTER);
+        mainVBox.setSpacing(25.0);
 
         // Label titolo
-        Label titleLabel = new Label(isAccount?"Delete Account":"Delete User");
+        Label titleLabel = new Label(isAccount ? "Delete Account" : "Delete User");
         titleLabel.setPrefHeight(35.0);
-        titleLabel.setPrefWidth(406.0);
+        titleLabel.setPrefWidth(405.0);
         titleLabel.getStyleClass().addAll("large-text", "bold-text", "on-primary");
 
         // Testo descrittivo
-        Text descriptionText = new Text(isAccount?"Are you sure you want to delete your account? By proceeding, you will be logged out and will no longer be able to access it.":"Are you sure you want to delete your user profile? Deleting your profile is an irreversible action and you will lose all data associated with it.");
+        Text descriptionText = new Text(isAccount ? "Are you sure you want to delete your account? By proceeding, you will be logged out and will no longer be able to access it." : "Are you sure you want to delete your user profile? Deleting your profile is an irreversible action and you will lose all data associated with it.");
         descriptionText.setStrokeType(javafx.scene.shape.StrokeType.OUTSIDE);
         descriptionText.setStrokeWidth(0.0);
         descriptionText.setWrappingWidth(400.0);
@@ -67,7 +67,7 @@ public class DeletePopUp extends StackPane {
 
         //password
         passwordField = new PasswordField();
-        passwordField.getStyleClass().addAll( "on-primary", "small-item","medium-text","surface-dim-border","text-area");
+        passwordField.getStyleClass().addAll("on-primary", "small-item", "medium-text", "surface-dim-border", "text-area");
         VBox.setMargin(passwordField, new Insets(0, 40.0, 0, 40.0));
 
         passwordVBox.getChildren().addAll(passwordLabel, passwordField);
@@ -77,7 +77,7 @@ public class DeletePopUp extends StackPane {
         buttonHBox.setAlignment(Pos.CENTER_RIGHT);
         buttonHBox.setPrefHeight(100.0);
         buttonHBox.setPrefWidth(200.0);
-        buttonHBox.setSpacing(36.0);
+        buttonHBox.setSpacing(35.0);
         VBox.setMargin(buttonHBox, new Insets(0, 40.0, 0, 0));
 
         // Pulsante Annulla
@@ -86,7 +86,7 @@ public class DeletePopUp extends StackPane {
         cancelButton.getStyleClass().addAll("medium-item", "back-button");
 
         // Pulsante Elimina account
-        deleteButton = new Button(isAccount?"Delete account":"Delete user");
+        deleteButton = new Button(isAccount ? "Delete account" : "Delete user");
         deleteButton.setMnemonicParsing(false);
         deleteButton.setPrefHeight(35.0);
         deleteButton.setPrefWidth(110.0);
@@ -118,7 +118,7 @@ public class DeletePopUp extends StackPane {
         return deleteButton;
     }
 
-    public VBox getPasswordBox(){
+    public VBox getPasswordBox() {
         return passwordVBox;
     }
 
