@@ -137,7 +137,7 @@ public class HeaderController {
         popupMenu.addSeparator();
         for (User i : users) {
             if (user.getID()!=i.getID()) {
-                createProfileItem(i, i.getName(), i.getIcona(), mainPagesController);
+                createProfileItem(i, i.getName(), i.getIcon(), mainPagesController);
             }
         }
         if(users.size()<4){createAddItem(account,mainPagesController);}

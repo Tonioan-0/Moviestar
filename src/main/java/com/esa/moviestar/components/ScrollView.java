@@ -66,12 +66,7 @@ public class ScrollView extends Control {
         return  new ScrollViewSkin(this );
     }
 
-    /* *************************************************************************
-     *                                                                         *
-     *                            Getters and Setters                          *
-     *                                                                         *
-     **************************************************************************/ //maybe this separator is too much
-
+    // Getters and setters for properties
     public void setContent(List<Node> objects ) {
         items.clear( );
         items.addAll(objects );
@@ -85,7 +80,6 @@ public class ScrollView extends Control {
         items.remove(item );
     }
 
-    // Getters and Setters for properties
     public String getTitle( ) {
         return title.get( );
     }

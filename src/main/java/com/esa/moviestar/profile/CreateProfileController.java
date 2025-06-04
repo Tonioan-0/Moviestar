@@ -58,7 +58,7 @@ public class CreateProfileController extends BaseProfileController {
             goToHome();
         } else if (source == Origine.PROFILE) {
             backToProfiles();
-        } else if (source == Origine.REGISTER || dao.countProfilesbyEmail(account.getEmail()) == 0) {
+        } else if (source == Origine.REGISTER || dao.countProfilesByEmail(account.getEmail()) == 0) {
             textName.setText("");
         }
     }
@@ -75,15 +75,14 @@ public class CreateProfileController extends BaseProfileController {
     }
 
     private User createUser(String name, int image) {
-        String gusto = "505050505050505050505050505050505050";
         LocalDate date = LocalDate.now();
-        return new User(name, image, gusto, account.getEmail(), date);
+        return new User(name, image, account.getEmail(), date);
     }
 
     private boolean saveUser(User user) {
         try {
-            UserDao utentedao = new UserDao();
-            utentedao.insertUser(user);
+            UserDao userDao= new UserDao();
+            userDao.insertUser(user);
             return true;
         } catch (Exception e) {
             System.err.println("Profile save error:" + e.getMessage());

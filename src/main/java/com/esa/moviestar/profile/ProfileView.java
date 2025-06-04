@@ -119,7 +119,7 @@ public class ProfileView {
         Label name = new Label(user.getName());
         name.getStyleClass().addAll("on-primary", "bold-text", "large-text");
 
-        Group icon = new Group(IconSVG.takeElement(user.getIDIcona()));
+        Group icon = new Group(IconSVG.takeElement(user.getIDIcon()));
         icon.setScaleY(SVG_SIZE);
         icon.setScaleX(SVG_SIZE);
 

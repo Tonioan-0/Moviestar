@@ -92,7 +92,7 @@ public class MainPagesController {
             return;
         }
 
-        ((HeaderController) this.header.controller()).setProfileIcon(user.getIcona());
+        ((HeaderController) this.header.controller()).setProfileIcon(user.getIcon());
 
         CompletableFuture.runAsync(() -> {
             showLoadingSpinner(); // Show spinner for home page loading
@@ -102,7 +102,7 @@ public class MainPagesController {
                     HomeController homeBodyController = (HomeController) homeData.controller();
                     homeBodyController.setRecommendations(user, MainPagesController.this);
                     this.home = homeData;
-                    transitionToPage(homeData);
+                    transitionToPage(homeData); // This will also call hideLoadingSpinner
                 });
             } else {
                 Platform.runLater(() -> {
@@ -149,31 +149,61 @@ public class MainPagesController {
         headerController.getTbxSearch().textProperty().addListener((observableValue, oldV, newV) -> {
             if (newV.isEmpty()) {
                 if (currentScene != null && currentScene.controller() instanceof SearchController) {
-                    if (pageBeforeSearch != null && pageBeforeSearch != currentScene) {
-                        transitionToPage(pageBeforeSearch);
-                        pageBeforeSearch = null; // Consumed
-                    } else if (home != null && currentScene != home) { // Fallback to home
-                        transitionToPage(home);
+                    PageData pageToReturnTo = null;
+                    String pageNameForButtonActivation = null;
+
+                    // Determine the page to return to and its corresponding name for button activation
+                    if (this.pageBeforeSearch != null && this.pageBeforeSearch.controller() != null &&
+                            !(this.pageBeforeSearch.controller() instanceof SearchController)) {
+                        pageToReturnTo = this.pageBeforeSearch;
+                        if (pageToReturnTo == this.home) pageNameForButtonActivation = "home";
+                        else if (pageToReturnTo == this.filter_film) pageNameForButtonActivation = "film filter";
+                        else if (pageToReturnTo == this.filter_series) pageNameForButtonActivation = "series filter";
+                    }
+
+                    // Fallback to home page if pageBeforeSearch is not suitable
+                    if (pageToReturnTo == null && this.home != null) {
+                        pageToReturnTo = this.home;
+                        pageNameForButtonActivation = "home";
+                    }
+
+                    if (pageToReturnTo != null && pageNameForButtonActivation != null) {
+                        final PageData finalPageToReturnTo = pageToReturnTo;
+
+                        loadPageAsync(pageNameForButtonActivation, () -> {
+
+                            return finalPageToReturnTo; // Return the already determined (and likely cached) page
+                        });
+
+                        if (this.pageBeforeSearch == pageToReturnTo) {
+                            this.pageBeforeSearch = null; // Consumed
+                        }
                     }
                 }
-                return;
+                return; // Exit after handling empty search text
             }
-            if (currentScene == null || !(currentScene.controller() instanceof SearchController)) {
-                if (currentScene != null && (pageBeforeSearch == null || (pageBeforeSearch.node() != currentScene.node()))) {
-                    pageBeforeSearch = currentScene;
+
+            // User is typing in search or search text is not empty
+            // Store the current page if we are navigating TO the search page from a non-search page
+            if (currentScene != null && !(currentScene.controller() instanceof SearchController)) {
+                // Only update pageBeforeSearch if it's not already the search page
+                // and if it's different from the current pageBeforeSearch
+                if (this.pageBeforeSearch == null || (this.pageBeforeSearch.node() != currentScene.node())) {
+                    this.pageBeforeSearch = currentScene;
                 }
             }
 
+            // Load the search page results
             loadPageAsync("search", () -> {
                 PageData searchResultPage = loadDynamicBody("search.fxml");
-                headerController.activeSearch();
-                if (searchResultPage != null) {
-                    try {
-                        ((SearchController) searchResultPage.controller()).setParamController(
-                                headerController, user,  this);
-                    } catch (IOException e) {
-                        throw new RuntimeException(e);
-                    }
+                // headerController.activeSearch(); // This is handled by loadPageAsync
+                if (searchResultPage != null && searchResultPage.controller() instanceof SearchController) {
+                    ((SearchController) searchResultPage.controller()).setParamController(
+                            headerController, user,  this);
+                } else if (searchResultPage == null) {
+                    System.err.println("MainPagesController: Search page (search.fxml) failed to load.");
+                } else {
+                    System.err.println("MainPagesController: Search page loaded, but controller is not SearchController.");
                 }
                 return searchResultPage;
             });
@@ -232,7 +262,6 @@ public class MainPagesController {
             fadeIn.play();
         });
     }
-
     private void hideLoadingSpinner() {
         Platform.runLater(() -> {
             if (loadingSpinner == null || loadingOverlay == null) return; // Nothing to hide
@@ -248,27 +277,37 @@ public class MainPagesController {
     }
 
     private void loadPageAsync(String pageName, java.util.function.Supplier<PageData> pageSupplier) {
-        CompletableFuture.runAsync(() -> {
-            HeaderController headerController = (HeaderController)header.controller();
-            try {
-                switch(pageName){
-                    case "home":
-                        headerController.activeButton(headerController.homeButton);
-                        break;
-                    case "film filter":
-                        headerController.activeButton(headerController.filmButton);
-                        break;
-                    case "series filter":
-                        headerController.activeButton(headerController.seriesButton);
-                        break;
-                    case "search":
-                        headerController.activeSearch();
-                        break;
-                }
-                showLoadingSpinner();
-                PageData page = pageSupplier.get();
-                if (page != null) {
+        if (header == null || header.controller() == null) {
+            System.err.println("MainPagesController.loadPageAsync: Header or its controller is null. Cannot proceed.");
+            hideLoadingSpinner(); // Ensure spinner is hidden if we can't proceed
+            return;
+        }
+        HeaderController headerController = (HeaderController)header.controller();
 
+        CompletableFuture.runAsync(() -> {
+            try {
+                // Activate button on the JavaFX Application Thread before showing spinner
+                Platform.runLater(() -> {
+                    switch(pageName){
+                        case "home":
+                            headerController.activeButton(headerController.homeButton);
+                            break;
+                        case "film filter":
+                            headerController.activeButton(headerController.filmButton);
+                            break;
+                        case "series filter":
+                            headerController.activeButton(headerController.seriesButton);
+                            break;
+                        case "search":
+                            headerController.activeSearch();
+                            break;
+                    }
+                });
+
+                showLoadingSpinner(); // Now show spinner
+                PageData page = pageSupplier.get(); // This can be time-consuming
+
+                if (page != null) {
                     Platform.runLater(() -> transitionToPage(page));
                 } else {
                     Platform.runLater(this::hideLoadingSpinner);
@@ -277,6 +316,7 @@ public class MainPagesController {
             } catch (Exception e) {
                 Platform.runLater(this::hideLoadingSpinner);
                 System.err.println("MainPagesController: Error to load " + pageName + " page: " + e.getMessage());
+                e.printStackTrace(); //suca no gemini aruqqq
             }
         });
     }
@@ -301,6 +341,7 @@ public class MainPagesController {
             return null;
         } catch (Exception e) {
             System.err.println("MainPagesController: Unexpected error while loading " + bodySource + ". Details: " + e.getMessage());
+            e.printStackTrace(); // Good for debugging
             return null;
         }
     }
@@ -325,30 +366,34 @@ public class MainPagesController {
 
     public void restorePreviousScene() {
         if (this.savedPageData != null) {
-            System.out.println("Restoring previous scene with slide animation");
+            System.out.println("Restoring previous scene"); // Removed "with slide animation" as it's a fade
 
             root.getChildren().clear();
-            root.getChildren().add(body);
-            root.getChildren().add(headerContainer);
+            // Ensure body and headerContainer are added back in the correct order
+            root.getChildren().add(body); // Body first
+            root.getChildren().add(headerContainer); // Header on top of body (conceptually, layout handles actual position)
 
-            // Clear body and add the saved page node
+
             body.getChildren().clear();
             Node pageNodeToRestore = savedPageData.node();
-            pageNodeToRestore.setOpacity(1.0);
+            pageNodeToRestore.setOpacity(1.0); // Ensure it's visible
             body.getChildren().add(pageNodeToRestore);
 
             if (loadingOverlay != null) {
-                if (!body.getChildren().contains(loadingOverlay))
-                    body.getChildren().add(loadingOverlay);
+                if (!body.getChildren().contains(loadingOverlay)) {
+                    body.getChildren().add(loadingOverlay); // Add it if not present
+                }
+                // Ensure loading overlay is hidden
                 loadingOverlay.setOpacity(0);
                 loadingOverlay.setVisible(false);
-                if (loadingSpinner != null)
+                if (loadingSpinner != null) {
                     loadingSpinner.stopAnimation();
+                }
             }
 
             this.currentScene = this.savedPageData;
-            this.savedPageData = null;
-            this.transitionInProgress = false;
+            this.savedPageData = null; // Consumed
+            this.transitionInProgress = false; // Reset transition flag
         } else {
             System.err.println("Cannot restore scene: savedPageData is null");
         }
@@ -361,53 +406,78 @@ public class MainPagesController {
 
         if (filmDetail != null && filmDetail.controller() instanceof FilmSceneController filmController) {
             filmController.setProperties(screenshotView, this);
-            //filmController.loadFilmData(filmId);
-            this.savedPageData = this.currentScene;
+            // filmController.loadFilmData(filmId); // This should be called by FilmSceneController itself
+            this.savedPageData = this.currentScene; // Save current page before switching
 
             root.getChildren().clear();
             root.getChildren().add(filmDetail.node());
+            // currentScene will be the filmDetail page implicitly after this
         } else {
             System.err.println("MainPagesController: Failed to load film scene");
         }
     }
 
     private void transitionToPage(PageData newPage) {
-        if (newPage == null || newPage.node() == null || transitionInProgress) {
-            if (newPage == null || newPage.node() == null) hideLoadingSpinner();
-            return;
+        if (newPage == null || newPage.node() == null || (currentScene == newPage && !body.getChildren().isEmpty() && body.getChildren().contains(newPage.node())) ) {
+            if (newPage == null || newPage.node() == null) hideLoadingSpinner(); // Still hide if page is invalid
+            if (currentScene == newPage && !transitionInProgress) hideLoadingSpinner(); // If already on page, just hide spinner
+            if (transitionInProgress && (currentScene == newPage)) return; // Avoid re-transition to same page if already in progress
+            if (newPage == null || newPage.node() == null) return;
         }
+        if (transitionInProgress) return; // Prevent concurrent transitions
+
 
         transitionInProgress = true;
 
         Node currentNode = null;
+        // Find the current visible page node, excluding the loading overlay
         for(Node child : body.getChildren()){
-            if(child != loadingOverlay){
+            if(child != loadingOverlay){ // Make sure not to fade out the loading overlay itself
                 currentNode = child;
                 break;
             }
         }
 
-        if (currentNode != null) {
+
+        if (currentNode != null && currentNode != newPage.node()) { // Only fade out if there's a different current node
             FadeTransition fadeOut = new FadeTransition(Duration.millis(FADE_DURATION), currentNode);
             fadeOut.setFromValue(1.0);
             fadeOut.setToValue(0.0);
-            Node finalCurrentNode = currentNode;
+            Node finalCurrentNode = currentNode; // For use in lambda
             fadeOut.setOnFinished(e -> {
                 body.getChildren().remove(finalCurrentNode);
                 showNewPage(newPage);
             });
             fadeOut.play();
-        } else {
+        } else { // No current node to fade out, or it's the same node (e.g., initial load)
+            if (currentNode == null && newPage.node() != null && !body.getChildren().contains(newPage.node())) {
+                // If no current node, directly add and show the new page
+            } else if (body.getChildren().contains(newPage.node())) {
+                // If the new page is already there (e.g. after a failed load then success), ensure it's visible
+                newPage.node().setOpacity(1.0);
+                currentScene = newPage;
+                transitionInProgress = false;
+                hideLoadingSpinner();
+                return;
+            }
             showNewPage(newPage);
         }
     }
 
     private void showNewPage(PageData newPage) {
         Node pageNode = newPage.node();
-        pageNode.setOpacity(0);
-        if (pageNode != loadingOverlay)
-            body.getChildren().addFirst(pageNode);
+        if (pageNode == null) { // Guard against null pageNode
+            transitionInProgress = false;
+            hideLoadingSpinner();
+            System.err.println("MainPagesController.showNewPage: newPage.node() is null.");
+            return;
+        }
 
+        pageNode.setOpacity(0); // Start transparent for fade-in
+        // Add the new page node if it's not already present and not the loading overlay
+        if (!body.getChildren().contains(pageNode) && pageNode != loadingOverlay) {
+            body.getChildren().addFirst(pageNode); // Add to the bottom of the stack (rendered first)
+        }
 
 
         FadeTransition fadeIn = new FadeTransition(Duration.millis(FADE_DURATION), pageNode);
@@ -457,11 +527,16 @@ public class MainPagesController {
             settingsViewController.setAccount(account); // Pass account
 
             Scene currentSceneNode = body.getScene(); // Use body.getScene() for consistency
+            if (currentSceneNode == null) {
+                System.err.println("MainPagesController.settingsClick: body.getScene() is null.");
+                return;
+            }
             Scene newScene = new Scene(settingContent, currentSceneNode.getWidth(), currentSceneNode.getHeight());
             Stage stage = (Stage) currentSceneNode.getWindow();
             stage.setScene(newScene);
         } catch (IOException e) {
             System.err.println("MainPagesController: Errore caricamento pagina dei setting: " + e.getMessage());
+            e.printStackTrace();
         }
     }
 
@@ -470,37 +545,47 @@ public class MainPagesController {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/esa/moviestar/login/access.fxml"), Main.resourceBundle);
             Parent accessContent = loader.load();
             Scene currentSceneNode = body.getScene();
+            if (currentSceneNode == null) {
+                System.err.println("MainPagesController.emailClick: body.getScene() is null.");
+                return;
+            }
             Scene newScene = new Scene(accessContent, currentSceneNode.getWidth(), currentSceneNode.getHeight());
             Stage stage = (Stage) currentSceneNode.getWindow();
             stage.setScene(newScene);
         } catch (IOException ex) {
             System.err.println("MainPagesController: Errore caricamento pagina di accesso dell'account: " + ex.getMessage());
+            ex.printStackTrace();
         }
     }
 
     public void profileClick(User newUser) {
         if (transitionInProgress) return;
 
-        if (loadingSpinner != null) loadingSpinner.stopAnimation();
+        showLoadingSpinner(); // Show spinner before starting the reset
 
-        // Clear main containers
-        if (body != null) body.getChildren().clear();
-        if (headerContainer != null) headerContainer.getChildren().clear();
+        // Clear main containers on JavaFX thread after current operations might finish
+        Platform.runLater(() -> {
+            if (loadingSpinner != null) loadingSpinner.stopAnimation(); // Stop any previous animation
 
-        // Reset page data and state
-        header = null;
-        home = null;
-        filter_film = null;
-        filter_series = null;
-        currentScene = null;
-        pageBeforeSearch = null;
-        savedPageData = null; // Reset this too
-        loadingOverlay = null; // Will be recreated by initialize
-        // transitionInProgress will be reset by initialize->showLoadingSpinner->transitionToPage flow
+            if (body != null) body.getChildren().clear();
+            if (headerContainer != null) headerContainer.getChildren().clear();
 
-        this.user = newUser; // Update to the new user
+            // Reset page data and state
+            header = null;
+            home = null;
+            filter_film = null;
+            filter_series = null;
+            currentScene = null;
+            pageBeforeSearch = null;
+            savedPageData = null;
+            // loadingOverlay will be recreated by first_load if needed, or re-added if createLoadingOverlay is called
+            // transitionInProgress will be reset by the first_load -> transitionToPage flow
 
-        first_load(this.user, this.account); // Reloads header and home for the new user
+            this.user = newUser; // Update to the new user
+
+            // Re-initialize the UI for the new user
+            first_load(this.user, this.account);
+        });
     }
 
     public void createProfileUser(Account account){
@@ -513,11 +598,16 @@ public class MainPagesController {
             createProfileController.setUser(this.user); // Pass current user context
 
             Scene currentSceneNode = body.getScene();
+            if (currentSceneNode == null) {
+                System.err.println("MainPagesController.createProfileUser: body.getScene() is null.");
+                return;
+            }
             Scene newScene = new Scene(createContent, currentSceneNode.getWidth(), currentSceneNode.getHeight());
             Stage stage = (Stage) currentSceneNode.getWindow();
             stage.setScene(newScene);
         }catch(IOException e){
             System.err.println("MainPagesController : errore caricamento pagina di creazione profili: " + e.getMessage());
+            e.printStackTrace();
         }
     }
 }

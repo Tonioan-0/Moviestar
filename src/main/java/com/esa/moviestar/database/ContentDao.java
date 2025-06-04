@@ -133,7 +133,7 @@ public class ContentDao {
 //        List<Integer> idsToDelete = new ArrayList<>();
 //        String selectExpiredSQL = "SELECT ID_Content FROM Content " +
 //                "WHERE Fetched_Date < ? " +
-//                "AND ID_Content NOT IN (SELECT DISTINCT ID_Content FROM Chronology) " +
+//                "AND ID_Content NOT IN (SELECT DISTINCT ID_Content FROM History) " +
 //                "AND ID_Content NOT IN (SELECT DISTINCT ID_Content FROM WatchList)";
 //        try (PreparedStatement selectStmt = connection.prepareStatement(selectExpiredSQL)) {
 //            selectStmt.setString(1, oneWeekAgoStr);
@@ -149,7 +149,7 @@ public class ContentDao {
 //
 //        String deleteSQL = "DELETE FROM Content " +
 //                "WHERE Fetched_Date < ? " +
-//                "AND ID_Content NOT IN (SELECT DISTINCT ID_Content FROM Chronology) " +
+//                "AND ID_Content NOT IN (SELECT DISTINCT ID_Content FROM History) " +
 //                "AND ID_Content NOT IN (SELECT DISTINCT ID_Content FROM WatchList)";
 //
 //        try (PreparedStatement stmt = connection.prepareStatement(deleteSQL)) {
@@ -313,7 +313,7 @@ public class ContentDao {
         List<Integer> idsToDelete = new ArrayList<>();
         String selectExpiredSQL = "SELECT ID_Content FROM Content " +
                 "WHERE Fetched_Date < ? " +
-                "AND ID_Content NOT IN (SELECT DISTINCT ID_Content FROM Chronology) " +
+                "AND ID_Content NOT IN (SELECT DISTINCT ID_Content FROM History) " +
                 "AND ID_Content NOT IN (SELECT DISTINCT ID_Content FROM WatchList)";
         try {
             if (connection == null || connection.isClosed()) {
@@ -335,7 +335,7 @@ public class ContentDao {
 
         String deleteSQL = "DELETE FROM Content " +
                 "WHERE Fetched_Date < ? " +
-                "AND ID_Content NOT IN (SELECT DISTINCT ID_Content FROM Chronology) " +
+                "AND ID_Content NOT IN (SELECT DISTINCT ID_Content FROM History) " +
                 "AND ID_Content NOT IN (SELECT DISTINCT ID_Content FROM WatchList)";
 
         try {
@@ -402,7 +402,7 @@ public class ContentDao {
             }
             // SQL to fetch all genres.
             // IMPORTANT: Replace 'Genre' and 'ID_Genre' with your actual table and column names for all genres.
-            String allGenresSql = "SELECT ID_Genre FROM Genre ORDER BY ID_Genre";
+            String allGenresSql = "SELECT ID_Genre FROM Taste ORDER BY ID_Genre";
             try {
                 if (connection == null || connection.isClosed()) {
                     System.err.println("ContentDao: getGenreIdsStringFromTaste - DB connection not available for fetching all genres.");
@@ -415,7 +415,7 @@ public class ContentDao {
                     }
                 }
             } catch (SQLException e) {
-                System.err.println("ContentDao: Error fetching all genre IDs from Genre table: " + e.getMessage());
+                System.err.println("ContentDao: Error fetching all genre IDs from Content_Genre table: " + e.getMessage());
                 return "-1";
             }
 
@@ -478,16 +478,16 @@ public class ContentDao {
                         "SELECT *, 2 AS List FROM (SELECT C.* FROM Content C ORDER BY Release_Date DESC LIMIT 8) UNION ALL " +
                         // Favorite tag(s) but not watched (uses first_top_genre_str which could be one or all)
                         "SELECT *, 3 AS List FROM (SELECT C.* FROM Content C JOIN Content_Genre CG ON C.ID_Content = CG.ID_Content " +
-                        "LEFT JOIN Chronology CR ON C.ID_Content = CR.ID_Content AND CR.ID_User = " + userId + " " +
+                        "LEFT JOIN History CR ON C.ID_Content = CR.ID_Content AND CR.ID_User = " + userId + " " +
                         "WHERE CG.ID_Genre IN (" + first_top_genre_str + ") " + // MODIFIED: Was complex subquery with '='
                         "AND CR.ID_Content IS NULL AND C.Episodes_Count = 0 ORDER BY RANDOM() LIMIT 8) UNION ALL " +
 
                         "SELECT *, 4 AS List FROM (SELECT C2.* FROM Content_Genre CG1 JOIN Content_Genre CG2 ON CG1.ID_Genre = CG2.ID_Genre AND CG1.ID_Content != CG2.ID_Content " +
-                        "JOIN Content C2 ON CG2.ID_Content = C2.ID_Content WHERE CG1.ID_Content = ( SELECT CR.ID_Content FROM Chronology CR WHERE CR.ID_User = " + userId + " " +
+                        "JOIN Content C2 ON CG2.ID_Content = C2.ID_Content WHERE CG1.ID_Content = ( SELECT CR.ID_Content FROM History CR WHERE CR.ID_User = " + userId + " " +
                         "ORDER BY CR.Date DESC LIMIT 1 ) ORDER BY RANDOM() LIMIT 7) UNION ALL " +
 
                         // Recently watched
-                        "SELECT *, 5 AS List FROM (SELECT C.* FROM Chronology CR JOIN Content C ON CR.ID_Content = C.ID_Content " +
+                        "SELECT *, 5 AS List FROM (SELECT C.* FROM History CR JOIN Content C ON CR.ID_Content = C.ID_Content " +
                         "WHERE CR.ID_User = " + userId + " ORDER BY CR.Date DESC LIMIT 7) UNION ALL " +
 
                         // Recommended series
@@ -525,7 +525,7 @@ public class ContentDao {
                     "UNION ALL " +
                     // Content from top genre(s) not watched
                     "SELECT *, 2 AS List FROM ( SELECT C.* FROM Content C JOIN Content_Genre CG ON C.ID_Content = CG.ID_Content  " +
-                    "LEFT JOIN Chronology CR ON C.ID_Content = CR.ID_Content AND CR.ID_User = " + userId + " " +
+                    "LEFT JOIN History CR ON C.ID_Content = CR.ID_Content AND CR.ID_User = " + userId + " " +
                     "WHERE CG.ID_Genre IN (" + top_genres_str + ") AND CR.ID_Content IS NULL " + typeConditionSpecific + " ORDER BY RANDOM() LIMIT 8 ) AS SubF2  UNION ALL  " +
                     "SELECT *, 3 AS List FROM ( SELECT C.* FROM Content C WHERE " + typeConditionGeneral + "ORDER BY RANDOM() LIMIT 8 ) AS SubF3 " +
                     "UNION ALL " +
@@ -537,7 +537,7 @@ public class ContentDao {
                     "WHERE CG.ID_Genre IN (" + top_genres_str + ") " + typeConditionSpecific + "ORDER BY RANDOM() LIMIT 7 ) AS SubS1 UNION ALL " +
                     // Content from top genre(s) not watched
                     "SELECT *, 2 AS List FROM ( SELECT C.* FROM Content C JOIN Content_Genre CG ON C.ID_Content = CG.ID_Content " +
-                    "LEFT JOIN Chronology CR ON C.ID_Content = CR.ID_Content AND CR.ID_User = " + userId + " WHERE CG.ID_Genre IN (" + top_genres_str + ") " +
+                    "LEFT JOIN History CR ON C.ID_Content = CR.ID_Content AND CR.ID_User = " + userId + " WHERE CG.ID_Genre IN (" + top_genres_str + ") " +
                     "AND CR.ID_Content IS NULL " + typeConditionSpecific + "ORDER BY RANDOM() LIMIT 8 ) AS SubS2 UNION ALL " +
                     "SELECT *, 3 AS List FROM ( SELECT C.* FROM Content C WHERE " + typeConditionGeneral + " ORDER BY RANDOM() LIMIT 8 ) AS SubS3 UNION ALL " +
                     "SELECT *, 4 AS List FROM ( SELECT C.* FROM Content C WHERE " + typeConditionGeneral + " ORDER BY RANDOM() LIMIT 10 ) AS SubS4;";
@@ -655,7 +655,7 @@ public class ContentDao {
     }
 
     public List<Content> getWatched(int idUser, int limit) {
-        return getListWithLimit(idUser, limit, "SELECT C.* FROM Content C JOIN Chronology Cr ON C.ID_Content = Cr.ID_Content WHERE Cr.ID_User = ?");
+        return getListWithLimit(idUser, limit, "SELECT C.* FROM Content C JOIN History Cr ON C.ID_Content = Cr.ID_Content WHERE Cr.ID_User = ?");
     }
 
     private List<Content> getListWithLimit(int idUser, int limit, String queryWithoutLimitAndPlaceholder) {
@@ -714,17 +714,17 @@ public class ContentDao {
 //                        "SELECT *, 2 AS List FROM (SELECT C.* FROM Content C ORDER BY Release_Date DESC LIMIT 8)  UNION ALL " +
 //                        // Favorite tag but not watched
 //                        "SELECT *, 3 AS List FROM (SELECT C.* FROM Content C JOIN Content_Genre CG ON C.ID_Content = CG.ID_Content " +
-//                        "LEFT JOIN Chronology CR ON C.ID_Content = CR.ID_Content AND CR.ID_User = " + user.getID() + " " +
+//                        "LEFT JOIN History CR ON C.ID_Content = CR.ID_Content AND CR.ID_User = " + user.getID() + " " +
 //                        "WHERE CG.ID_Genre = ( SELECT ID_Genre FROM Content_Genre WHERE ID_Content IN ( " +
 //                        "SELECT ID_Content FROM Content_Genre WHERE ID_Genre = " + (gusti.isEmpty() ? "NULL" : gusti.getFirst()) + " LIMIT 1 ) LIMIT 1" +
 //                        ") AND CR.ID_Content IS NULL AND C.Episodes_Count = 0 ORDER BY RANDOM() LIMIT 8)  UNION ALL " +
 //
 //                        "SELECT *, 4 AS List FROM (SELECT C2.* FROM Content_Genre CG1 JOIN Content_Genre CG2 ON CG1.ID_Genre = CG2.ID_Genre AND CG1.ID_Content != CG2.ID_Content " +
-//                        "JOIN Content C2 ON CG2.ID_Content = C2.ID_Content WHERE CG1.ID_Content = ( SELECT CR.ID_Content FROM Chronology CR WHERE CR.ID_User = " + user.getID() + " " +
+//                        "JOIN Content C2 ON CG2.ID_Content = C2.ID_Content WHERE CG1.ID_Content = ( SELECT CR.ID_Content FROM History CR WHERE CR.ID_User = " + user.getID() + " " +
 //                        "ORDER BY CR.Date DESC LIMIT 1 ) ORDER BY RANDOM() LIMIT 7) UNION ALL " +
 //
 //                        // Recently watched
-//                        "SELECT *, 5 AS List FROM (SELECT C.* FROM Chronology CR JOIN Content C ON CR.ID_Content = C.ID_Content " +
+//                        "SELECT *, 5 AS List FROM (SELECT C.* FROM History CR JOIN Content C ON CR.ID_Content = C.ID_Content " +
 //                        "WHERE CR.ID_User = " + user.getID() + " ORDER BY CR.Date DESC LIMIT 7)  UNION ALL " +
 //
 //                        // Recommended series
@@ -758,7 +758,7 @@ public class ContentDao {
 //                    "WHERE CG.ID_Genre IN (" + top_genres_str + ") " + typeConditionSpecific + "ORDER BY RANDOM() LIMIT 7 ) AS SubF1 " +
 //                    "UNION ALL " +
 //                    "SELECT *, 2 AS List FROM ( SELECT C.* FROM Content C JOIN Content_Genre CG ON C.ID_Content = CG.ID_Content  " +
-//                    "LEFT JOIN Chronology CR ON C.ID_Content = CR.ID_Content AND CR.ID_User = " + user.getID() + " WHERE CG.ID_Genre = ( SELECT ID_Genre  " +
+//                    "LEFT JOIN History CR ON C.ID_Content = CR.ID_Content AND CR.ID_User = " + user.getID() + " WHERE CG.ID_Genre = ( SELECT ID_Genre  " +
 //                    "FROM Content_Genre WHERE ID_Content IN ( SELECT ID_Content FROM Content_Genre WHERE ID_Genre IN (" + top_genres_str + ") LIMIT 1 ) LIMIT 1 ) " +
 //                    "AND CR.ID_Content IS NULL " + typeConditionSpecific + "ORDER BY RANDOM() LIMIT 8 ) AS SubF2 " +
 //                    "UNION ALL  " +
@@ -772,7 +772,7 @@ public class ContentDao {
 //                    "SELECT *, 1 AS List FROM ( SELECT C.* FROM Content C JOIN Content_Genre CG ON C.ID_Content = CG.ID_Content " +
 //                    "WHERE CG.ID_Genre IN (" + top_genres_str + ") " + typeConditionSpecific + "ORDER BY RANDOM() LIMIT 7 ) AS SubS1 UNION ALL " +
 //                    "SELECT *, 2 AS List FROM ( SELECT C.* FROM Content C JOIN Content_Genre CG ON C.ID_Content = CG.ID_Content " +
-//                    "LEFT JOIN Chronology CR ON C.ID_Content = CR.ID_Content AND CR.ID_User = " + user.getID() +
+//                    "LEFT JOIN History CR ON C.ID_Content = CR.ID_Content AND CR.ID_User = " + user.getID() +
 //                    " WHERE CG.ID_Genre = ( SELECT ID_Genre FROM Content_Genre WHERE ID_Content IN (" +
 //                    "SELECT ID_Content FROM Content_Genre WHERE ID_Genre IN (" + top_genres_str + ") LIMIT 1 ) LIMIT 1 ) " +
 //                    "AND CR.ID_Content IS NULL " + typeConditionSpecific + "ORDER BY RANDOM() LIMIT 8 ) AS SubS2 UNION ALL " +

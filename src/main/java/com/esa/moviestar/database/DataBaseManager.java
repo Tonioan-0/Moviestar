@@ -1,4 +1,4 @@
-package com.esa.moviestar.database;  // Dichiara il package in cui risiede questa classe
+package com.esa.moviestar.database;  // Declares the package where this class resides
 
 import java.net.URL;
 import java.net.URISyntaxException;
@@ -9,43 +9,53 @@ import java.sql.SQLException;
 
 public class DataBaseManager {
 
-    private static final String DB_NAME = "com/esa/moviestar/DatabaseProjectUID.db";  //nome del file che contiente il database
+    // Defines the resource path for the SQLite database file.
+    // This path is relative to the classpath root.
+    private static final String DB_NAME = "com/esa/moviestar/DatabaseProjectUID.db";
 
-    //Metodo vero e proprio di connessione
     public static Connection getConnection() throws SQLException {
         try {
-            URL dbUrl = DataBaseManager.class.getResource("/" + DB_NAME);  //cerca il file nel classpath grazie a getResource , poi usiamo /+DB_NAME perche nella parte prima dello / si trova tutto il path e poi nella parte dopo il nome del file del database
-            if (dbUrl == null) { //se il percorso è nullo
-                throw new RuntimeException("Database not found in the classpath"); //manda questo errore
+            // Attempt to find the database file within the classpath.
+            // The leading "/" ensures the path is resolved from the root of the classpath.
+            URL dbUrl = DataBaseManager.class.getResource("/" + DB_NAME);
+
+            // If dbUrl is null, the resource was not found.
+            if (dbUrl == null) {
+                throw new RuntimeException("Database file '" + DB_NAME + "' not found in the classpath.");
             }
 
+            // Construct the JDBC URL for SQLite.
+            // 1. dbUrl.toURI(): Converts the URL to a URI, which is a more general representation of a resource identifier.
+            //    This is necessary because URLs can contain special characters that need to be handled correctly for file paths.
+            // 2. Paths.get(dbUrl.toURI()): Converts the URI to a Path object, representing the file system path.
+            // 3. .toString(): Converts the Path object to its string representation.
+            // The resulting string is the absolute path to the database file, suitable for the JDBC SQLite driver.
             String jdbcUrl = "jdbc:sqlite:" + Paths.get(dbUrl.toURI()).toString();
 
-            /*Converte l'URL del database in un percorso di file che può essere usato da SQLite.
-            (dbUrl.toURI()) converte l'URL in un oggetto URI, che è una rappresentazione generica di un percorso.
-            (Paths.get(...)) converte l'oggetto URI in un oggetto Path che rappresenta un file nel filesystem.
-            (toString()) converte il Path in una stringa che può essere usata dal driver JDBC.
-            Il risultato finale è una stringa che rappresenta il percorso assoluto del file del database, */
+            // Establish and return the database connection.
+            return DriverManager.getConnection(jdbcUrl);
 
-            return DriverManager.getConnection(jdbcUrl); //la vera e propria connessione avviene qui
-
-        } catch (URISyntaxException e) { //errore nella conversione del percorso file da url a uri
-            throw new RuntimeException("Error converting the DB path.", e);
+        } catch (URISyntaxException e) {
+            // This exception occurs if the URL retrieved from the classpath
+            // cannot be converted into a valid URI (e.g., due to illegal characters).
+            throw new RuntimeException("Error converting the database URL to a URI. Ensure the path is valid.", e);
         }
     }
 
-    public static void main(String[] args) {
 
+    public static void main(String[] args) {
+        // Using try-with-resources to ensure the connection is automatically closed.
         try (Connection conn = getConnection()) {
-            // Se conn non è null, significa che la connessione è riuscita
+            // If conn is not null, the connection was successful.
             if (conn != null) {
-                System.out.println("Successfully connected to the database");
+                System.out.println("Successfully connected to the database: " + DB_NAME);
             }
         }
+        // Catches SQLException that might be thrown by getConnection() or during auto-closing.
         catch (SQLException e) {
             System.err.println("Connection failed: " + e.getMessage());
-            // Stampa un messaggio di errore con il dettaglio fornito dall’eccezione
+            // Prints an error message including details from the exception.
         }
-        // Fine del metodo main; la connessione è già chiusa dal try-with-resources
+        // The connection is automatically closed here by the try-with-resources statement.
     }
 }

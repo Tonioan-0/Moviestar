@@ -97,7 +97,6 @@
         <Insets bottom="48.0" left="48.0" right="48.0" top="48.0" />
     </padding>
     <stylesheets>
-        <URL value="@../styles/access.css" />
         <URL value="@../styles/general.css" />
     </stylesheets>
 </StackPane>
