@@ -1,13 +1,17 @@
- /*
-    General is the main class that we have used in mostly all of owr fxml
-    In this css there are all the preset for the object
+/*
+    General.css - Unified CSS Base
+    This file contains all base classes for dimensions, colors and styles.
+    Specific classes for access have been integrated as modular extensions.
+
     Resources:
         https://docs.oracle.com/javafx/2/api/javafx/scene/doc-files/cssref.html
         https://blog.e-zest.com/gradients-in-javafx-2/
         https://m3.material.io/styles
-  */
+*/
 
- /* Colors of the application all the button th*/
+/* ========== BASE COLOR SYSTEM ========== */
+
+/* Application primary colors */
 .primary {
     -fx-background-color: #7341BE;
 }
@@ -27,47 +31,76 @@
     -fx-fill: #F0ECFD;
 }
 
-.texture-gold{
-    -fx-fill: linear-gradient(
-              	to bottom right,
-              	#f6e27a 33%,
-              	#cb9b51 66%,
-              	#462523 100%
-              	);
+.on-primary-border {
+    -fx-border-color: #F0ECFD;
 }
 
- /* Backgrounds of the pages or the objects*/
+.texture-gold{
+    -fx-fill: linear-gradient(
+        to bottom right,
+        #f6e27a 33%,
+        #cb9b51 66%,
+        #462523 100%
+    );
+}
+
+/* ========== SURFACES AND BACKGROUNDS ========== */
 
 .surface-gradient{
-    -fx-background-color:  radial-gradient(focus-distance 0% , center 50% 50% , radius 55% , rgba(0,0,0,0.4),rgba(0,0,0,0.6),rgba(0,0,0,0.8), #101010),
+    -fx-background-color: radial-gradient(focus-distance 0%, center 50% 50%, radius 55%, rgba(0,0,0,0.4),rgba(0,0,0,0.6),rgba(0,0,0,0.8), #101010),
     linear-gradient(to right,#101010 0%, rgba(0,0,0,0) 5%,rgba(0,0,0,0) 35%,rgba(0,0,0,0) 50%,rgba(0,0,0,0) 65%, rgba(0,0,0,0) 5%, #101010);
 }
 
 .surface-opaque{
-    -fx-background-color:  rgba(15,15,15,0.97);
+    -fx-background-color: rgba(15,15,15,0.97);
 }
+
 .surface-solid{
     -fx-background-color: #101010;
 }
 
-
 .surface-dim{
     -fx-background-color: #262626;
 }
+
 .surface-dim-border{
     -fx-border-color: #262626;
 }
+
 .surface-dim-opaque{
-    -fx-background-color:  rgba(37,37,37,0.97);
+    -fx-background-color: rgba(37,37,37,0.97);
+}
+
+.surface-dim-opaque-gradient {
+    -fx-background-color: linear-gradient(to bottom,
+        #2A2A2A 0%,
+        #252525 10%,
+        #252525 100%
+    );
+}
+
+.surface-vertical-gradient {
+    -fx-background-color: linear-gradient(to bottom,
+        rgba(37, 37, 37, 0) 0%,
+        rgba(37, 37, 37, 0.32) 15%,
+        rgba(37, 37, 37, 0.43) 25%,
+        rgba(37, 37, 37, 0.58) 35%,
+        rgba(37, 37, 37, 0.67) 50%,
+        rgba(37, 37, 37, 0.78) 65%,
+        rgba(37, 37, 37, 0.85) 75%,
+        rgba(37, 37, 37, 0.9) 85%,
+        rgba(37, 37, 37, 0.93) 92%,
+        rgba(37, 37, 37, 0.97) 100%);
 }
 
 .surface-danger{
-    -fx-background-color:  #9E3536 ;
+    -fx-background-color: #9E3536;
 }
 
 .surface-danger:hover{
     -fx-background-color: #802a2b;
 }
+
 .surface-danger:pressed{
     -fx-background-color: #731718;
 }
@@ -75,59 +108,113 @@
 .surface-transparent {
     -fx-background-color: transparent;
 }
+
 .surface-transparent:hover {
     -fx-background-color: #262626;
 }
+
 .surface-transparent:pressed {
     -fx-background-color: #101010;
 }
 
-
 .bg-color{
-    -fx-background-color: radial-gradient(focus-angle 254deg , focus-distance 20% , center 50% 50% , radius 55% , #7341BE, #101010);
+    -fx-background-color: radial-gradient(focus-angle 254deg, focus-distance 20%, center 50% 50%, radius 55%, #7341BE, #101010);
 }
 
-/*To create smooth effect we created a based on the size of the items*/
+.grey-button{
+    -fx-background-color: #232323;
+}
 
+.grey-button:hover {
+    -fx-background-color: #141414;
+}
+
+.grey-button:pressed {
+    -fx-background-color: #121212;
+}
+
+/* ========== STANDARDIZED DIMENSION SYSTEM ========== */
+
+/* Dimensions for border-radius and background-radius */
 .small-item{
     -fx-border-radius: 16px;
-    -fx-background-radius:16px;
+    -fx-background-radius: 16px;
 }
+
 .medium-item{
     -fx-border-radius: 24px;
-    -fx-background-radius:24px;
+    -fx-background-radius: 24px;
 }
+
 .large-item{
     -fx-border-radius: 32px;
-    -fx-background-radius:32px;
+    -fx-background-radius: 32px;
 }
+
 .very-large-item{
     -fx-border-radius: 48px;
-    -fx-background-radius:48px;
+    -fx-background-radius: 48px;
+}
+.very-large-item-filmScene{
+    -fx-border-radius: 0 0 48px 48px;
+    -fx-background-radius: 0 0 48px 48px;
 }
 
-
+/* Text dimensions */
 .small-text{
     -fx-font-size: 12px;
 }
+
 .medium-text{
     -fx-font-size: 16px;
 }
+
 .large-text{
-   -fx-font-size: 24px;
+    -fx-font-size: 24px;
 }
+
 .very-large-text{
     -fx-font-size: 32px;
 }
+
 .bold-text{
     -fx-font-weight: bold;
 }
 
-/*Particular structure to manage the chips, see material design guidelines*/
+/* ========== BASE COMPONENTS ========== */
 
-.chips{
-     -fx-padding: 4 20 4 12;
-     -fx-spacing: 12;
+.back-button {
+    -fx-text-fill: #F0ECFD;
+    -fx-font-size: 14px;
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+    -fx-cursor: hand;
+    -fx-alignment: CENTER_LEFT;
+}
+
+.back-button:hover {
+    -fx-underline: true;
+    -fx-text-fill: white;
+}
+
+/* Text fields */
+.text-field-login, .password-field-login {
+    -fx-background-color: rgba(100, 100, 100, 0.7);
+    -fx-text-fill: white;
+    -fx-font-size: 15px;
+    -fx-border-radius: 16px;
+    -fx-border-width: 2px;
+    -fx-border-color: #262626;
+    -fx-background-radius: 16px;
+    -fx-padding: 10px;
+    -fx-pref-height: 40px;
+    -fx-prompt-text-fill: #9E9E9E;
+}
+
+.text-field-login:focused,
+.password-field-login:focused {
+    -fx-background-color: linear-gradient(to bottom right, #262626, #101010);
+    -fx-border-color: #7341BE;
 }
 
 .text-area{
@@ -139,18 +226,375 @@
 }
 
 .text-area:focused{
-    -fx-background-color:  #262626;
+    -fx-background-color: #262626;
     -fx-border-color: #7341BE;
 }
-.scroll-pane {
-    -fx-background-color:transparent;
+
+/* ========== ACCESS SPECIFIC ELEMENTS (EXTENSIONS) ========== */
+
+/* Specific backgrounds for login/register */
+.root-pane {
+    -fx-background-color: radial-gradient(focus-angle 254deg, focus-distance 20%, center 50% 50%, radius 55%, #7341BE, #101010);
+    -fx-background-radius: 0;
+    -fx-background-insets: 0;
+    -fx-fill-height: true;
 }
+
+.MainPane {
+    -fx-background-image: url('../images/background.jpg');
+    -fx-background-size: cover;
+    -fx-background-position: center;
+}
+
+.Hbox-Padre {
+    -fx-background-color: linear-gradient(to right, rgba(31, 31, 31, 0) 40%, rgba(0, 0, 0, 0.9) 60%);
+}
+
+.main-vbox {
+    -fx-background-color: radial-gradient(focus-angle 54deg, focus-distance 10%, center 50% 50%, radius 250%, transparent, rgba(255, 255, 255, 0.3));
+    -fx-alignment: center;
+}
+
+/* Specific containers for forms */
+.VBox-style {
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.5), 15, 0, 0, 5);
+}
+
+.vbox-background {
+    -fx-background-color: rgba(51, 51, 51, 0);
+}
+
+.vbox-title {
+    -fx-padding: 20px;
+}
+
+.register-box, .register-box2 {
+    -fx-background-color: rgba(37, 37, 37, 0.97);
+    -fx-border-color: #262626;
+    -fx-border-width: 2px;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.5), 15, 0, 0, 5);
+}
+
+/* Specific texts for access forms */
+.welcome-text {
+    -fx-text-fill: #F0ECFD;
+    -fx-alignment: center;
+    -fx-font-weight: bold;
+    -fx-padding: 5px;
+}
+
+.title-text {
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-padding: 5px;
+}
+
+.register-text {
+    -fx-background-color: transparent;
+    -fx-alignment: center;
+}
+
+.register-text-recommendation-mid {
+    -fx-background-color: transparent;
+    -fx-alignment: center;
+}
+
+.register-text-recommendation-big {
+    -fx-background-color: transparent;
+}
+
+.register-text:hover, .register-text-recommendation-mid:hover {
+    -fx-underline: true;
+}
+
+.warnings-text1 {
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-width: 200px;
+}
+
+.warnings-text2 {
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-alignment: center-left;
+}
+
+/* Specific toggle password button */
+.toggle-password-button {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+    -fx-text-fill: #9E9E9E;
+    -fx-pref-width: 30px;
+    -fx-pref-height: 30px;
+    -fx-min-width: 30px;
+    -fx-min-height: 30px;
+    -fx-max-width: 30px;
+    -fx-max-height: 30px;
+    -fx-cursor: hand;
+    -fx-padding: 0;
+    -fx-effect: null;
+}
+
+.toggle-password-button:hover {
+    -fx-background-color: rgba(255, 255, 255, 0.1);
+    -fx-text-fill: white;
+}
+
+.toggle-password-button:pressed {
+    -fx-background-color: rgba(115, 65, 190, 0.3);
+    -fx-text-fill: #F0ECFD;
+}
+
+/* ========== STREAMING INTERFACE ELEMENTS ========== */
+
+/* Hero section for content */
+.hero-section {
+    -fx-background-color: transparent;
+}
+
+.hero-title {
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.8), 10, 0, 2, 2);
+    -fx-max-width: 600px;
+}
+.big-title{
+    -fx-font-size:48px;
+}
+
+
+.icon-button {
+    -fx-background-color: rgba(42, 42, 42, 0.6);
+    -fx-cursor: hand;
+    -fx-border-color: rgba(255, 255, 255, 0.7);
+    -fx-border-width: 2px;
+    -fx-pref-height: 40px;
+    -fx-pref-width: 40px;
+}
+.play-button{
+    -fx-pref-height: 44px;
+}
+.icon-button:hover {
+    -fx-background-color: rgba(42, 42, 42, 0.8);
+    -fx-border-color: white;
+}
+
+.close-button {
+    -fx-background-color: rgba(42, 42, 42, 0.6);
+    -fx-font-weight: bold;
+    -fx-cursor: hand;
+    -fx-pref-height: 50px;
+    -fx-pref-width: 50px;
+}
+
+.close-button:hover {
+    -fx-background-color: rgba(42, 42, 42, 0.8);
+}
+
+/* Content details */
+.content-details {
+    -fx-background-color: #141414;
+}
+
+
+.rating-badge {
+    -fx-text-fill: black;
+    -fx-font-weight: bold;
+    -fx-padding: 1px 4px;
+    -fx-background-radius: 2px;
+}
+
+.content-warning {
+    -fx-text-fill: #999999;
+}
+
+.description-text {
+    -fx-line-spacing: 2px;
+}
+
+.info-label {
+    -fx-text-fill: #777777;
+    -fx-font-weight: bold;
+}
+
+.info-text {
+    -fx-line-spacing: 1px;
+}
+
+.section-title {
+    -fx-font-weight: bold;
+}
+
+.series-title {
+    -fx-text-fill: #777777;
+}
+
+/* Episodes */
+.episodes-container {
+    -fx-background-color: transparent;
+    -fx-padding: 10 0 0 0;
+}
+
+.episode-item {
+    -fx-background-color: rgba(42, 42, 42, 0.3);
+    -fx-padding: 15px;
+    -fx-cursor: hand;
+}
+
+.episode-item:hover {
+    -fx-background-color: rgba(42, 42, 42, 0.6);
+}
+
+.episode-item.clickable:hover {
+    -fx-background-color: rgba(42, 42, 42, 0.8);
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.3), 5, 0, 0, 2);
+}
+
+.episode-number {
+    -fx-font-weight: bold;
+    -fx-min-width: 50px;
+    -fx-alignment: center;
+}
+
+.button-big-text {
+    -fx-font-size: 18px;
+    -fx-font-weight: bold;
+    -fx-border-radius: 24px;
+    -fx-background-radius: 24px;
+    -fx-pref-height: 40px;
+}
+
+/* Button with class style */
+.button-big {
+    -fx-font-size: 25px;
+    -fx-font-weight: bold;
+    -fx-border-color: #262626;
+    -fx-border-radius: 24px;
+    -fx-background-radius: 24px;
+    -fx-pref-height: 40px;
+    -fx-pref-width: 200px;
+    -fx-alignment: center;
+    -fx-background-color: rgba(100, 100, 100, 0.7);
+    -fx-cursor: hand;
+}
+
+/* Button hover effect */
+.button-text:hover {
+    -fx-background-color: linear-gradient(to bottom right, #7341BE, #432570);
+    -fx-text-fill: #F0ECFD;
+}
+
+/* Button pressed effect */
+.button-text:pressed {
+    -fx-background-color: linear-gradient(to bottom right, #262626, #101010);
+    -fx-text-fill: #F0ECFD;
+}
+
+.episode-thumbnail {
+    -fx-background-color: #333333;
+    -fx-background-radius: 4px;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.3), 3, 0, 0, 1);
+}
+
+.episode-title {
+    -fx-font-weight: bold;
+}
+
+
+.episode-description {
+    -fx-wrap-text: true;
+}
+
+/* Season selector */
+.seasons-dropdown-button {
+    -fx-background-color: transparent;
+    -fx-border-color: white;
+    -fx-border-width: 1px;
+    -fx-font-weight: bold;
+    -fx-padding: 8 16 8 16;
+    -fx-cursor: hand;
+    -fx-min-width: 180px;
+}
+
+.seasons-dropdown-button:hover {
+    -fx-background-color: rgba(255, 255, 255, 0.1);
+    -fx-border-color: white;
+}
+
+.seasons-dropdown-button:pressed {
+    -fx-background-color: rgba(255, 255, 255, 0.2);
+}
+
+.seasons-dropdown-menu {
+    -fx-background-color: rgba(15,15,15,0.97);
+    -fx-border-color: #262626;
+    -fx-border-width: 1px;
+    -fx-border-radius: 4px;
+    -fx-background-radius: 4px;
+    -fx-padding: 8;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.5), 10, 0, 0, 4);
+    -fx-spacing: 2px;
+}
+
+.season-option-button {
+    -fx-background-color: transparent;
+    -fx-padding: 8 12 8 12;
+    -fx-cursor: hand;
+    -fx-alignment: center-left;
+}
+
+.season-option-button:hover {
+    -fx-background-color: rgba(255, 255, 255, 0.1);
+}
+
+.season-option-button.selected-season {
+    -fx-background-color: #7341BE;
+}
+
+.season-option-button.selected-season:hover {
+    -fx-background-color: #593294;
+}
+
+/* ========== COMMON ELEMENTS ========== */
+
+.warningText{
+    -fx-text-fill: #9E3536;
+    -fx-font-weight: bold;
+    -fx-alignment: center;
+    -fx-opacity: 0.9;
+}
+
+.menu-button-selected {
+    -fx-background-color: #7341BE;
+}
+
+.hboxMenu:hover {
+    -fx-translate-x: 1.5;
+    -fx-translate-y: 1.5;
+}
+
+.hboxMenu{
+    -fx-translate-x: 0;
+    -fx-translate-y: 0;
+}
+
+.chips{
+    -fx-padding: 4 20 4 12;
+    -fx-spacing: 12;
+}
+
+/* ========== SCROLL PANE ========== */
+
+.scroll-pane {
+    -fx-background-color: transparent;
+}
+
 .scroll-pane > .viewport {
-   -fx-background-color: transparent;
+    -fx-background-color: transparent;
 }
 
 .scroll-bar:horizontal, .scroll-bar:vertical{
-    -fx-background-color:transparent;
+    -fx-background-color: transparent;
 }
 
 .increment-button, .decrement-button {
@@ -170,100 +614,6 @@
     -fx-background-radius: 5em;
 }
 
-.warningText{
-    -fx-text-fill: #9E3536;
-    -fx-font-size: 14px;
-    -fx-font-weight: bold;
-    -fx-alignment: center;
-    -fx-opacity: 0.9;
-}
-
-.menu-button-selected {
-    -fx-background-color: #7341BE;
-}
-
-.grey-button{
-     -fx-background-color: #232323;
-}
-
-.grey-button:hover {
-    -fx-background-color: #141414;
-}
-
-.grey-button:pressed {
-    -fx-background-color: #121212;
-}
-
-.on-primary-border {
- -fx-border-color: #F0ECFD;
-}
-
-.hboxMenu:hover {
-    -fx-translate-x: 1.5;
-    -fx-translate-y: 1.5;
-}
-
-.hboxMenu{
-    -fx-translate-x: 0;
-    -fx-translate-y: 0;
-}
-
-
-.back-button {
-    -fx-text-fill: #F0ECFD;
-    -fx-font-size: 14px;
-    -fx-background-color: transparent;
-    -fx-border-color: transparent;
-    -fx-cursor: hand;
-    -fx-alignment: CENTER_LEFT;
-}
-
-.back-button:hover {
-    -fx-underline: true;
-    -fx-text-fill: white;
-}
-
-.surface-dim-opaque-gradient {
-    -fx-background-color:
-        linear-gradient(to bottom,
-            #2A2A2A 0%,   /* leggermente più scuro in alto */
-            #252525 10%,  /* graduale passaggio */
-            #252525 100%  /* colore finale uniforme */
-        );
-}
-
-.surface-vertical-gradient {
-   -fx-background-color: linear-gradient(to bottom,
-       rgba(37, 37, 37, 0) 0%,
-       rgba(37, 37, 37, 0.32) 15%,
-       rgba(37, 37, 37, 0.43) 25%,
-       rgba(37, 37, 37, 0.58) 35%,
-       rgba(37, 37, 37, 0.67) 50%,
-       rgba(37, 37, 37, 0.78) 65%,
-       rgba(37, 37, 37, 0.85) 75%,
-       rgba(37, 37, 37, 0.9) 85%,
-       rgba(37, 37, 37, 0.93) 92%,
-       rgba(37, 37, 37, 0.97) 100%);
-}
-
-/* Close Button */
-.close-button {
-    -fx-background-color: rgba(42, 42, 42, 0.6);
-    -fx-text-fill: white;
-    -fx-font-size: 16px;
-    -fx-font-weight: bold;
-    -fx-background-radius: 16px;
-    -fx-border-radius: 16px;
-    -fx-cursor: hand;
-    -fx-pref-height: 40px;
-    -fx-pref-width: 40px;
-}
-
-.close-button:hover {
-    -fx-background-color: rgba(42, 42, 42, 0.8);
-}
-
-/* Transparent ScrollPane */
 .transparent-scroll {
     -fx-background-color: transparent;
     -fx-background: transparent;
@@ -282,296 +632,11 @@
     -fx-background-radius: 5px;
 }
 
-/* Hero Section */
-.hero-section {
-    -fx-background-color: transparent;
+/* ========== RESPONSIVE MEDIA QUERIES ========== */
 
-}
-.bakground-image {
-    -fx-background-image: url('../images/evangeliontry.jpg');
-    -fx-background-repeat: no-repeat;
-    -fx-background-position: center center;
-    -fx-background-size: cover; /* oppure 'contain' se vuoi vedere l'immagine intera */
-}
-
-.hero-title {
-    -fx-text-fill: white;
-    -fx-font-size: 42px;
-    -fx-font-weight: bold;
-    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.8), 10, 0, 2, 2);
-    -fx-max-width: 600px;
-}
-
-/* Buttons */
-.play-button {
-    -fx-background-color: white;
-    -fx-text-fill: black;
-    -fx-font-size: 16px;
-    -fx-font-weight: bold;
-    -fx-background-radius: 4px;
-    -fx-cursor: hand;
-    -fx-padding: 8px 20px;
-    -fx-pref-height: 40px;
-}
-
-.play-button:hover {
-    -fx-background-color: rgba(255, 255, 255, 0.8);
-}
-
-.icon-button {
-    -fx-background-color: rgba(42, 42, 42, 0.6);
-    -fx-text-fill: white;
-    -fx-font-size: 16px;
-    -fx-background-radius: 16px;
-    -fx-cursor: hand;
-    -fx-border-color: rgba(255, 255, 255, 0.7);
-    -fx-border-width: 2px;
-    -fx-border-radius: 16px;
-    -fx-pref-height: 40px;
-    -fx-pref-width: 40px;
-}
-
-.icon-button:hover {
-    -fx-background-color: rgba(42, 42, 42, 0.8);
-    -fx-border-color: white;
-}
-
-/* Content Details Section */
-.content-details {
-    -fx-background-color: #141414;
-}
-
-/* Metadata Text */
-.metadata-text {
-    -fx-text-fill: white;
-    -fx-font-size: 16px;
-}
-
-.rating-badge {
-    -fx-background-color: rgba(255, 255, 255, 0.2);
-    -fx-text-fill: white;
-    -fx-font-size: 12px;
-    -fx-font-weight: bold;
-    -fx-padding: 1px 4px;
-    -fx-background-radius: 2px;
-}
-
-.maturity-badge {
-    -fx-background-color: #f5c518;
-    -fx-text-fill: black;
-    -fx-font-size: 12px;
-    -fx-font-weight: bold;
-    -fx-padding: 1px 4px;
-    -fx-background-radius: 2px;
-}
-
-.content-warning {
-    -fx-text-fill: #999999;
-    -fx-font-size: 12px;
-}
-
-/* Description */
-.description-text {
-    -fx-text-fill: white;
-    -fx-font-size: 16px;
-    -fx-line-spacing: 2px;
-}
-
-/* Info Labels and Text */
-.info-label {
-    -fx-text-fill: #777777;
-    -fx-font-size: 16px;
-    -fx-font-weight: bold;
-}
-
-.info-text {
-    -fx-text-fill: white;
-    -fx-font-size: 16px;
-    -fx-line-spacing: 1px;
-}
-
-/* Section Titles */
-.section-title {
-    -fx-text-fill: white;
-    -fx-font-size: 24px;
-    -fx-font-weight: bold;
-}
-
-.series-title {
-    -fx-text-fill: #777777;
-    -fx-font-size: 16px;
-}
-
-/* Episodes Container */
-.episodes-container {
-    -fx-background-color: transparent;
-}
-
-.episode-item {
-    -fx-background-color: rgba(42, 42, 42, 0.3);
-    -fx-background-radius: 12px;
-    -fx-padding: 15px;
-    -fx-cursor: hand;
-}
-
-.episode-item:hover {
-    -fx-background-color: rgba(42, 42, 42, 0.6);
-}
-
-.episode-number {
-    -fx-text-fill: #d2d2d2;
-    -fx-font-size: 24px;
-    -fx-font-weight: bold;
-    -fx-min-width: 30px;
-}
-
-.episode-thumbnail {
-    -fx-background-color: #333333;
-    -fx-background-radius: 4px;
-}
-
-.episode-title {
-    -fx-text-fill: white;
-    -fx-font-size: 16px;
-    -fx-font-weight: bold;
-}
-
-.episode-duration {
-    -fx-text-fill: #d2d2d2;
-    -fx-font-size: 12px;
-}
-
-.episode-description {
-    -fx-text-fill: #d2d2d2;
-    -fx-font-size: 16px;
-    -fx-line-spacing: 1px;
-}
-/* Seasons Selector Styles */
-.seasons-dropdown-button {
-    -fx-background-color: transparent; /* Kept: 'transparent' is used extensively before */
-    -fx-border-color: white; /* Kept: 'white' is used before */
-    -fx-border-width: 1px;
-    -fx-border-radius: 4px; /* Kept: '4px' is used for .play-button, .episode-thumbnail */
-    -fx-text-fill: white; /* Kept: 'white' is used before */
-    -fx-font-weight: bold;
-    -fx-font-size: 14px; /* Kept: '14px' is used for .back-button */
-    -fx-padding: 8 16 8 16;
-    -fx-cursor: hand;
-    -fx-min-width: 180px;
-}
-
-.seasons-dropdown-button:hover {
-    -fx-background-color: rgba(255, 255, 255, 0.1); /* Kept: 'rgba(255, 255, 255, 0.1)' is used for .transparent-scroll .scroll-bar */
-    -fx-border-color: white; /* Kept: 'white' is used before */
-}
-
-.seasons-dropdown-button:pressed {
-    -fx-background-color: rgba(255, 255, 255, 0.2); /* Kept: 'rgba(255, 255, 255, 0.2)' is used for .rating-badge */
-}
-
-.seasons-dropdown-menu {
-    -fx-background-color: rgba(15,15,15,0.97); /* Changed: Nearest is .surface-opaque 'rgba(15,15,15,0.97)' */
-    -fx-border-color: #262626; /* Changed: Nearest is .surface-dim-border '#262626' or .episode-thumbnail '#333333'. Chose '#262626' for general dim border. */
-    -fx-border-width: 1px;
-    -fx-border-radius: 4px; /* Kept: '4px' is common for interactive elements */
-    -fx-padding: 8;
-    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.5), 10, 0, 0, 4);
-    -fx-spacing: 2px;
-}
-
-.season-option-button {
-    -fx-background-color: transparent; /* Kept */
-    -fx-text-fill: white; /* Kept */
-    -fx-font-size: 12px; /* Changed: Nearest available are '12px' (.small-text) or '14px' (.back-button). Chose '12px'. */
-    -fx-padding: 8 12 8 12;
-    -fx-cursor: hand;
-    -fx-alignment: center-left;
-    -fx-border-radius: 4px; /* Changed: Nearest '2px' (badges) or '4px' (buttons). Chose '4px' for button-like item. */
-}
-
-.season-option-button:hover {
-    -fx-background-color: rgba(255, 255, 255, 0.1); /* Kept */
-}
-
-.season-option-button.selected-season {
-    -fx-background-color: #7341BE; /* Changed: Replaced with .primary color */
-    -fx-text-fill: white; /* Kept */
-}
-
-.season-option-button.selected-season:hover {
-    -fx-background-color: #593294; /* Changed: Replaced with .primary:hover color */
-}
-
-/* Episode Item Enhancements */
-.episode-item { /* Note: This selector already exists before "FROM HERE ON" */
-    -fx-padding: 15px; /* Kept: Matches original .episode-item */
-    -fx-background-radius: 12px; /* Corrected: Matches original .episode-item -fx-background-radius: 12px */
-    -fx-cursor: hand; /* Kept: Matches original .episode-item */
-    -fx-border-radius: 12px; /* Corrected: To match background-radius and original .episode-item style for consistency */
-    /* Original .episode-item -fx-background-color was rgba(42, 42, 42, 0.3). If this was meant to be reset, it should be added back. */
-    /* Assuming the new hover styles below are intended to work with the original background or a new one if specified elsewhere. */
-}
-
-.episode-item:hover { /* Note: This selector already exists before "FROM HERE ON" */
-    -fx-background-color: rgba(42, 42, 42, 0.6); /* Changed: Reverted to original .episode-item:hover color */
-}
-
-.episode-item.clickable:hover {
-    -fx-background-color: rgba(42, 42, 42, 0.8); /* Changed: Nearest available for stronger hover is .close-button:hover 'rgba(42, 42, 42, 0.8)' */
-    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.3), 5, 0, 0, 2);
-}
-
-.episode-number { /* Note: This selector already exists before "FROM HERE ON" */
-    -fx-text-fill: white; /* Changed: Original was '#d2d2d2'. 'white' is also used extensively. If '#F0ECFD' (on-primary) or '#d2d2d2' is preferred, adjust. */
-    -fx-font-size: 24px; /* Corrected: Matches original .episode-number font-size */
-    -fx-font-weight: bold; /* Kept: Matches original */
-    -fx-min-width: 30px; /* Kept: Matches original */
-    -fx-alignment: center;
-}
-
-.episode-thumbnail { /* Note: This selector already exists before "FROM HERE ON" */
-    -fx-background-radius: 4px; /* Kept: Matches original .episode-thumbnail */
-    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.3), 3, 0, 0, 1);
-}
-
-.episode-title { /* Note: This selector already exists before "FROM HERE ON" */
-    -fx-text-fill: white; /* Kept: Matches original */
-    -fx-font-size: 16px; /* Kept: Matches original */
-    -fx-font-weight: bold; /* Kept: Matches original */
-}
-
-.episode-duration { /* Note: This selector already exists before "FROM HERE ON" */
-    -fx-text-fill: #d2d2d2; /* Corrected: Matches original .episode-duration color */
-    -fx-font-size: 12px; /* Corrected: Matches original .episode-duration font-size */
-}
-
-.episode-description { /* Note: This selector already exists before "FROM HERE ON" */
-    -fx-text-fill: #d2d2d2; /* Corrected: Matches original .episode-description color */
-    -fx-font-size: 16px; /* Corrected: Matches original .episode-description font-size */
-    -fx-wrap-text: true;
-}
-
-/* General enhancements */
-.section-title { /* Note: This selector already exists before "FROM HERE ON" */
-    -fx-text-fill: white; /* Kept: Matches original */
-    -fx-font-size: 24px; /* Corrected: Matches original .section-title font-size */
-    -fx-font-weight: bold; /* Kept: Matches original */
-}
-
-.series-title { /* Note: This selector already exists before "FROM HERE ON" */
-    -fx-text-fill: #777777; /* Corrected: Matches original .series-title color */
-    -fx-font-size: 16px; /* Kept: Matches original */
-}
-
-.episodes-container { /* Note: This selector already exists before "FROM HERE ON" */
-    -fx-padding: 10 0 0 0;
-}
-
-/* Responsive adjustments */
 @media (max-width: 800px) {
     .seasons-dropdown-button {
         -fx-min-width: 150px;
-        -fx-font-size: 12px; /* Kept: '12px' is available (.small-text) */
     }
 
     .episode-item {
@@ -579,11 +644,6 @@
     }
 
     .episode-number {
-        -fx-font-size: 16px; /* Kept: '16px' is available (.medium-text) */
         -fx-min-width: 25px;
     }
-
-    .episode-title {
-        -fx-font-size: 14px; /* Added: Based on typical reduction, '14px' is available (.back-button) */
-    }
-}}
+}

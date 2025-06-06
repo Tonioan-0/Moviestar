@@ -83,7 +83,7 @@ public class Access {
         welcomeText.setText("WELCOME");
         access.setText("Access");
         register.setText("Don't have an account? Sign up");
-        resetPassword.setText("Forgot password? Recover it");
+        resetPassword.setText("Password forgotten? get it back");
 
         setupPasswordToggle();
 

@@ -34,7 +34,7 @@ public class ModifyProfileController extends BaseProfileController {
 
         if (user != null) {
             textName.setText(user.getName());
-            codCurrentImage = user.getIDIcona();
+            codCurrentImage = user.getIDIcon();
 
             // Mostra l'icona corrente
             defaultImagine.getChildren().clear();
@@ -56,7 +56,7 @@ public class ModifyProfileController extends BaseProfileController {
     protected int getInitialImageCode() {
         int idIcona;
         if (user != null) {
-            idIcona = user.getIDIcona();
+            idIcona = user.getIDIcon();
         } else {
             idIcona = 0;
         }
@@ -85,7 +85,7 @@ public class ModifyProfileController extends BaseProfileController {
 
     private boolean saveChanges(String name, int image) {
         user.setName(name);
-        user.setIcona(image);
+        user.setIcon(image);
 
         UserDao dao = new UserDao();
         boolean success = dao.updateUser(user);

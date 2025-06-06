@@ -1,5 +1,8 @@
 package com.esa.moviestar;
 
+import com.esa.moviestar.home.MainPagesController;
+import com.esa.moviestar.model.Account;
+import com.esa.moviestar.model.User;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
@@ -7,6 +10,7 @@ import javafx.scene.image.Image;
 import javafx.stage.Stage;
 
 import java.io.IOException;
+import java.time.LocalDate;
 import java.util.Objects;
 import java.util.ResourceBundle;
 
@@ -18,10 +22,10 @@ public class Main extends Application{
     public void start(Stage primaryStage) throws IOException {
 
         FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("login/access.fxml"), resourceBundle);
-        //FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("home/main.fxml"));
+        //FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("home/search.fxml"));
         Scene scene = new Scene(fxmlLoader.load());
         //Account account = new Account("ss","asda");
-        //((MainPagesController)fxmlLoader.getController()).first_load(new Utente(1,"genoveffo","01FF32763200112233445566778899AABB",1,"prova2@gmail.com"),account);
+        //((MainPagesController)fxmlLoader.getController()).first_load(new User("genoveffo",1,"prova2@gmail.com", LocalDate.ofEpochDay(1)),account);
         primaryStage.setTitle("Moviestar");
         primaryStage.setMinWidth(1280);
         primaryStage.setMinHeight(720);

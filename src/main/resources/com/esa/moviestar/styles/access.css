@@ -141,18 +141,25 @@
 /* ========== FORM CONTROLS ========== */
 
 /* Button general style */
+
 Button {
-    -fx-text-fill: white;
     -fx-font-size: 18px;
     -fx-font-weight: bold;
     -fx-border-radius: 24px;
     -fx-background-radius: 24px;
     -fx-pref-height: 40px;
 }
+/* Back button */
+.back-button {
+    -fx-font-size: 14px;
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+    -fx-cursor: hand;
+    -fx-alignment: CENTER_LEFT;
+}
 
-/* Button with class style */
+
 .button-text {
-    -fx-text-fill: white;
     -fx-font-size: 25px;
     -fx-font-weight: bold;
     -fx-border-color: #262626;
@@ -168,31 +175,12 @@ Button {
 /* Button hover effect */
 .button-text:hover {
     -fx-background-color: linear-gradient(to bottom right, #7341BE, #432570);
-    -fx-text-fill: #F0ECFD;
 }
 
 /* Button pressed effect */
 .button-text:pressed {
     -fx-background-color: linear-gradient(to bottom right, #262626, #101010);
-    -fx-text-fill: #F0ECFD;
 }
-
-/* Back button */
-.back-button {
-    -fx-text-fill: #F0ECFD;
-    -fx-font-size: 14px;
-    -fx-background-color: transparent;
-    -fx-border-color: transparent;
-    -fx-cursor: hand;
-    -fx-alignment: CENTER_LEFT;
-}
-
-/* Back button hover effect - only underline */
-.back-button:hover {
-    -fx-underline: true;
-    -fx-text-fill: white;
-}
-
 /* ========== PASSWORD TOGGLE BUTTON ========== */
 
 /* Toggle password button styling */
@@ -241,7 +229,6 @@ TextField, PasswordField {
     -fx-prompt-text-fill: #9E9E9E;
 }
 
-/* Class-based text field styles for specific cases */
 .text-field, .password-field {
     -fx-background-color: rgba(100, 100, 100, 0.7);
     -fx-text-fill: white;
@@ -255,7 +242,6 @@ TextField, PasswordField {
     -fx-prompt-text-fill: #9E9E9E;
 }
 
-/* Text field and password field focus effect */
 .text-field:focused,
 .password-field:focused,
 TextField:focused,

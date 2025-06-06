@@ -1,49 +1,40 @@
 package com.esa.moviestar.model;
+
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Content class representing a film or TV series based on the SQLite schema.
- */
 public class Content {
     private int id;
     private String title;
+    private String originalTitle;
     private String plot;
-    private String imageUrl;
-    private String posterUrl;
+    private String imageUrl;    // Typically backdrop URL
+    private String posterUrl;   // Poster URL
     private String videoUrl;
-    private double time;
+
+    private int runtimeMinutes;
+
     private int year;
     private double rating;
     private int popularity;
     private String country;
     private String releaseDate;
+
     private boolean isSeries;
-    private boolean isSeasonDivided;
-    private int seasonCount;
-    private int episodeCount;
-    private List<Integer> categories ;
 
-    public Content(){
-        categories= new ArrayList<>();
-    }
+    private int numberOfSeasons;
+    private int numberOfEpisodes; // Total episodes in the series
+
+    private List<Integer> categories;
+    private List<String> genreNames;
 
 
-    public boolean isSeries() {
-        return this.isSeries;
-    }
-    public void Series(boolean isSeries) {
-        this.isSeries = isSeries;
+    public Content() {
+        this.categories = new ArrayList<>();
+        this.genreNames = new ArrayList<>();
     }
 
-    public boolean isSeasonDivided() {
-        return this.isSeasonDivided;
-    }
-    public void seasonDivided(boolean isSeries) {
-        this.isSeasonDivided = isSeries;
-    }
-
-    // Getters and setters
+    // --- Standard Getters and Setters ---
     public int getId() {
         return id;
     }
@@ -58,6 +49,14 @@ public class Content {
 
     public void setTitle(String title) {
         this.title = title;
+    }
+
+    public String getOriginalTitle() {
+        return originalTitle;
+    }
+
+    public void setOriginalTitle(String originalTitle) {
+        this.originalTitle = originalTitle;
     }
 
     public String getPlot() {
@@ -76,6 +75,14 @@ public class Content {
         this.imageUrl = imageUrl;
     }
 
+    public String getPosterUrl() {
+        return posterUrl;
+    }
+
+    public void setPosterUrl(String posterUrl) {
+        this.posterUrl = posterUrl;
+    }
+
     public String getVideoUrl() {
         return videoUrl;
     }
@@ -84,12 +91,12 @@ public class Content {
         this.videoUrl = videoUrl;
     }
 
-    public double getTime() {
-        return time;
+    public int getRuntimeMinutes() {
+        return runtimeMinutes;
     }
 
-    public void setTime(double time) {
-        this.time = time;
+    public void setRuntimeMinutes(int runtimeMinutes) {
+        this.runtimeMinutes = runtimeMinutes;
     }
 
     public int getYear() {
@@ -132,23 +139,30 @@ public class Content {
         this.releaseDate = releaseDate;
     }
 
-
-    public int getEpisodeCount() {
-        return episodeCount;
+    public boolean isSeries() {
+        return this.isSeries;
     }
 
-    public void setEpisodeCount(int episodeCount) {
-        this.episodeCount = episodeCount;
+    // Renamed for convention
+    public void setIsSeries(boolean isSeries) {
+        this.isSeries = isSeries;
     }
 
-    public int getSeasonCount() {
-        return seasonCount;
+    public int getNumberOfSeasons() {
+        return numberOfSeasons;
     }
 
-    public void setSeasonCount(int seasonCount) {
-        this.seasonCount = seasonCount;
+    public void setNumberOfSeasons(int numberOfSeasons) {
+        this.numberOfSeasons = numberOfSeasons;
     }
 
+    public int getNumberOfEpisodes() {
+        return numberOfEpisodes;
+    }
+
+    public void setNumberOfEpisodes(int numberOfEpisodes) {
+        this.numberOfEpisodes = numberOfEpisodes;
+    }
 
     public List<Integer> getCategories() {
         return categories;
@@ -158,10 +172,19 @@ public class Content {
         this.categories = categories;
     }
 
-    public  void  addCategory(Integer i){
-        if(categories==null)
-            categories= new ArrayList<>();
+    public void addCategory(Integer i) {
+        if (this.categories == null) {
+            this.categories = new ArrayList<>();
+        }
         this.categories.add(i);
+    }
+
+    public List<String> getGenreNames() {
+        return genreNames;
+    }
+
+    public void setGenreNames(List<String> genreNames) {
+        this.genreNames = genreNames;
     }
 
     @Override
@@ -169,28 +192,17 @@ public class Content {
         return "Content{" +
                 "id=" + id +
                 ", title='" + title + '\'' +
-                ", plot='" + plot + '\'' +
+                ", originalTitle='" + originalTitle + '\'' +
+                ", plot='" + (plot != null ? plot.substring(0, Math.min(plot.length(), 50)) + "..." : "N/A") + '\'' +
                 ", imageUrl='" + imageUrl + '\'' +
-                ", videoUrl='" + videoUrl + '\'' +
-                ", time=" + time +
+                ", posterUrl='" + posterUrl + '\'' +
+                ", runtimeMinutes=" + runtimeMinutes +
                 ", year=" + year +
                 ", rating=" + rating +
-                ", popularity=" + popularity +
-                ", country='" + country + '\'' +
-                ", releaseDate='" + releaseDate + '\'' +
                 ", isSeries=" + isSeries +
-                ", isSeasonDivided=" + isSeasonDivided +
-                ", seasonCount=" + seasonCount +
-                ", episodeCount=" + episodeCount +
-                ", categories=" + categories +
+                ", numberOfSeasons=" + numberOfSeasons +
+                ", numberOfEpisodes=" + numberOfEpisodes +
+                ", genreNames=" + genreNames +
                 '}';
-    }
-
-    public String getPosterUrl() {
-        return posterUrl;
-    }
-
-    public void setPosterUrl(String posterUrl) {
-        this.posterUrl = posterUrl;
     }
 }

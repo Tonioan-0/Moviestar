@@ -15,30 +15,27 @@ public class UserDao {
         try {
             this.connection = DataBaseManager.getConnection();
         } catch (SQLException e) {
-            System.err.println("utenteDao : Database connection error "+e.getMessage());
+            System.err.println("UserDao : Database connection error "+e.getMessage());
         }
     }
 
-    // Inserimento di un nuovo user
     public void insertUser(User user){
-        String query = "INSERT INTO Utente (Nome, Gusti, Email, Icona, DataRegistrazione) VALUES (?, ?, ?, ?, ?);";
+        String query = "INSERT INTO User (Name, Email, Icon, RegisterDate) VALUES (?, ?, ?, ?);";
 
         try (PreparedStatement stmt = connection.prepareStatement(query)) {
             stmt.setString(1, user.getName());
-            stmt.setString(2, user.getTastes());
-            stmt.setString(3, user.getEmail());
-            stmt.setInt(4, user.getIDIcona());
-            stmt.setString(5, user.getRegistrationDate().toString());
+            stmt.setString(2, user.getEmail());
+            stmt.setInt(3, user.getIDIcon());
+            stmt.setString(4, user.getRegistrationDate().toString());
             stmt.executeUpdate();
             System.out.println("UserDao : user name  : "+ user.getName()+"id user : "+ user.getID());
         } catch (SQLException e) {
-            System.err.println("utenteDao : User insertion error "+e.getMessage());
+            System.err.println("UserDao : User insertion error "+e.getMessage());
         }
     }
 
-    // Rimozione utente tramite codice
-    public boolean deleteUser(int idUser){
-        String query = "DELETE FROM Utente WHERE ID_Utente = ?;";
+    public void deleteUser(int idUser){
+        String query = "DELETE FROM User WHERE ID_User = ?;";
 
         try (PreparedStatement stmt = connection.prepareStatement(query)) {
             stmt.setInt(1, idUser);
@@ -48,13 +45,12 @@ public class UserDao {
             }
             System.out.println("UserDao : User deleted : "+idUser);
         } catch (SQLException e) {
-            System.err.println("utenteDao :Error removing user "+e.getMessage());
+            System.err.println("UserDao :Error removing user "+e.getMessage());
         }
-        return false;
     }
 
-    public boolean deleteUserbyEmail(String email){
-        String query = "DELETE FROM Utente WHERE Email = ?;";
+    public void deleteUserByEmail(String email){
+        String query = "DELETE FROM User WHERE Email = ?;";
 
         try (PreparedStatement stmt = connection.prepareStatement(query)) {
             stmt.setString(1, email);
@@ -64,15 +60,13 @@ public class UserDao {
             }
             System.out.println("UserDao : User deleted : "+email);
         } catch (SQLException e) {
-            System.err.println("utenteDao :Error removing user "+e.getMessage());
+            System.err.println("UserDao :Error removing user "+e.getMessage());
         }
-        return false;
     }
 
-    // Ricerca utente tramite codice
-
-    public int countProfilesbyEmail(String email){
-        String query = "SELECT COUNT(*) FROM Utente WHERE Email = ?;";
+    //Counts how many users the account has
+    public int countProfilesByEmail(String email){
+        String query = "SELECT COUNT(*) FROM User WHERE Email = ?;";
         try (PreparedStatement stmt = connection.prepareStatement(query)) {
             stmt.setString(1, email);
             ResultSet rs = stmt.executeQuery();
@@ -80,36 +74,36 @@ public class UserDao {
                 return rs.getInt(1);
             }
         }catch(SQLException e){
-            System.err.println("utenteDao : User count error "+e.getMessage());        }
+            System.err.println("UserDao : User count error "+e.getMessage());        }
         return 0;
     }
 
 
-    public int findUserCode(String email) {
-        String query = "SELECT ID_Utente FROM User WHERE Email = ?;";
+    /*public int findUserCode(String email) {
+        String query = "SELECT ID_User FROM User WHERE Email = ?;";
         try(PreparedStatement stmt = connection.prepareStatement(query)){
             stmt.setString(1,email);
             ResultSet rs = stmt.executeQuery();
             if (rs.next()) {
-                return rs.getInt("ID_Utente");
+                return rs.getInt("ID_User");
             }
 
         }catch(SQLException e){
-            System.err.println("utenteDao : User code retrieval error "+e.getMessage());        }
+            System.err.println("UserDao : User code retrieval error "+e.getMessage());        }
         return -1;
-    }
+    }*/
 
-    // Metodo che recupera tutti gli utenti
+    // Gets all users in which have the same email
     public List<User> findAllUsers(String email) {
-        List<User> utenti = new ArrayList<>();
-        String query = "SELECT * FROM Utente WHERE Email = ?;";  // Recupera tutti gli utenti in base all'email
+        List<User> users = new ArrayList<>();
+        String query = "SELECT * FROM User WHERE Email = ?;";
 
         try (PreparedStatement stmt = connection.prepareStatement(query)) {
             stmt.setString(1, email);
             ResultSet rs = stmt.executeQuery();
 
             while (rs.next()) {
-                String dataRegString = rs.getString("DataRegistrazione");
+                String dataRegString = rs.getString("RegisterDate");
                 LocalDate registrationDate = null;
 
                 if (dataRegString != null && !dataRegString.isEmpty()) {
@@ -117,39 +111,38 @@ public class UserDao {
                         registrationDate = LocalDate.parse(dataRegString);
 
                     } catch (DateTimeParseException e) {
-                        System.err.println("Errore parsing data: " + dataRegString + " - " + e.getMessage());
+                        System.err.println("Error parsing data: " + dataRegString + " - " + e.getMessage());
                     }
                 }
 
                 User user = new User(
-                        rs.getInt("ID_Utente"),
-                        rs.getString("Nome"),
-                        rs.getString("Gusti"),
-                        rs.getInt("Icona"),
+                        rs.getInt("ID_User"),
+                        rs.getString("Name"),
+                        rs.getInt("Icon"),
                         email,
                         registrationDate
                 );
-                utenti.add(user);
+                users.add(user);
             }
 
-            System.out.println("UserDao : Numero di utenti recuperati: " + utenti.size());
+            System.out.println("UserDao : Number of users found: " + users.size());
         } catch (SQLException e) {
-            System.err.println("utenteDao : Error fetching user list by user email " + e.getMessage());
+            System.err.println("UserDao : Error fetching user list by user email " + e.getMessage());
         }
-        return utenti;
+        return users;
     }
 
 
     public boolean updateUser(User user){
-        String query = "UPDATE Utente SET Nome = ? , Icona = ? WHERE ID_Utente=?;";
+        String query = "UPDATE User SET Nome = ? , Icon = ? WHERE ID_User=?;";
         try(PreparedStatement stmt = connection.prepareStatement(query)){
             stmt.setString(1, user.getName());
-            stmt.setInt(2, user.getIDIcona());
+            stmt.setInt(2, user.getIDIcon());
             stmt.setInt(3, user.getID());
             stmt.executeUpdate();
             return true;
         }catch (SQLException e){
-            System.err.println("utenteDao : errore di aggiornamento dell'user "+e.getMessage());
+            System.err.println("UserDao : update user error "+e.getMessage());
             return false;
         }
     }

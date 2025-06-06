@@ -21,9 +21,6 @@ public class AccountDao {
     }
 
 
-
-
-    //Metodo per inserire un Account
     public boolean insertAccount(Account account) {
         String query = "INSERT INTO Account (Email,Password) Values (?,?);";
 
@@ -43,7 +40,6 @@ public class AccountDao {
         }
     }
 
-    //Metodo per eliminare l'account
     public boolean deleteAccount(String email) {
         String query = "DELETE FROM Account WHERE Email = ?;";
         try (PreparedStatement stmt = connection.prepareStatement(query)) {
@@ -62,7 +58,6 @@ public class AccountDao {
     }
 
 
-    //Metodo per cercare l'account dall'email
     public  Account searchAccount(String email) {
         String query = "SELECT * FROM Account WHERE Email = ?;";
 
@@ -84,20 +79,17 @@ public class AccountDao {
         }
         return null;
     }
-    public boolean updatePassword(String email, String password) {
+    public void updatePassword(String email, String password) {
         String query = "UPDATE Account SET Password = ? WHERE Email = ?;";
 
         try (PreparedStatement stmt = connection.prepareStatement(query)) {
             stmt.setString(1, password);
             stmt.setString(2, email);
-            int rowsAffected = stmt.executeUpdate();
             System.out.println("AccountDao :account with updated password : "+email);
-            return rowsAffected > 0;  // ritorna true se almeno una riga è stata modificata
         } catch (SQLException e) {
             System.err.println("accountDao : Account password update error"+e.getMessage());
 
         }
-        return false;
     }
 
     public boolean checkPassword(String email , String password){

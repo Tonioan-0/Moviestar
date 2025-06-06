@@ -61,7 +61,7 @@ public class AccountSettingController {
     public void setUtente(User user) {
         this.user = user;
         if (user != null) {
-            int codImmagineCorrente = user.getIDIcona();
+            int codImmagineCorrente = user.getIDIcon();
             profileImage.getChildren().clear();
             Group g = new Group(IconSVG.takeElement(codImmagineCorrente));
             profileImage.getChildren().add(g);
@@ -103,7 +103,7 @@ public class AccountSettingController {
                 if (CredentialCryptManager.verifyPassword(userPopUp.getPasswordField().getText(), (account.getPassword()))) {
                     UserDao userDao = new UserDao();
                     userDao.deleteUser(user.getID());
-                    if (userDao.countProfilesbyEmail(account.getEmail()) > 0) {
+                    if (userDao.countProfilesByEmail(account.getEmail()) > 0) {
                         try {
                             FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/esa/moviestar/profile/profile-view.fxml"));
                             Parent profileView = loader.load();
@@ -120,7 +120,7 @@ public class AccountSettingController {
                             System.err.println("AccountSettingController : Error returning to the profiles page " + m.getMessage());
                         }
 
-                    } else if ((userDao.countProfilesbyEmail(account.getEmail()) == 0)) {
+                    } else if ((userDao.countProfilesByEmail(account.getEmail()) == 0)) {
                         try {
                             FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/esa/moviestar/profile/create-profile-view.fxml"), Main.resourceBundle);
                             Parent createView = loader.load();
@@ -170,7 +170,7 @@ public class AccountSettingController {
                     AccountDao accountDao = new AccountDao();
                     accountDao.deleteAccount(account.getEmail());
                     UserDao userDao = new UserDao();
-                    userDao.deleteUserbyEmail(account.getEmail());
+                    userDao.deleteUserByEmail(account.getEmail());
                     try {
                         FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/esa/moviestar/login/access.fxml"), Main.resourceBundle);
                         Parent accessContent = loader.load();
