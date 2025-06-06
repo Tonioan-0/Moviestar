@@ -5,12 +5,12 @@ import com.esa.moviestar.model.Content;
 import com.esa.moviestar.model.User;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
-// import javafx.geometry.Insets; // Not strictly needed if FlowPane hgap/vgap is used
+import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
-import javafx.scene.control.Label;
+// import javafx.scene.control.Label; // Label import is not used directly in this snippet
 import javafx.scene.layout.FlowPane;
-// import javafx.scene.layout.HBox; // No longer needed for label-like buttons
+import javafx.scene.layout.HBox;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.CycleMethod;
 import javafx.scene.paint.LinearGradient;
@@ -21,178 +21,225 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Set;
+import java.util.HashSet;
+import java.util.concurrent.CompletableFuture;
+import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 public class SearchController {
-    @FXML private FlowPane recommendations; // Top section for label-like buttons
-    @FXML private Line separatorLine;
-    @FXML private Button findOutButton; // "Altri titoli da scoprire:"
-    @FXML private FlowPane filmSeriesRecommendations; // Bottom section for rich poster display
+    @FXML
+    private FlowPane recommendations; // Top section for label-like buttons
+    @FXML
+    private Line separatorLine;
+    @FXML
+    private Button findOutButton; // Text "Altri titoli da scoprire:" refers to 'recommendations'
+    @FXML
+    private FlowPane filmSeriesRecommendations; // Bottom section for rich display
 
-    private MainPagesController mainPagesController;
+    private MainPagesController setupController;
     private HeaderController headerController;
     private User user;
     private TMDbApiManager tmdbApiManager;
 
-    public void initialize() {
-        tmdbApiManager = TMDbApiManager.getInstance();
-        if (separatorLine != null) {
-            separatorLine.setStroke(new LinearGradient(0, 0, 1, 0, true, CycleMethod.NO_CYCLE,
-                    new Stop(0.0, Color.TRANSPARENT), new Stop(0.5, Color.WHITE), new Stop(1.0, Color.TRANSPARENT)));
-        } else System.err.println("SearchController: separatorLine is null.");
+    private static final int MAX_PAGES_TO_FETCH_SEARCH = 3; // Number of pages to fetch for search results
+    private static final int TOP_N_COUNT_FOR_RICH_DISPLAY = 20; // Max items for the rich display
+    private static final int MAX_LABEL_LIKE_COUNT = 15;       // Max items for the "Altri titoli" section
 
-        recommendations.getChildren().add(new Label("Use the search bar above to find movies and TV shows."));
-        filmSeriesRecommendations.getChildren().clear();
-        recommendations.setHgap(8); // Spacing for label-like buttons
-        recommendations.setVgap(4);
+    // Helper Predicate for distinct by key (e.g., title)
+    private static <T> Predicate<T> distinctByKey(Function<? super T, ?> keyExtractor) {
+        Set<Object> seen = new HashSet<>();
+        return t -> {
+            Object key = keyExtractor.apply(t);
+            if (key == null) {
+                return false;
+            }
+            return seen.add(key);
+        };
     }
 
-    public void setParamController(HeaderController header, User user, MainPagesController mainPagesControllerInstance) {
+    public void initialize() {
+        if (this.setupController == null) {
+            this.setupController = new MainPagesController();
+        }
+        tmdbApiManager = TMDbApiManager.getInstance();
+
+        if (separatorLine != null) {
+            separatorLine.setStroke(
+                    new LinearGradient(
+                            0, 0, 1, 0, true, CycleMethod.NO_CYCLE,
+                            new Stop(0.0, Color.TRANSPARENT),
+                            new Stop(0.5, Color.WHITE),
+                            new Stop(1.0, Color.TRANSPARENT)
+                    ));
+        } else {
+            System.err.println("SearchController: separatorLine is null. Check FXML linkage.");
+        }
+    }
+
+    public void setParamController(HeaderController header, User user, MainPagesController mainPagesController) {
         this.headerController = header;
         this.user = user;
-        this.mainPagesController = mainPagesControllerInstance;
+        this.setupController = mainPagesController;
 
         if (headerController != null && headerController.getTbxSearch() != null) {
             String query = headerController.getTbxSearch().getText();
             if (query != null && !query.trim().isEmpty()) {
                 performSearch(query);
             } else {
-                Platform.runLater(() -> {
-                    recommendations.getChildren().clear();
-                    filmSeriesRecommendations.getChildren().clear();
-                    recommendations.getChildren().add(new Label("Enter a search term to begin."));
-                });
+                clearSearchResults();
             }
         }
     }
 
-    public void performSearch(String query) {
-        if (query == null || query.trim().isEmpty()) {
-            Platform.runLater(() -> {
-                recommendations.getChildren().clear();
-                filmSeriesRecommendations.getChildren().clear();
-                recommendations.getChildren().add(new Label("Please enter a search term."));
-            });
-            return;
-        }
-
+    private void clearSearchResults() {
         Platform.runLater(() -> {
             recommendations.getChildren().clear();
             filmSeriesRecommendations.getChildren().clear();
-            Label searchingLabel = new Label("Searching for: " + query + "...");
-            searchingLabel.setStyle("-fx-text-fill: white;");
-            // Add to one pane, or a dedicated status area if you have one
-            filmSeriesRecommendations.getChildren().add(searchingLabel);
+            if (findOutButton != null) findOutButton.setVisible(false);
+        });
+    }
+
+    public void performSearch(String query) {
+        Platform.runLater(() -> {
+            recommendations.getChildren().clear();
+            filmSeriesRecommendations.getChildren().clear();
+            if (findOutButton != null) findOutButton.setVisible(false); // Hide initially
+            // Optionally, show a loading indicator here
         });
 
-        tmdbApiManager.searchMultiContent(query, 1)
-                .thenAcceptAsync(fullContentList -> {
+        List<CompletableFuture<List<Content>>> pageFutures = new ArrayList<>();
+        for (int i = 1; i <= MAX_PAGES_TO_FETCH_SEARCH; i++) {
+            pageFutures.add(tmdbApiManager.searchMultiContent(query, i));
+        }
+
+        CompletableFuture<Void> allPagesFuture = CompletableFuture.allOf(pageFutures.toArray(new CompletableFuture[0]));
+
+        allPagesFuture.thenAcceptAsync(v -> {
+                    List<Content> allRawResultsFromApi = new ArrayList<>();
+                    for (CompletableFuture<List<Content>> pageFuture : pageFutures) {
+                        try {
+                            List<Content> pageResult = pageFuture.join(); // .join() is safe here
+                            if (pageResult != null) {
+                                allRawResultsFromApi.addAll(pageResult);
+                            }
+                        } catch (Exception e) {
+                            System.err.println("SearchController: Error fetching or joining one page of search results: " + e.getMessage());
+                            // Continue processing other pages
+                        }
+                    }
+
+                    // Process the combined list on the JavaFX Application Thread
                     Platform.runLater(() -> {
-                        filmSeriesRecommendations.getChildren().clear(); // Clear "Searching..."
+                        if (allRawResultsFromApi.isEmpty() && pageFutures.stream().allMatch(CompletableFuture::isCompletedExceptionally)) {
+                            System.err.println("SearchController: All page fetches failed for query '" + query + "'.");
+                            // Optionally display an error message to the user in the UI
+                            return; // Nothing to process
+                        }
+
                         String lowerCaseQuery = query.toLowerCase();
 
-                        List<Content> allMatchingContent = fullContentList.stream()
-                                .filter(content -> content.getTitle() != null && !content.getTitle().trim().isEmpty() &&
-                                        (content.getPosterUrl() != null || content.getImageUrl() != null) &&
-                                        (content.getTitle().toLowerCase().contains(lowerCaseQuery) ||
-                                                (content.getOriginalTitle() != null && content.getOriginalTitle().toLowerCase().contains(lowerCaseQuery)))
-                                )
+                        // 1. Filter by query, sort by popularity, then make unique by title (case-insensitive)
+                        //    from the combined list of all pages.
+                        List<Content> uniquePopularContent = allRawResultsFromApi.stream()
+                                .filter(content -> content != null && content.getTitle() != null &&
+                                        !content.getTitle().trim().isEmpty() &&
+                                        content.getTitle().toLowerCase().contains(lowerCaseQuery))
                                 .sorted(Comparator.comparingDouble(Content::getPopularity).reversed())
+                                .filter(distinctByKey(content -> content.getTitle().toLowerCase())) // De-duplicate by title
+                                .collect(Collectors.toList()); // Use collect first, then stream again for partitioning
+
+                        // 2. Populate 'filmSeriesRecommendations' (bottom pane)
+                        List<Content> forRichDisplay = uniquePopularContent.stream()
+                                .limit(TOP_N_COUNT_FOR_RICH_DISPLAY)
                                 .collect(Collectors.toList());
 
-                        if (allMatchingContent.isEmpty()) {
-                            filmSeriesRecommendations.getChildren().add(new Label("No results found for '" + query + "'."));
-                            findOutButton.setVisible(false);
-                            findOutButton.setManaged(false);
-                            return;
-                        }
-
-                        int topNCountForRichDisplay = 20;
-
-                        List<Content> forRichDisplay = allMatchingContent.stream()
-                                .limit(topNCountForRichDisplay)
-                                .collect(Collectors.toList());
-
-                        try {
-                            if (!forRichDisplay.isEmpty()) {
-                                if (mainPagesController == null) {
-                                    System.err.println("SearchController: mainPagesController is null. Cannot create film nodes.");
-                                    filmSeriesRecommendations.getChildren().add(new Label("Error: Cannot display rich results."));
-                                } else {
-                                    List<Node> filmNodes = mainPagesController.createFilmNodes(
-                                            forRichDisplay,
-                                            false,
-                                            clickedContent -> mainPagesController.showFilmDetail(clickedContent)
-                                    );
-                                    filmSeriesRecommendations.getChildren().addAll(filmNodes);
+                        if (!forRichDisplay.isEmpty()) {
+                            try {
+                                if (setupController == null) {
+                                    System.err.println("SearchController: setupController is null. Cannot create film nodes.");
+                                    return;
                                 }
+                                List<Node> filmNodes = setupController.createFilmNodes(forRichDisplay, false);
+                                filmSeriesRecommendations.getChildren().addAll(filmNodes);
+                            } catch (IOException e) {
+                                System.err.println("SearchController: Error creating film nodes for filmSeriesRecommendations: " + e.getMessage());
+                            } catch (NullPointerException e) {
+                                System.err.println("SearchController: NullPointerException during film node creation. Check setupController: " + e.getMessage());
                             }
-                        } catch (IOException e) {
-                            System.err.println("SearchController: Error creating film nodes: " + e.getMessage());
-                            filmSeriesRecommendations.getChildren().add(new Label("Error displaying results."));
                         }
 
-                        List<Content> forLabelLikeDisplay;
-                        if (allMatchingContent.size() > topNCountForRichDisplay) {
-                            forLabelLikeDisplay = allMatchingContent.stream()
-                                    .skip(topNCountForRichDisplay)
-                                    .limit(10) // Max 10 text links
-                                    .collect(Collectors.toList());
-                        } else {
-                            forLabelLikeDisplay = new ArrayList<>();
-                        }
+                        // 3. Populate 'recommendations' (top pane) with "other" titles
+                        //    These are unique titles not shown in the rich display.
+                        List<Content> forLabelLikeDisplay = uniquePopularContent.stream()
+                                .skip(forRichDisplay.size()) // Crucial: Skip items already taken for rich display
+                                .limit(MAX_LABEL_LIKE_COUNT)    // Take the next N items
+                                .collect(Collectors.toList());
 
-                        recommendations.getChildren().clear(); // Clear any previous
+                        recommendations.getChildren().clear(); // Clear any previous loading/content
                         if (!forLabelLikeDisplay.isEmpty()) {
-                            findOutButton.setVisible(true);
-                            findOutButton.setManaged(true);
                             List<Node> labelButtons = createLabelLikeButtons(forLabelLikeDisplay);
                             recommendations.getChildren().addAll(labelButtons);
+                            if (findOutButton != null) findOutButton.setVisible(true);
                         } else {
-                            findOutButton.setVisible(false);
-                            findOutButton.setManaged(false);
+                            if (findOutButton != null) findOutButton.setVisible(false);
                         }
 
-                        if (filmSeriesRecommendations.getChildren().isEmpty() && recommendations.getChildren().isEmpty()) {
-                            filmSeriesRecommendations.getChildren().add(new Label("No suitable results found for '" + query + "'."));
+                        if (forRichDisplay.isEmpty() && forLabelLikeDisplay.isEmpty()) {
+                            System.out.println("SearchController: No results found for query '" + query + "' after processing all pages.");
+                            // Optionally, display a "No results found" message in one of the panes
+                            // e.g., filmSeriesRecommendations.getChildren().add(new Label("No results found for '" + query + "'."));
                         }
                     });
-                }, tmdbApiManager.getExecutor()) // Use API manager's executor for API call's continuation
+                }, tmdbApiManager.getExecutor()) // Use API manager's executor for aggregation
                 .exceptionally(ex -> {
-                    System.err.println("SearchController: Error during search for '" + query + "': " + ex.getMessage());
+                    System.err.println("SearchController: Error during multi-page search operation for query '" + query + "': " + ex.getMessage());
                     ex.printStackTrace();
                     Platform.runLater(() -> {
                         recommendations.getChildren().clear();
                         filmSeriesRecommendations.getChildren().clear();
-                        filmSeriesRecommendations.getChildren().add(new Label("Search failed. Please check connection or try again."));
+                        if (findOutButton != null) findOutButton.setVisible(false);
+                        // Optionally, display an error message to the user
+                        // e.g., filmSeriesRecommendations.getChildren().add(new Label("Search failed. Please try again."));
                     });
                     return null;
                 });
     }
 
     private List<Node> createLabelLikeButtons(List<Content> contentList) {
-        List<Node> items = new ArrayList<>();
-        if (contentList == null || contentList.isEmpty()) return items;
+        List<Node> buttons = new ArrayList<>();
+        if (contentList == null || contentList.isEmpty()) return buttons;
 
-        for (Content content : contentList) {
+        for (int i = 0; i < contentList.size(); i++) {
+            Content content = contentList.get(i);
             if (content.getTitle() == null || content.getTitle().trim().isEmpty()) continue;
 
-            Button button = new Button(content.getTitle() + (content.getYear() > 0 ? " (" + content.getYear() + ")" : ""));
-            button.getStyleClass().add("register-text-recommendations-mid"); // From access.css
-            // Simpler styling, relying more on CSS class or FlowPane's hgap
-            button.setStyle("-fx-background-color: transparent; -fx-text-fill: #B0B0B0; -fx-padding: 2 5; -fx-cursor: hand;");
-            button.setOnMouseEntered(e -> button.setStyle("-fx-background-color: transparent; -fx-text-fill: white; -fx-underline: true; -fx-padding: 2 5; -fx-cursor: hand;"));
-            button.setOnMouseExited(e -> button.setStyle("-fx-background-color: transparent; -fx-text-fill: #B0B0B0; -fx-padding: 2 5; -fx-cursor: hand;"));
+            HBox itemContainer = new HBox();
+            itemContainer.setAlignment(javafx.geometry.Pos.CENTER);
+            itemContainer.setSpacing(2);
 
+            Button button = new Button(content.getTitle());
+            button.getStyleClass().addAll("register-text-recommendation-mid", "on-primary", "button-big-text");
             button.setOnAction(event -> {
-                if (mainPagesController != null) {
-                    mainPagesController.showFilmDetail(content);
+                if (setupController != null) {
+                    setupController.openFilmScene(content.getId(), content.isSeries());
                 } else {
-                    System.err.println("SearchController: mainPagesController is null. Cannot navigate.");
+                    System.err.println("SearchController: setupController is null. Cannot open film scene.");
                 }
             });
-            items.add(button);
+
+            itemContainer.getChildren().add(button);
+
+            if (i < contentList.size() - 1) {
+                Line verticalSeparator = new Line(0, 0, 0, 20);
+                verticalSeparator.setStrokeWidth(1.0);
+                verticalSeparator.setStroke(Color.LIGHTGRAY);
+                HBox.setMargin(verticalSeparator, new Insets(0, 8, 0, 8));
+                itemContainer.getChildren().add(verticalSeparator);
+            }
+            buttons.add(itemContainer);
         }
-        return items;
+        return buttons;
     }
 }

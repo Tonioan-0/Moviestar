@@ -53,21 +53,22 @@
                         </VBox.margin>
                     </StackPane>
 
-                    <Label fx:id="warning1" maxWidth="1.7976931348623157E308" styleClass="warnings-text1"  textAlignment="CENTER" />
+                    <Label fx:id="warning1" maxWidth="1.7976931348623157E308" styleClass="warnings-text1" textAlignment="CENTER" />
                     <Label fx:id="warning2" maxWidth="1.7976931348623157E308" styleClass="warnings-text2" />
-                    <Label fx:id="warningSpecial" maxWidth="1.7976931348623157E308" styleClass="warnings-text2"/>
+                    <Label fx:id="warningSpecial" maxWidth="1.7976931348623157E308" styleClass="warnings-text2" />
                     <Label fx:id="warningSpecial2" maxWidth="1.7976931348623157E308" styleClass="warnings-text2" />
 
-                    <Button fx:id="register" alignment="CENTER" prefHeight="40.0" >
+                    <Button fx:id="register" alignment="CENTER" prefHeight="40.0">
                         <VBox.margin>
                             <Insets bottom="10.0" />
                         </VBox.margin>
                         <styleClass>
                             <String fx:value="button-text" />
-                            <String fx:value="small-item" />
+                            <String fx:value="on-primary" />
+                     <String fx:value="small-item" />
                         </styleClass>
                     </Button>
-                    <Button fx:id="backToLogin" alignment="CENTER" maxWidth="1.7976931348623157E308"  wrapText="true">
+                    <Button fx:id="backToLogin" alignment="CENTER" maxWidth="1.7976931348623157E308" wrapText="true">
                         <VBox.margin>
                             <Insets top="10.0" />
                         </VBox.margin>
@@ -77,6 +78,7 @@
                         <styleClass>
                             <String fx:value="register-text" />
                             <String fx:value="small-item" />
+                     <String fx:value="on-primary" />
                         </styleClass>
                     </Button>
                 </children>
@@ -97,6 +99,7 @@
         <Insets bottom="48.0" left="48.0" right="48.0" top="48.0" />
     </padding>
     <stylesheets>
+        <URL value="@../styles/access.css" />
         <URL value="@../styles/general.css" />
     </stylesheets>
 </StackPane>

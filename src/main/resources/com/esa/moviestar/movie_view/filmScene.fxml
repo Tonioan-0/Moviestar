@@ -1,79 +1,231 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import java.lang.*?>
 <?import javafx.geometry.*?>
 <?import javafx.scene.*?>
 <?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
 <?import javafx.scene.layout.*?>
+<?import javafx.scene.shape.*?>
 <?import javafx.scene.text.*?>
 
 <StackPane fx:id="background" prefHeight="800.0" prefWidth="1200.0" stylesheets="@../styles/general.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.esa.moviestar.movie_view.FilmSceneController">
 
     <ScrollPane fx:id="scrollPane" fitToWidth="true" hbarPolicy="NEVER" vbarPolicy="AS_NEEDED">
         <content>
-            <AnchorPane> <children>
-                <VBox alignment="TOP_CENTER" spacing="0" styleClass="surface-dim" AnchorPane.leftAnchor="400.0" AnchorPane.rightAnchor="400.0" AnchorPane.topAnchor="50.0">
-                    <VBox alignment="BOTTOM_LEFT" prefHeight="500.0" styleClass="bakground-image"> <padding>
-                        <Insets top="100.0" />
-                    </padding>
-                        <Label fx:id="titleLabel" styleClass="hero-title" text="NEON GENESIS EVANGELION" wrapText="true">
-                            <font><Font name="System Bold" size="48.0" /></font>
-                            <VBox.margin><Insets left="60.0" /></VBox.margin>
-                        </Label>
-                        <HBox alignment="CENTER_LEFT" spacing="12.0">
-                            <VBox.margin><Insets top="25.0" /></VBox.margin>
-                            <Button fx:id="playButton" mnemonicParsing="false" onAction="#playContent" prefHeight="40.0" prefWidth="180.0" styleClass="play-button" text="Prossimo episodio">
-                                <font><Font name="System Bold" size="14.0" /></font>
-                                <HBox.margin><Insets left="60.0" /></HBox.margin>
-                                <cursor><Cursor fx:constant="DEFAULT" /></cursor>
-                            </Button>
-                            <Button fx:id="addButton" minHeight="50.0" minWidth="50.0" mnemonicParsing="false" onAction="#addToList" prefHeight="50.0" prefWidth="50.0" styleClass="icon-button" text="🔖">
-                                <font><Font name="System Bold" size="20.0" /></font>
-                            </Button>
-                            <Button fx:id="infoButton" minHeight="50.0" minWidth="50.0" mnemonicParsing="false" onAction="#showInfo" prefHeight="50.0" prefWidth="50.0" styleClass="icon-button" text=" 💚 ">
-                                <font><Font name="System Bold" size="20.0" /></font>
-                            </Button>
-                        </HBox>
-                        <Region prefHeight="45.0" prefWidth="405.0" styleClass="surface-vertical-gradient" />
-                    </VBox>
+            <AnchorPane>
+                <children>
+                    <VBox fx:id="mainVBox" alignment="TOP_CENTER" spacing="0" AnchorPane.leftAnchor="400.0" AnchorPane.rightAnchor="400.0" AnchorPane.topAnchor="40.0">
+                        <clip>
+                            <Rectangle arcHeight="96.0" arcWidth="96.0" height="${mainVBox.height}" width="${mainVBox.width}" />
+                        </clip>
+                  <StackPane>
+                     <children>
+                         <ImageView fx:id="heroImageView" fitHeight="493.0" fitWidth="350.0" pickOnBounds="true" styleClass="primary">
 
-                    <VBox spacing="25.0" styleClass="surface-dim-opaque-gradient">
-                        <padding><Insets bottom="50.0" left="60.0" right="60.0" top="30.0" /></padding>
-                        <HBox alignment="TOP_LEFT" spacing="30.0">
-                            <VBox prefWidth="550.0" spacing="15.0">
-                                <HBox alignment="CENTER_LEFT" spacing="15.0">
-                                    <Label fx:id="yearLabel" styleClass="metadata-text" text="1995" />
-                                    <Label fx:id="episodesLabel" styleClass="metadata-text" text="26 episodi" /> <Label fx:id="ratingLabel" styleClass="rating-badge" text="HD" /> <Label fx:id="maturityLabel" styleClass="maturity-badge" text="13+" /> <Label fx:id="violenceLabel" styleClass="content-warning" text="violenza" /> </HBox>
-                                <Label fx:id="descriptionLabel" styleClass="description-text" text="Quindici anni dopo il Second Impact..." wrapText="true" />
-                            </VBox>
-                            <VBox prefWidth="350.0" spacing="15.0">
-                                <VBox spacing="8.0">
-                                    <Label styleClass="info-label" text="Cast:" />
-                                    <Label fx:id="castLabel" styleClass="info-text" text="Megumi Ogata..." wrapText="true" />
+                         </ImageView>
+                               <Region prefHeight="45.0" prefWidth="405.0" styleClass="surface-vertical-gradient" />
+                              <!-- Hero Section -->
+                              <VBox fx:id="backgroundVBox" alignment="BOTTOM_CENTER" prefHeight="650.0" styleClass="background-image">
+                           <HBox alignment="CENTER_LEFT">
+                              <VBox.margin>
+                                 <Insets left="60.0" />
+                              </VBox.margin>
+                              <children>
+                                        <Label fx:id="titleLabel" styleClass="hero-title" text="Loading..." wrapText="true">
+                                    <styleClass>
+                                       <String fx:value="big-title" />
+                                       <String fx:value="on-primary" />
+                                    </styleClass>
+                                        </Label>
+                              </children>
+                           </HBox>
+
+                                  <!-- Action Buttons -->
+                                  <HBox alignment="CENTER_LEFT" spacing="12.0">
+                                      <VBox.margin>
+                                 <Insets top="25.0" />
+                              </VBox.margin>
+                                      <Button fx:id="playButton" mnemonicParsing="false" onAction="#playContent" prefHeight="40.0" prefWidth="180.0" text="▶ Play">
+                                          <font>
+                                    <Font name="System Bold" size="14.0" />
+                                 </font>
+                                          <HBox.margin>
+                                    <Insets left="60.0" />
+                                 </HBox.margin>
+                                          <cursor>
+                                    <Cursor fx:constant="HAND" />
+                                 </cursor>
+                                 <styleClass>
+                                    <String fx:value="primary" />
+                                    <String fx:value="on-primary" />
+                                    <String fx:value="small-item" />
+                                    <String fx:value="play-button" />
+                                    <String fx:value="medium-text" />
+                                 </styleClass>
+                                      </Button>
+                                      <Button fx:id="addButton" minHeight="50.0" minWidth="50.0" mnemonicParsing="false" onAction="#addToList" prefHeight="50.0" prefWidth="50.0" text="＋">
+                                          <font>
+                                    <Font name="System Bold" size="20.0" />
+                                 </font>
+                                          <cursor>
+                                    <Cursor fx:constant="HAND" />
+                                 </cursor>
+                                 <styleClass>
+                                    <String fx:value="icon-button" />
+                                    <String fx:value="small-item" />
+                                    <String fx:value="on-primary" />
+                                 </styleClass>
+                                      </Button>
+                                      <Button fx:id="infoButton" minHeight="50.0" minWidth="50.0" mnemonicParsing="false" onAction="#showInfo" prefHeight="50.0" prefWidth="50.0" text="ⓘ">
+                                          <font>
+                                    <Font name="System Bold" size="20.0" />
+                                 </font>
+                                          <cursor>
+                                    <Cursor fx:constant="HAND" />
+                                 </cursor>
+                                 <styleClass>
+                                    <String fx:value="icon-button" />
+                                    <String fx:value="small-item" />
+                                    <String fx:value="on-primary" />
+                                 </styleClass>
+                                      </Button>
+                                  </HBox>
+                           <padding>
+                              <Insets bottom="20.0" />
+                           </padding>
+                              </VBox>
+                     </children>
+                  </StackPane>
+
+                        <!-- Content Details Section -->
+                        <VBox spacing="25.0">
+                            <padding><Insets bottom="50.0" left="60.0" right="60.0" top="30.0" /></padding>
+
+                            <!-- Metadata and Description Row -->
+                            <HBox alignment="TOP_LEFT" spacing="30.0">
+                                <!-- Left Column: Main Info -->
+                                <VBox prefWidth="550.0" spacing="15.0" HBox.hgrow="ALWAYS">
+                                    <!-- Metadata Row -->
+                                    <HBox alignment="CENTER_LEFT" spacing="15.0" styleClass="medium-text">
+                                        <Label fx:id="yearLabel" text="----">
+                                 <styleClass>
+                                    <String fx:value="medium-text" />
+                                    <String fx:value="on-primary" />
+                                 </styleClass></Label>
+                              <Label fx:id="runtimeOrSeasons" text="Label">
+                                 <styleClass>
+                                    <String fx:value="medium-text" />
+                                    <String fx:value="on-primary" />
+                                 </styleClass></Label>
+                                        <Label fx:id="ratingLabel" text="HD">
+                                 <styleClass>
+                                    <String fx:value="primary" />
+                                    <String fx:value="medium-text" />
+                                    <String fx:value="rating-badge" />
+                                 </styleClass></Label>
+                                    </HBox>
+
+                                    <!-- Description -->
+                                    <Label fx:id="descriptionLabel" maxWidth="Infinity" text="Loading description..." wrapText="true">
+                              <styleClass>
+                                 <String fx:value="description-text" />
+                                 <String fx:value="medium-text" />
+                                 <String fx:value="on-primary" />
+                              </styleClass></Label>
                                 </VBox>
-                                <VBox spacing="8.0">
-                                    <Label styleClass="info-label" text="Generi:" />
-                                    <Label fx:id="genresLabel" styleClass="info-text" text="Anime di fantascienza..." wrapText="true" />
+
+                                <!-- Right Column: Additional Info -->
+                                <VBox prefWidth="350.0" spacing="15.0" HBox.hgrow="ALWAYS">
+                                    <!-- Cast Info -->
+                                    <VBox spacing="8.0">
+                                        <Label text="Cast:">
+                                 <styleClass>
+                                    <String fx:value="info-label" />
+                                    <String fx:value="medium-text" />
+                                 </styleClass></Label>
+                                        <Label fx:id="castLabel" maxWidth="Infinity" text="Loading..." wrapText="true">
+                                 <styleClass>
+                                    <String fx:value="on-primary" />
+                                    <String fx:value="medium-text" />
+                                 </styleClass></Label>
+                                    </VBox>
+
+                                    <!-- Genres Info -->
+                                    <VBox spacing="8.0">
+                                        <Label text="Genres:">
+                                 <styleClass>
+                                    <String fx:value="info-label" />
+                                    <String fx:value="medium-text" />
+                                 </styleClass></Label>
+                                        <Label fx:id="genresLabel" maxWidth="Infinity" text="Loading..." wrapText="true">
+                                 <styleClass>
+                                    <String fx:value="on-primary" />
+                                    <String fx:value="medium-text" />
+                                 </styleClass></Label>
+                                    </VBox>
+
+                                    <!-- Content Type Info -->
+                                    <VBox spacing="8.0">
+                                        <Label text="Type:">
+                                 <styleClass>
+                                    <String fx:value="info-label" />
+                                    <String fx:value="medium-text" />
+                                 </styleClass></Label>
+                                        <Label fx:id="showTypeLabel" text="LOADING">
+                                 <styleClass>
+                                    <String fx:value="on-primary" />
+                                    <String fx:value="medium-text" />
+                                 </styleClass></Label>
+                                    </VBox>
                                 </VBox>
-                                <VBox spacing="8.0">
-                                    <Label styleClass="info-label" text="Questa serie:" />
-                                    <Label fx:id="showTypeLabel" styleClass="info-text" text="Suspense, Avvincente" /> </VBox>
-                            </VBox>
-                        </HBox>
+                            </HBox>
 
-                        <VBox fx:id="episodesSectionVBox" spacing="20.0">  <HBox alignment="CENTER_LEFT" spacing="20.0"> <Label styleClass="section-title" text="Episodi" />
-                            <Label fx:id="seriesTitleLabel" styleClass="series-title" text="Neon Genesis Evangelion" /> </HBox>
+                            <!-- Episodes Section (Only visible for TV Series) -->
+                            <VBox fx:id="episodesSectionVBox" managed="false" spacing="20.0" styleClass="very-large-item" visible="false">
+                                <!-- Episodes Header -->
+                                <HBox alignment="CENTER_LEFT" spacing="20.0">
+                                    <Label text="Episodes">
+                              <styleClass>
+                                 <String fx:value="section-title" />
+                                  <String fx:value="on-primary" />
+                                 <String fx:value="medium-text" />
+                              </styleClass></Label>
+                                    <Label fx:id="seriesTitleLabel" managed="false" text="" visible="false">
+                              <styleClass>
+                                 <String fx:value="series-title" />
+                                 <String fx:value="medium-text" />
+                              </styleClass></Label>
+                                </HBox>
 
-                            <VBox fx:id="episodesList" spacing="15.0" styleClass="episodes-container">
+                                <!-- Episodes List Container -->
+                                <VBox fx:id="episodesList" spacing="15.0" styleClass="episodes-container">
+                                    <!-- Episodes will be dynamically added here by the controller -->
+                                </VBox>
                             </VBox>
+                     <styleClass>
+                        <String fx:value="surface-dim-opaque-gradient" />
+                        <String fx:value="very-large-item-filmScene" />
+                     </styleClass>
                         </VBox>
+                  <styleClass>
+                     <String fx:value="surface-dim" />
+                     <String fx:value="very-large-item" />
+                  </styleClass>
                     </VBox>
-                </VBox>
-            </children>
+                </children>
             </AnchorPane>
         </content>
     </ScrollPane>
 
-    <Button fx:id="closeButton" mnemonicParsing="false" onAction="#closeView" prefHeight="40.0" prefWidth="40.0" styleClass="close-button" text="✕" StackPane.alignment="TOP_RIGHT">
+    <!-- Close Button -->
+    <Button fx:id="closeButton" maxHeight="50.0" maxWidth="50.0" mnemonicParsing="false" onAction="#closeView" prefHeight="50.0" prefWidth="50.0" text="✕" StackPane.alignment="TOP_RIGHT">
         <StackPane.margin><Insets right="20.0" top="20.0" /></StackPane.margin>
+        <cursor><Cursor fx:constant="HAND" /></cursor>
+      <styleClass>
+         <String fx:value="close-button" />
+         <String fx:value="small-item" />
+         <String fx:value="on-primary" />
+      </styleClass>
     </Button>
 </StackPane>

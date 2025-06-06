@@ -155,6 +155,10 @@
     -fx-border-radius: 48px;
     -fx-background-radius: 48px;
 }
+.very-large-item-filmScene{
+    -fx-border-radius: 0 0 48px 48px;
+    -fx-background-radius: 0 0 48px 48px;
+}
 
 /* Text dimensions */
 .small-text{
@@ -179,37 +183,6 @@
 
 /* ========== BASE COMPONENTS ========== */
 
-/* General buttons */
-Button {
-    -fx-text-fill: white;
-    -fx-font-size: 18px;
-    -fx-font-weight: bold;
-    -fx-border-radius: 24px;
-    -fx-background-radius: 24px;
-    -fx-pref-height: 40px;
-}
-
-.button-text {
-    -fx-text-fill: white;
-    -fx-font-weight: bold;
-    -fx-border-color: #262626;
-    -fx-pref-height: 40px;
-    -fx-pref-width: 200px;
-    -fx-alignment: center;
-    -fx-background-color: rgba(100, 100, 100, 0.7);
-    -fx-cursor: hand;
-}
-
-.button-text:hover {
-    -fx-background-color: linear-gradient(to bottom right, #7341BE, #432570);
-    -fx-text-fill: #F0ECFD;
-}
-
-.button-text:pressed {
-    -fx-background-color: linear-gradient(to bottom right, #262626, #101010);
-    -fx-text-fill: #F0ECFD;
-}
-
 .back-button {
     -fx-text-fill: #F0ECFD;
     -fx-font-size: 14px;
@@ -225,7 +198,7 @@ Button {
 }
 
 /* Text fields */
-TextField, PasswordField {
+.text-field-login, .password-field-login {
     -fx-background-color: rgba(100, 100, 100, 0.7);
     -fx-text-fill: white;
     -fx-font-size: 15px;
@@ -238,25 +211,8 @@ TextField, PasswordField {
     -fx-prompt-text-fill: #9E9E9E;
 }
 
-.text-field, .password-field {
-    -fx-background-color: rgba(100, 100, 100, 0.7);
-    -fx-text-fill: white;
-    -fx-font-size: 15px;
-    -fx-border-radius: 16px;
-    -fx-border-width: 2px;
-    -fx-border-color: #262626;
-    -fx-background-radius: 16px;
-    -fx-padding: 10px;
-    -fx-pref-height: 40px;
-    -fx-prompt-text-fill: #9E9E9E;
-}
-
-.text-field:focused,
-.password-field:focused,
-TextField:focused,
-PasswordField:focused,
-#passwordContainer TextField:focused,
-#passwordContainer PasswordField:focused {
+.text-field-login:focused,
+.password-field-login:focused {
     -fx-background-color: linear-gradient(to bottom right, #262626, #101010);
     -fx-border-color: #7341BE;
 }
@@ -323,6 +279,7 @@ PasswordField:focused,
 .welcome-text {
     -fx-text-fill: #F0ECFD;
     -fx-alignment: center;
+    -fx-font-weight: bold;
     -fx-padding: 5px;
 }
 
@@ -330,12 +287,10 @@ PasswordField:focused,
     -fx-text-fill: white;
     -fx-font-weight: bold;
     -fx-padding: 5px;
-    -fx-font-family: "Arial";
 }
 
 .register-text {
     -fx-background-color: transparent;
-    -fx-text-fill: white;
     -fx-alignment: center;
 }
 
@@ -397,45 +352,28 @@ PasswordField:focused,
     -fx-background-color: transparent;
 }
 
-.bakground-image {
-    -fx-background-image: url('../images/evangeliontry.jpg');
-    -fx-background-repeat: no-repeat;
-    -fx-background-position: center center;
-    -fx-background-size: cover;
-}
-
 .hero-title {
     -fx-text-fill: white;
     -fx-font-weight: bold;
     -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.8), 10, 0, 2, 2);
     -fx-max-width: 600px;
 }
-
-/* Specific streaming buttons */
-.play-button {
-    -fx-background-color: white;
-    -fx-text-fill: black;
-    -fx-font-weight: bold;
-    -fx-background-radius: 4px;
-    -fx-cursor: hand;
-    -fx-padding: 8px 20px;
-    -fx-pref-height: 40px;
+.big-title{
+    -fx-font-size:48px;
 }
 
-.play-button:hover {
-    -fx-background-color: rgba(255, 255, 255, 0.8);
-}
 
 .icon-button {
     -fx-background-color: rgba(42, 42, 42, 0.6);
-    -fx-text-fill: white;
     -fx-cursor: hand;
     -fx-border-color: rgba(255, 255, 255, 0.7);
     -fx-border-width: 2px;
     -fx-pref-height: 40px;
     -fx-pref-width: 40px;
 }
-
+.play-button{
+    -fx-pref-height: 44px;
+}
 .icon-button:hover {
     -fx-background-color: rgba(42, 42, 42, 0.8);
     -fx-border-color: white;
@@ -443,11 +381,10 @@ PasswordField:focused,
 
 .close-button {
     -fx-background-color: rgba(42, 42, 42, 0.6);
-    -fx-text-fill: white;
     -fx-font-weight: bold;
     -fx-cursor: hand;
-    -fx-pref-height: 40px;
-    -fx-pref-width: 40px;
+    -fx-pref-height: 50px;
+    -fx-pref-width: 50px;
 }
 
 .close-button:hover {
@@ -459,20 +396,8 @@ PasswordField:focused,
     -fx-background-color: #141414;
 }
 
-.metadata-text {
-    -fx-text-fill: white;
-}
 
 .rating-badge {
-    -fx-background-color: rgba(255, 255, 255, 0.2);
-    -fx-text-fill: white;
-    -fx-font-weight: bold;
-    -fx-padding: 1px 4px;
-    -fx-background-radius: 2px;
-}
-
-.maturity-badge {
-    -fx-background-color: #f5c518;
     -fx-text-fill: black;
     -fx-font-weight: bold;
     -fx-padding: 1px 4px;
@@ -484,7 +409,6 @@ PasswordField:focused,
 }
 
 .description-text {
-    -fx-text-fill: white;
     -fx-line-spacing: 2px;
 }
 
@@ -494,12 +418,10 @@ PasswordField:focused,
 }
 
 .info-text {
-    -fx-text-fill: white;
     -fx-line-spacing: 1px;
 }
 
 .section-title {
-    -fx-text-fill: white;
     -fx-font-weight: bold;
 }
 
@@ -529,10 +451,43 @@ PasswordField:focused,
 }
 
 .episode-number {
-    -fx-text-fill: white;
     -fx-font-weight: bold;
-    -fx-min-width: 30px;
+    -fx-min-width: 50px;
     -fx-alignment: center;
+}
+
+.button-big-text {
+    -fx-font-size: 18px;
+    -fx-font-weight: bold;
+    -fx-border-radius: 24px;
+    -fx-background-radius: 24px;
+    -fx-pref-height: 40px;
+}
+
+/* Button with class style */
+.button-big {
+    -fx-font-size: 25px;
+    -fx-font-weight: bold;
+    -fx-border-color: #262626;
+    -fx-border-radius: 24px;
+    -fx-background-radius: 24px;
+    -fx-pref-height: 40px;
+    -fx-pref-width: 200px;
+    -fx-alignment: center;
+    -fx-background-color: rgba(100, 100, 100, 0.7);
+    -fx-cursor: hand;
+}
+
+/* Button hover effect */
+.button-text:hover {
+    -fx-background-color: linear-gradient(to bottom right, #7341BE, #432570);
+    -fx-text-fill: #F0ECFD;
+}
+
+/* Button pressed effect */
+.button-text:pressed {
+    -fx-background-color: linear-gradient(to bottom right, #262626, #101010);
+    -fx-text-fill: #F0ECFD;
 }
 
 .episode-thumbnail {
@@ -542,16 +497,11 @@ PasswordField:focused,
 }
 
 .episode-title {
-    -fx-text-fill: white;
     -fx-font-weight: bold;
 }
 
-.episode-duration {
-    -fx-text-fill: #d2d2d2;
-}
 
 .episode-description {
-    -fx-text-fill: #d2d2d2;
     -fx-wrap-text: true;
 }
 
@@ -560,8 +510,6 @@ PasswordField:focused,
     -fx-background-color: transparent;
     -fx-border-color: white;
     -fx-border-width: 1px;
-    -fx-border-radius: 4px;
-    -fx-text-fill: white;
     -fx-font-weight: bold;
     -fx-padding: 8 16 8 16;
     -fx-cursor: hand;
@@ -582,6 +530,7 @@ PasswordField:focused,
     -fx-border-color: #262626;
     -fx-border-width: 1px;
     -fx-border-radius: 4px;
+    -fx-background-radius: 4px;
     -fx-padding: 8;
     -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.5), 10, 0, 0, 4);
     -fx-spacing: 2px;
@@ -589,11 +538,9 @@ PasswordField:focused,
 
 .season-option-button {
     -fx-background-color: transparent;
-    -fx-text-fill: white;
     -fx-padding: 8 12 8 12;
     -fx-cursor: hand;
     -fx-alignment: center-left;
-    -fx-border-radius: 4px;
 }
 
 .season-option-button:hover {
@@ -602,7 +549,6 @@ PasswordField:focused,
 
 .season-option-button.selected-season {
     -fx-background-color: #7341BE;
-    -fx-text-fill: white;
 }
 
 .season-option-button.selected-season:hover {

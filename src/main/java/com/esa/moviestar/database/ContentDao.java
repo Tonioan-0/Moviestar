@@ -208,16 +208,11 @@ public class ContentDao {
         content.setImageUrl(rs.getString("Image_Url"));
         content.setPosterUrl(rs.getString("Poster_Url"));
         content.setVideoUrl(rs.getString("Film_Url"));
-        content.setTime(rs.getDouble("Time"));
         content.setYear(rs.getInt("Year"));
         content.setRating(rs.getDouble("Rating"));
         content.setPopularity(rs.getInt("Popularity"));
         content.setCountry(rs.getString("Nation"));
         content.setReleaseDate(rs.getString("Release_Date"));
-        content.seasonDivided(rs.getInt("Seasons") > 0);
-        content.setSeasonCount(rs.getInt("Seasons"));
-        content.Series(rs.getInt("Episodes_Count") > 0);
-        content.setEpisodeCount(rs.getInt("Episodes_Count"));
     }
 
     // Refactored createContent to use the cache
@@ -268,14 +263,12 @@ public class ContentDao {
                     stmtInsertContent.setString(4, content.getImageUrl() != null ? content.getImageUrl() : "error");
                     stmtInsertContent.setString(5, content.getPosterUrl() != null ? content.getPosterUrl() : "error");
                     stmtInsertContent.setString(6, content.getVideoUrl() != null ? content.getVideoUrl() : "error");
-                    stmtInsertContent.setDouble(7, content.getTime());
                     stmtInsertContent.setInt(8, content.getYear());
                     stmtInsertContent.setDouble(9, content.getRating());
                     stmtInsertContent.setInt(10, content.getPopularity());
                     stmtInsertContent.setString(11, content.getCountry() != null ? content.getCountry() : "");
                     stmtInsertContent.setString(12, content.getReleaseDate() != null ? content.getReleaseDate() : "");
                     stmtInsertContent.setInt(13, content.isSeries() ? 1 : 0);
-                    stmtInsertContent.setInt(14, content.getSeasonCount());
                     stmtInsertContent.setString(15, OffsetDateTime.now(ZoneOffset.UTC).format(DateTimeFormatter.ISO_OFFSET_DATE_TIME));
                     stmtInsertContent.addBatch();
                     if(content.getCategories()!=null && ! content.getCategories().isEmpty())

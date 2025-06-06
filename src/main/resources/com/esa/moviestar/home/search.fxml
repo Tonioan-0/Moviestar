@@ -1,20 +1,26 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import java.lang.*?>
 <?import javafx.geometry.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-<?import javafx.scene.shape.Line?>
+<?import javafx.scene.shape.*?>
 
 <AnchorPane maxHeight="1920" maxWidth="1080" minHeight="-Infinity" minWidth="-Infinity" prefHeight="851.0" prefWidth="1077.0" styleClass="bg-color" stylesheets="@../styles/general.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.esa.moviestar.home.SearchController">
     <ScrollPane fitToWidth="true" hbarPolicy="NEVER" hmax="0.0" prefHeight="1080.0" prefWidth="1920.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" BorderPane.alignment="TOP_CENTER">
         <VBox alignment="TOP_CENTER" spacing="16.0" style="-fx-background-color: transparent;" VBox.vgrow="ALWAYS">
             <!-- Used like a dynamic margin for the scroll pane to give the header (main.fxml) space in initial position-->
-            <Pane  minHeight="90.0" prefWidth="1" />
+            <Pane minHeight="90.0" prefWidth="1" />
 
             <HBox spacing="8">
-                <Button fx:id="findOutButton" styleClass="register-text-recommendations-big" text="Altri titoli da scoprire:">
+                <Button fx:id="findOutButton" text="Find out more titles:">
+                    <styleClass>
+                        <String fx:value="register-text-recommendation-mid" />
+                        <String fx:value="on-primary" />
+                        <String fx:value="button-big-text" />
+                    </styleClass>
                     <padding>
-                        <Insets bottom="11" />
+                        <Insets bottom="11.0" top="6.0" />
                     </padding>
                     <HBox.margin>
                         <Insets bottom="60.0" left="12.0" />
@@ -23,7 +29,7 @@
                 <FlowPane fx:id="recommendations" prefWrapLength="1500" />
             </HBox>
 
-            <HBox spacing="15" alignment="CENTER">
+            <HBox alignment="CENTER" spacing="15">
 
                 <Line fx:id="separatorLine" endX="1400" strokeWidth="1.5">
                     <HBox.margin>

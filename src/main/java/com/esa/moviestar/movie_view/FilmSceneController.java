@@ -2,283 +2,398 @@ package com.esa.moviestar.movie_view;
 
 import com.esa.moviestar.home.MainPagesController;
 import com.esa.moviestar.libraries.TMDbApiManager;
-import com.esa.moviestar.model.Content;
+import com.esa.moviestar.model.FilmSeriesDetails;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
+import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.OverrunStyle;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.effect.ColorAdjust;
 import javafx.scene.effect.GaussianBlur;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
+import javafx.stage.Popup;
 
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
-import java.util.Objects;
-import java.util.concurrent.CompletableFuture;
-import java.util.stream.Collectors;
-
 
 public class FilmSceneController {
 
-    private MainPagesController mainPagesController;
-    private TMDbApiManager tmdbApiManager;
-    private Content currentContentDetails; // Stores the fully detailed content object
+    public VBox episodesSectionVBox;
+    public VBox backgroundVBox;
+    public VBox mainVBox;
+    public ImageView heroImageView;
+    public Label runtimeOrSeasons;
+    MainPagesController mainPagesController;
+    private TMDbApiManager apiManager;
+    private FilmSeriesDetails currentContent;
 
-    @FXML public StackPane background;
-    @FXML public ScrollPane scrollPane;
-    @FXML public VBox episodesList; // This VBox is where individual episode items are added
+    // Main containers
+    @FXML
+    public StackPane background;
+    @FXML
+    public ScrollPane scrollPane;
+    @FXML
+    public VBox episodesList;
 
-    @FXML private Button closeButton;
-    @FXML private Button playButton;
-    @FXML private Button addButton;
-    @FXML private Button infoButton;
+    // Buttons
+    @FXML
+    private Button closeButton;
+    @FXML
+    private Button playButton;
+    @FXML
+    private Button addButton;
+    @FXML
+    private Button infoButton;
 
-    @FXML private Label titleLabel;
-    @FXML private Label yearLabel;
-    @FXML private Label episodesLabel; // For current season's episode count or movie runtime
-    @FXML private Label ratingLabel;
-    @FXML private Label maturityLabel;
-    @FXML private Label violenceLabel;
-    @FXML private Label descriptionLabel;
-    @FXML private Label castLabel;
-    @FXML private Label genresLabel;
-    @FXML private Label showTypeLabel;
-    @FXML private Label seriesTitleLabel; // Title for episodes section, e.g., "Episodes of [Series Name]"
+    // Labels for content info
+    @FXML
+    private Label titleLabel;
+    @FXML
+    private Label yearLabel;
+    @FXML
+    private Label episodesLabel;
+    @FXML
+    private Label ratingLabel;
+    @FXML
+    private Label maturityLabel;
+    @FXML
+    private Label violenceLabel;
+    @FXML
+    private Label descriptionLabel;
+    @FXML
+    private Label castLabel;
+    @FXML
+    private Label genresLabel;
+    @FXML
+    private Label showTypeLabel;
+    @FXML
+    private Label seriesTitleLabel;
 
     // Season selection components
     private HBox seasonsContainer;
     private Button seasonsDropdownButton;
-    private VBox seasonsDropdownMenu; // This is the menu itself, child of a ScrollPane
-    private ScrollPane seasonsDropdownScrollPane; // ScrollPane for the dropdown menu
+    private VBox seasonsDropdownMenu;
     private boolean isDropdownOpen = false;
-
-    // Simplified data storage for seasons and episodes
-    private List<TMDbApiManager.ApiSeasonDetails> allSeasonsDetails;
     private int currentSeasonIndex = 0;
-    private boolean isSeriesView = false;
+    private int currentSeriesId = 0; // Store series ID for loading additional seasons
+
+    // Event filter for closing dropdown
+    private javafx.event.EventHandler<javafx.scene.input.MouseEvent> closeDropdownFilter;
 
 
-    public Error initialize() {
-        if (background == null) return new Error("background node not initialized in FXML");
-        // Other critical FXML null checks can be added if issues persist
+    public void initialize() {
+        apiManager = TMDbApiManager.getInstance();
 
-        this.tmdbApiManager = TMDbApiManager.getInstance();
-        this.allSeasonsDetails = new ArrayList<>();
-
-        if (closeButton != null) closeButton.setOnMouseClicked(event -> closeView());
-        if (playButton != null) playButton.setOnAction(event -> playContent());
-        if (addButton != null) addButton.setOnAction(event -> addToList());
-        if (infoButton != null) infoButton.setOnAction(event -> showInfo());
-
-        if (scrollPane != null && scrollPane.getContent() instanceof Region) {
-            ((Region) scrollPane.getContent()).prefWidthProperty().bind(scrollPane.widthProperty());
+        // Set button actions
+        if (closeButton != null) {
+            closeButton.setOnMouseClicked(event -> closeView());
         }
+        if (playButton != null) {
+            playButton.setOnAction(event -> playContent());
+        }
+        if (addButton != null) {
+            addButton.setOnAction(event -> addToList());
+        }
+        if (infoButton != null) {
+            infoButton.setOnAction(event -> showInfo());
+        }
+
         System.out.println("FilmSceneController initialized.");
-        return null;
     }
 
-    public void setMainPagesController(MainPagesController mainPagesController) {
-        this.mainPagesController = mainPagesController;
-    }
+    /**
+     * Main method to load content data from TMDb API
+     *
+     * @param contentId The TMDb ID of the content
+     * @param isMovie   true for movie, false for TV series
+     */
+    public void loadContent(int contentId, boolean isMovie) {
+        System.out.println("Loading " + (isMovie ? "movie" : "TV series") + " with ID: " + contentId);
 
-    public void loadContent(Content initialContent) {
-        if (initialContent == null) {
-            Platform.runLater(() -> {
-                setTitle("Error");
-                setDescription("Content not found.");
-                setPlaceholderBackground();
-            });
-            return;
+        // Show loading state
+        showLoadingState();
+
+        if (isMovie) {
+            loadMovieData(contentId);
+        } else {
+            currentSeriesId = contentId; // Store series ID
+            loadTVSeriesData(contentId);
         }
-        clearUIBeforeLoading();
+    }
 
-        tmdbApiManager.fetchFullContentDetails(initialContent.getId(), initialContent.isSeries())
-                .thenAcceptAsync(fullContent -> {
-                    this.currentContentDetails = fullContent;
-                    this.isSeriesView = fullContent.isSeries();
+    private void loadMovieData(int movieId) {
+        String endpoint = "/movie/" + movieId + "?append_to_response=credits";
 
+        apiManager.makeRequestAsync(endpoint)
+                .thenAccept(jsonString -> {
                     Platform.runLater(() -> {
-                        updateBackground(fullContent.getImageUrl() != null ? fullContent.getImageUrl() : fullContent.getPosterUrl());
-                        populateBaseUI(fullContent);
-
-                        if (fullContent.isSeries()) {
-                            setupAsSeriesViewType();
-                            loadSeasonsAndEpisodesForSeries(fullContent);
-                        } else {
-                            setupAsMovieViewType();
-                            if (episodesLabel != null) {
-                                episodesLabel.setText(fullContent.getRuntimeMinutes() > 0 ? fullContent.getRuntimeMinutes() + " min" : "Runtime N/A");
-                                episodesLabel.setVisible(true);
-                                episodesLabel.setManaged(true);
-                            }
+                        try {
+                            JsonObject movieJson = JsonParser.parseString(jsonString).getAsJsonObject();
+                            currentContent = parseMovieData(movieJson);
+                            displayMovieContent();
+                        } catch (Exception e) {
+                            System.err.println("Error parsing movie data: " + e.getMessage());
+                            e.printStackTrace();
+                            showErrorState();
                         }
                     });
-                }, Platform::runLater)
+                })
                 .exceptionally(ex -> {
-                    System.err.println("FilmSceneController: Failed to fetch full content details for ID " + initialContent.getId() + ": " + ex.getMessage());
-                    ex.printStackTrace();
                     Platform.runLater(() -> {
-                        setTitle("Error Loading Details");
-                        setDescription("Could not load details. Please try again.");
-                        setPlaceholderBackground();
+                        System.err.println("Error loading movie data: " + ex.getMessage());
+                        ex.printStackTrace();
+                        showErrorState();
                     });
                     return null;
                 });
     }
 
-    private void clearUIBeforeLoading() {
-        setTitle("Loading...");
-        setYear("");
-        setDescription("");
-        setGenres("");
-        setRating("");
-        setMaturity("");
-        setViolenceLabel("");
-        setCast("");
-        if (episodesLabel != null) episodesLabel.setText("");
-        if (episodesList != null) episodesList.getChildren().clear();
-        allSeasonsDetails.clear();
-        currentSeasonIndex = 0;
-        hideSeasonsSelectorVisuals(); // Hides the dropdown related UI
-        if (seriesTitleLabel != null) {
-            seriesTitleLabel.setVisible(false);
-            seriesTitleLabel.setManaged(false);
-        }
+    private void loadTVSeriesData(int seriesId) {
+        String seriesEndpoint = "/tv/" + seriesId + "?append_to_response=credits";
+
+        apiManager.makeRequestAsync(seriesEndpoint)
+                .thenAccept(seriesJsonString -> {
+                    Platform.runLater(() -> {
+                        try {
+                            JsonObject seriesJson = JsonParser.parseString(seriesJsonString).getAsJsonObject();
+                            currentContent = parseSeriesData(seriesJson);
+                            initializeAllSeasons();
+                            displaySeriesContent();
+                        } catch (Exception e) {
+                            System.err.println("Error parsing series data: " + e.getMessage());
+                            e.printStackTrace();
+                            showErrorState();
+                        }
+                    });
+                })
+                .exceptionally(ex -> {
+                    Platform.runLater(() -> {
+                        System.err.println("Error loading series data: " + ex.getMessage());
+                        ex.printStackTrace();
+                        showErrorState();
+                    });
+                    return null;
+                });
     }
 
-    private void updateBackground(String imageUrl) {
-        if (background == null) return;
-        background.getChildren().removeIf(node -> node instanceof ImageView || node.getStyle().contains("-fx-background-color:"));
+    private FilmSeriesDetails parseMovieData(JsonObject movieJson) {
+        FilmSeriesDetails movie = new FilmSeriesDetails();
 
-        if (imageUrl != null && !imageUrl.trim().isEmpty()) {
+        movie.setId(getIntegerOrNull(movieJson, "id", 0));
+        movie.setTitle(getStringOrNull(movieJson, "title"));
+        movie.setPlot(getStringOrNull(movieJson, "overview"));
+        movie.setPosterUrl(apiManager.getImageUrl(getStringOrNull(movieJson, "poster_path"), "w500"));
+        movie.setBackdropUrl(apiManager.getImageUrl(getStringOrNull(movieJson, "backdrop_path"), "w1280"));
+        movie.setReleaseDate(getStringOrNull(movieJson, "release_date"));
+        movie.setMovieRuntime(getIntegerOrNull(movieJson, "runtime", 0));
+
+
+        if (movie.getReleaseDate() != null && movie.getReleaseDate().length() >= 4) {
             try {
-                Image image = new Image(imageUrl, true);
-                ImageView bgImageView = new ImageView(image);
-                image.errorProperty().addListener((obs, oldE, newE) -> {
-                    if (newE) {
-                        System.err.println("FilmSceneController: Failed to load background image: " + imageUrl);
-                        Platform.runLater(this::setPlaceholderBackground);
-                    }
-                });
-                if (!image.isError()) {
-                    bgImageView.setEffect(createBackgroundEffect());
-                    background.getChildren().addFirst(configureBackgroundImage(bgImageView));
-                } else {
-                    setPlaceholderBackground();
-                }
-            } catch (Exception e) {
-                System.err.println("FilmSceneController: Exception loading background image: " + imageUrl + " - " + e.getMessage());
-                setPlaceholderBackground();
+                movie.setYear(Integer.parseInt(movie.getReleaseDate().substring(0, 4)));
+            } catch (NumberFormatException e) {
+                System.err.println("Could not parse year for movie.");
             }
-        } else {
-            setPlaceholderBackground();
-        }
-    }
-
-    private void setPlaceholderBackground() {
-        if (background == null) return;
-        background.getChildren().removeIf(node -> node instanceof ImageView || node.getStyle().contains("-fx-background-color:"));
-        Pane placeholder = new Pane();
-        placeholder.setStyle("-fx-background-color: #1A1A1A;");
-        background.getChildren().addFirst(placeholder);
-        placeholder.prefWidthProperty().bind(background.widthProperty());
-        placeholder.prefHeightProperty().bind(background.heightProperty());
-    }
-
-    private void populateBaseUI(Content content) {
-        setTitle(content.getTitle());
-        setYear(content.getYear() > 0 ? String.valueOf(content.getYear()) : "N/A");
-        setDescription(content.getPlot());
-        setGenres(content.getGenreNames() != null && !content.getGenreNames().isEmpty() ?
-                String.join(", ", content.getGenreNames()) : "N/A");
-        setRating(content.getRating() > 0 ? String.format("%.1f/10", content.getRating()) : "N/A");
-        setMaturity("TV-MA"); // Placeholder
-        setViolenceLabel("Mild Violence"); // Placeholder
-        setCast("Cast not available"); // Placeholder
-    }
-
-    private void loadSeasonsAndEpisodesForSeries(Content seriesContent) {
-        allSeasonsDetails.clear();
-        currentSeasonIndex = 0;
-
-        if (seriesContent.getNumberOfSeasons() == 0) {
-            Platform.runLater(() -> {
-                if (episodesLabel != null) episodesLabel.setText("No seasons available.");
-                hideSeasonsSelectorVisuals();
-                if (episodesList != null) episodesList.getChildren().clear();
-            });
-            return;
         }
 
-        List<CompletableFuture<TMDbApiManager.ApiSeasonDetails>> seasonFutures = new ArrayList<>();
-        for (int i = 1; i <= seriesContent.getNumberOfSeasons(); i++) { // Fetch seasons 1 to N
-            seasonFutures.add(tmdbApiManager.fetchTvSeasonDetails(seriesContent.getId(), i));
+        movie.setSeries(false);
+
+        List<String> genreNames = new ArrayList<>();
+        if (movieJson.has("genres") && movieJson.get("genres").isJsonArray()) {
+            for (JsonElement genreEl : movieJson.getAsJsonArray("genres")) {
+                genreNames.add(getStringOrNull(genreEl.getAsJsonObject(), "name"));
+            }
         }
-        // Optionally fetch season 0 (Specials) if needed, by adding another future.
+        movie.setGenreNames(genreNames);
 
-        CompletableFuture.allOf(seasonFutures.toArray(new CompletableFuture[0]))
-                .thenAcceptAsync(voidResult -> {
-                    this.allSeasonsDetails = seasonFutures.stream()
-                            .map(future -> {
-                                try { return future.join(); }
-                                catch (Exception e) {
-                                    System.err.println("FilmSceneController: Error joining season future: " + e.getMessage());
-                                    return null;
-                                }
-                            })
-                            .filter(Objects::nonNull)
-                            .filter(s -> s.episodes != null && !s.episodes.isEmpty()) // Only keep seasons with episodes
-                            .sorted(Comparator.comparingInt(s -> s.seasonNumber))
-                            .collect(Collectors.toList());
+        if (movieJson.has("production_companies") && movieJson.get("production_companies").isJsonArray()) {
+            JsonArray prodArray = movieJson.getAsJsonArray("production_companies");
+            if (!prodArray.isEmpty()) {
+                movie.setProductionName(getStringOrNull(prodArray.get(0).getAsJsonObject(), "name"));
+            }
+        }
 
-                    Platform.runLater(this::updateSeriesUIDisplay);
-                }, Platform::runLater)
-                .exceptionally(ex -> {
-                    System.err.println("FilmSceneController: Error fetching all season details for " + seriesContent.getTitle() + ": " + ex.getMessage());
-                    Platform.runLater(() -> {
-                        if (episodesLabel != null) episodesLabel.setText("Could not load episodes.");
-                        hideSeasonsSelectorVisuals();
-                    });
-                    return null;
-                });
+        if (movieJson.has("credits") && movieJson.getAsJsonObject("credits").has("cast")) {
+            JsonArray castArray = movieJson.getAsJsonObject("credits").getAsJsonArray("cast");
+            List<String> castNames = new ArrayList<>();
+            for (int i = 0; i < castArray.size() && i < 5; i++) {
+                castNames.add(getStringOrNull(castArray.get(i).getAsJsonObject(), "name"));
+            }
+            movie.setCast(String.join(", ", castNames));
+        }
+        return movie;
     }
 
-    private void updateSeriesUIDisplay() {
-        if (!allSeasonsDetails.isEmpty()) {
-            currentSeasonIndex = 0; // Default to first season
-            ensureSeasonsSelectorExists(); // Create if not present, update if present
-            displayEpisodesForCurrentSeason();
-        } else {
-            if (episodesLabel != null) episodesLabel.setText("No episodes available for this series.");
-            hideSeasonsSelectorVisuals();
-            if (episodesList != null) episodesList.getChildren().clear();
+    private FilmSeriesDetails parseSeriesData(JsonObject seriesJson) {
+        FilmSeriesDetails series = new FilmSeriesDetails();
+
+        series.setId(getIntegerOrNull(seriesJson, "id", 0));
+        series.setTitle(getStringOrNull(seriesJson, "name"));
+        series.setPlot(getStringOrNull(seriesJson, "overview"));
+        series.setPosterUrl(apiManager.getImageUrl(getStringOrNull(seriesJson, "poster_path"), "w500"));
+        series.setBackdropUrl(apiManager.getImageUrl(getStringOrNull(seriesJson, "backdrop_path"), "w1280"));
+        series.setReleaseDate(getStringOrNull(seriesJson, "first_air_date"));
+
+        if (series.getReleaseDate() != null && series.getReleaseDate().length() >= 4) {
+            try {
+                series.setYear(Integer.parseInt(series.getReleaseDate().substring(0, 4)));
+            } catch (NumberFormatException e) {
+                System.err.println("Could not parse year for series.");
+            }
         }
+
+        series.setSeries(true);
+        series.setNumberOfSeasons(getIntegerOrNull(seriesJson, "number_of_seasons", 0));
+
+        List<String> genreNames = new ArrayList<>();
+        if (seriesJson.has("genres") && seriesJson.get("genres").isJsonArray()) {
+            for (JsonElement genreEl : seriesJson.getAsJsonArray("genres")) {
+                genreNames.add(getStringOrNull(genreEl.getAsJsonObject(), "name"));
+            }
+        }
+        series.setGenreNames(genreNames);
+
+        if (seriesJson.has("production_companies") && seriesJson.get("production_companies").isJsonArray()) {
+            JsonArray prodArray = seriesJson.getAsJsonArray("production_companies");
+            if (!prodArray.isEmpty()) {
+                series.setProductionName(getStringOrNull(prodArray.get(0).getAsJsonObject(), "name"));
+            }
+        }
+
+        if (seriesJson.has("credits") && seriesJson.getAsJsonObject("credits").has("cast")) {
+            JsonArray castArray = seriesJson.getAsJsonObject("credits").getAsJsonArray("cast");
+            List<String> castNames = new ArrayList<>();
+            for (int i = 0; i < castArray.size() && i < 5; i++) {
+                castNames.add(getStringOrNull(castArray.get(i).getAsJsonObject(), "name"));
+            }
+            series.setCast(String.join(", ", castNames));
+        }
+        return series;
     }
 
-    public void setupAsSeriesViewType() {
-        this.isSeriesView = true;
-        if (showTypeLabel != null) showTypeLabel.setText("SERIE TV");
-        if (seriesTitleLabel != null && titleLabel != null) {
-            seriesTitleLabel.setText(titleLabel.getText()); // Or "Episodes of " + titleLabel.getText()
+    private FilmSeriesDetails.SeasonDetails parseSeasonData(JsonObject seasonJson) {
+        FilmSeriesDetails.SeasonDetails season = new FilmSeriesDetails.SeasonDetails();
+
+        season.setSeasonNumber(getIntegerOrNull(seasonJson, "season_number", 0));
+        season.setName(getStringOrNull(seasonJson, "name"));
+        season.setOverview(getStringOrNull(seasonJson, "overview"));
+        season.setPosterUrl(apiManager.getImageUrl(getStringOrNull(seasonJson, "poster_path"), "w300"));
+        season.setAirDate(getStringOrNull(seasonJson, "air_date"));
+
+        if (seasonJson.has("episodes") && seasonJson.get("episodes").isJsonArray()) {
+            for (JsonElement epEl : seasonJson.getAsJsonArray("episodes")) {
+                JsonObject epJson = epEl.getAsJsonObject();
+                FilmSeriesDetails.EpisodeDetails episode = new FilmSeriesDetails.EpisodeDetails();
+
+                episode.setEpisodeNumber(getIntegerOrNull(epJson, "episode_number", 0));
+                episode.setName(getStringOrNull(epJson, "name"));
+                episode.setOverview(getStringOrNull(epJson, "overview"));
+                episode.setStillUrl(apiManager.getImageUrl(getStringOrNull(epJson, "still_path"), "w300"));
+                episode.setRuntimeMinutes(getIntegerOrNull(epJson, "runtime", 0));
+
+                season.addEpisode(episode);
+            }
+        }
+        return season;
+    }
+
+    private String truncateText(String text) {
+        if (text == null || text.isEmpty()) {
+            return text;
+        }
+        // If "..." is already present, assume it's suitably truncated or meant to be displayed as is.
+        if (text.contains("...")) {
+            return text;
+        }
+
+        int firstPeriod = text.indexOf('.');
+        if (firstPeriod == -1) {
+            return text; // No periods, return original
+        }
+
+        int secondPeriod = text.indexOf('.', firstPeriod + 1);
+        if (secondPeriod == -1) {
+            return text; // Only one period, return original
+        }
+        // Return the substring up to and including the second period
+        return text.substring(0, secondPeriod + 1);
+    }
+
+    private void displayMovieContent() {
+        if (currentContent == null) return;
+
+        setTitle(currentContent.getTitle());
+        setYear(String.valueOf(currentContent.getYear()));
+        setMovieRuntime(currentContent.getMovieRuntime());
+        setDescription(truncateText(currentContent.getPlot()));
+        setCast(currentContent.getCast());
+        setGenres(String.join(", ", currentContent.getGenreNames()));
+
+        if (showTypeLabel != null) showTypeLabel.setText("MOVIE");
+        hideSeriesSpecificUI();
+        loadBackdrop(currentContent.getBackdropUrl());
+        System.out.println("Movie content displayed: " + currentContent.getTitle());
+    }
+
+    private void displaySeriesContent() {
+        if (currentContent == null) return;
+
+        setTitle(currentContent.getTitle());
+        setYear(String.valueOf(currentContent.getYear()));
+        setDescription(truncateText(currentContent.getPlot()));
+        setCast(currentContent.getCast());
+        setGenres(String.join(", ", currentContent.getGenreNames()));
+        setSeasonsNumber(currentContent.getNumberOfSeasons());
+
+
+        if (showTypeLabel != null) showTypeLabel.setText("TV SERIES");
+        if (seriesTitleLabel != null) {
+            seriesTitleLabel.setText(currentContent.getTitle());
             seriesTitleLabel.setVisible(true);
             seriesTitleLabel.setManaged(true);
         }
+
+        showSeriesSpecificUI();
+        loadBackdrop(currentContent.getBackdropUrl());
+        System.out.println("Series content displayed: " + currentContent.getTitle());
     }
 
-    public void setupAsMovieViewType() {
-        this.isSeriesView = false;
-        if (showTypeLabel != null) showTypeLabel.setText("FILM");
-        hideSeasonsSelectorVisuals();
-        if (episodesList != null) episodesList.getChildren().clear();
+    private void showSeriesSpecificUI() {
+        if (episodesSectionVBox != null) {
+            episodesSectionVBox.setVisible(true);
+            episodesSectionVBox.setManaged(true);
+        }
+        createSeasonsSelector();
+        updateEpisodesDisplay();
+    }
+
+    private void hideSeriesSpecificUI() {
+        removeCloseDropdownFilter();
+        if (seasonsContainer != null) {
+            seasonsContainer.setVisible(false);
+            seasonsContainer.setManaged(false);
+        }
+        if (episodesList != null) {
+            episodesList.getChildren().clear();
+        }
+        if (episodesSectionVBox != null) {
+            episodesSectionVBox.setVisible(false);
+            episodesSectionVBox.setManaged(false);
+        }
         if (episodesLabel != null) {
-            episodesLabel.setVisible(true); // Will be set to runtime by loadContent
-            episodesLabel.setManaged(true);
+            episodesLabel.setVisible(false);
+            episodesLabel.setManaged(false);
         }
         if (seriesTitleLabel != null) {
             seriesTitleLabel.setVisible(false);
@@ -286,13 +401,17 @@ public class FilmSceneController {
         }
     }
 
-    private void ensureSeasonsSelectorExists() {
+    private void createSeasonsSelector() {
         if (episodesList == null || !(episodesList.getParent() instanceof VBox)) {
-            System.err.println("Cannot create seasons selector: episodesList issue or parent not VBox.");
+            System.err.println("Cannot create seasons selector: episodesList is null or its parent is not a VBox.");
             return;
         }
-        VBox episodesSectionParent = (VBox) episodesList.getParent();
 
+        VBox episodesSectionParent = episodesSectionVBox;
+        if (episodesSectionParent == null) {
+            System.err.println("Cannot create seasons selector: episodesSectionVBox is null.");
+            return;
+        }
         if (seasonsContainer == null) {
             seasonsContainer = new HBox();
             seasonsContainer.setAlignment(Pos.CENTER_LEFT);
@@ -300,237 +419,331 @@ public class FilmSceneController {
             seasonsContainer.setStyle("-fx-padding: 0 0 15 0;");
 
             seasonsDropdownButton = new Button();
-            seasonsDropdownButton.getStyleClass().add("seasons-dropdown-button");
+            seasonsDropdownButton.getStyleClass().addAll("seasons-dropdown-button","small-item","on-primary");
             seasonsDropdownButton.setPrefHeight(35);
-            seasonsDropdownButton.setOnAction(e -> toggleSeasonsDropdownMenu());
+            seasonsDropdownButton.setOnAction(e -> popUpSeasonContainer());
+            if (currentContent.getSeasons() != null && !currentContent.getSeasons().isEmpty() && currentContent.getSeasons().get(0) != null) {
+                FilmSeriesDetails.SeasonDetails season = currentContent.getSeasons().get(0);
+                if (season.getName() != null && !season.getName().isEmpty()) {
+                    seasonsDropdownButton.setText(season.getName());
+                }
+            } else {
+                seasonsDropdownButton.setText("Season " + (1));
+            }
 
-            seasonsDropdownMenu = new VBox(); // This is the content of the ScrollPane
-            seasonsDropdownMenu.getStyleClass().add("seasons-dropdown-menu");
+            seasonsDropdownMenu = new VBox();
+            seasonsDropdownMenu.getStyleClass().addAll("seasons-dropdown-menu","small-item","on-primary");
+            seasonsDropdownMenu.setVisible(false);
+            seasonsDropdownMenu.setManaged(false);
             seasonsDropdownMenu.setSpacing(2);
+            seasonsDropdownMenu.setMaxHeight(200);
 
-            seasonsDropdownScrollPane = new ScrollPane(seasonsDropdownMenu);
-            seasonsDropdownScrollPane.setFitToWidth(true);
-            seasonsDropdownScrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
-            seasonsDropdownScrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
-            seasonsDropdownScrollPane.setMaxHeight(200);
-            seasonsDropdownScrollPane.getStyleClass().add("transparent-scroll"); // From general.css
-            seasonsDropdownScrollPane.setVisible(false); // Visibility controlled by isDropdownOpen
-            seasonsDropdownScrollPane.setManaged(false);
-
-            StackPane dropdownWrapper = new StackPane(seasonsDropdownButton, seasonsDropdownScrollPane);
-            StackPane.setAlignment(seasonsDropdownScrollPane, Pos.TOP_LEFT);
-            seasonsDropdownScrollPane.setTranslateY(seasonsDropdownButton.getPrefHeight() + 2); // Position below button
+            StackPane dropdownWrapper = new StackPane(seasonsDropdownButton, seasonsDropdownMenu);
+            StackPane.setAlignment(seasonsDropdownMenu, Pos.TOP_LEFT);
+            seasonsDropdownMenu.setTranslateY(37);
 
             seasonsContainer.getChildren().add(dropdownWrapper);
-
-            // Add seasonsContainer to the parent VBox if not already present
-            if (!episodesSectionParent.getChildren().contains(seasonsContainer)) {
-                int insertIndex = 0; // Default to top
-                Node targetNodeForInsertionBefore = episodesLabel != null ? episodesLabel : episodesList;
-                if (targetNodeForInsertionBefore != null && episodesSectionParent.getChildren().contains(targetNodeForInsertionBefore)) {
-                    insertIndex = episodesSectionParent.getChildren().indexOf(targetNodeForInsertionBefore);
-                } else if (episodesList != null && episodesSectionParent.getChildren().contains(episodesList)) {
-                    insertIndex = episodesSectionParent.getChildren().indexOf(episodesList);
-                } else if (episodesSectionParent.getChildren().size() > 0) {
-                    // Fallback: try to insert after seriesTitleLabel if it exists
-                    if (seriesTitleLabel != null && episodesSectionParent.getChildren().contains(seriesTitleLabel)) {
-                        insertIndex = episodesSectionParent.getChildren().indexOf(seriesTitleLabel) + 1;
-                    } else {
-                        // If seriesTitleLabel is not there or not found, add before the first element if list is not empty
-                        // or at the end if all else fails or list is empty.
-                        insertIndex = episodesSectionParent.getChildren().isEmpty() ? 0 : Math.max(0, insertIndex);
-                    }
-                }
-
-                if (insertIndex >= 0 && insertIndex <= episodesSectionParent.getChildren().size()) {
-                    episodesSectionParent.getChildren().add(insertIndex, seasonsContainer);
-                } else {
-                    episodesSectionParent.getChildren().add(seasonsContainer); // Fallback
-                }
-            }
         }
 
-        populateSeasonsDropdownOptions(); // Populate/update options
+        if (!episodesSectionParent.getChildren().contains(seasonsContainer)) {
+            int insertIndex = episodesSectionParent.getChildren().indexOf(episodesList);
+            if (insertIndex == -1) insertIndex = 0;
+            episodesSectionParent.getChildren().add(insertIndex, seasonsContainer);
+        }
+
         seasonsContainer.setVisible(true);
         seasonsContainer.setManaged(true);
     }
 
-    private void populateSeasonsDropdownOptions() {
-        if (allSeasonsDetails == null || allSeasonsDetails.isEmpty() || seasonsDropdownButton == null || seasonsDropdownMenu == null) {
-            hideSeasonsSelectorVisuals();
+    private void popUpSeasonContainer(){
+        Popup popup = new Popup();
+        StackPane stackPane = new StackPane();
+        stackPane.getStylesheets().add(getClass().getResource("/com/esa/moviestar/styles/general.css").toExternalForm());
+        stackPane.setPadding(new Insets(8));
+        stackPane.getStyleClass().addAll("medium-item","surface-dim");
+        ScrollPane scroll = new ScrollPane();
+        scroll.setFitToWidth(true);
+        scroll.setMaxHeight(200);
+        VBox vbox = new VBox();
+
+        for (int i = 0; i < currentContent.getNumberOfSeasons(); i++) {
+            String seasonName = "Season " + (i + 1);
+            if (currentContent.getSeasons() != null && i < currentContent.getSeasons().size() && currentContent.getSeasons().get(i) != null) {
+                FilmSeriesDetails.SeasonDetails season = currentContent.getSeasons().get(i);
+                if (season.getName() != null && !season.getName().isEmpty()) {
+                    seasonName = season.getName();
+                }
+            } else {
+                seasonName = "Season " + (i + 1);
+            }
+
+            Button seasonOptionButton = new Button(seasonName);
+            seasonOptionButton.getStyleClass().addAll("season-option-button","small-item","on-primary");
+            seasonOptionButton.setPrefWidth(256);
+            seasonOptionButton.setPrefHeight(50);
+            final int seasonIdx = i;
+            seasonOptionButton.setOnAction(e -> {selectSeason(seasonIdx); popup.hide();});
+            if (i == currentSeasonIndex) {
+                seasonOptionButton.getStyleClass().addAll("selected-season");
+            }
+            vbox.getChildren().add(seasonOptionButton);
+        }
+        scroll.setContent(vbox);
+        stackPane.getChildren().add(scroll);
+        popup.getContent().add(stackPane);
+        popup.setAutoHide(true);
+        popup.setHideOnEscape(true);
+        double anchorX = seasonsContainer.localToScreen(0, 0).getX();
+        double anchorY = seasonsContainer.localToScreen(0, 8).getY();
+        double posY = anchorY + seasonsContainer.getBoundsInLocal().getHeight();
+        popup.show(seasonsContainer.getScene().getWindow(), anchorX, posY);
+
+    }
+
+
+
+
+    private void selectSeason(int seasonIndex) {
+        if (currentContent == null || seasonIndex < 0 || seasonIndex >= currentContent.getNumberOfSeasons()) {
             return;
         }
-        seasonsContainer.setVisible(true);
-        seasonsContainer.setManaged(true);
-
-        TMDbApiManager.ApiSeasonDetails currentSeason = allSeasonsDetails.get(currentSeasonIndex);
-        String buttonText = (currentSeason.name != null && !currentSeason.name.isEmpty() ? currentSeason.name : "Season " + currentSeason.seasonNumber);
-        seasonsDropdownButton.setText(buttonText + (isDropdownOpen ? " \u25B2" : " \u25BC"));
-
-        seasonsDropdownMenu.getChildren().clear();
-        for (int i = 0; i < allSeasonsDetails.size(); i++) {
-            TMDbApiManager.ApiSeasonDetails season = allSeasonsDetails.get(i);
-            String optionName = (season.name != null && !season.name.isEmpty() ? season.name : "Season " + season.seasonNumber);
-            if (season.seasonNumber == 0 && (optionName.equalsIgnoreCase("Season 0") || optionName.isEmpty())) {
-                optionName = "Specials"; // Common naming for season 0
-            }
-
-            Button seasonOptionButton = new Button(optionName);
-            seasonOptionButton.getStyleClass().add("season-option-button");
-            seasonOptionButton.setPrefWidth(200);
-            seasonOptionButton.setPrefHeight(30);
-            final int seasonIdx = i;
-            seasonOptionButton.setOnAction(e -> handleSeasonSelection(seasonIdx));
-            if (i == currentSeasonIndex) seasonOptionButton.getStyleClass().add("selected-season");
-            seasonsDropdownMenu.getChildren().add(seasonOptionButton);
-        }
-    }
-
-    private void toggleSeasonsDropdownMenu() {
-        isDropdownOpen = !isDropdownOpen;
-        if (seasonsDropdownScrollPane != null) {
-            seasonsDropdownScrollPane.setVisible(isDropdownOpen);
-            seasonsDropdownScrollPane.setManaged(isDropdownOpen);
-        }
-        // Update arrow on button
-        if (seasonsDropdownButton != null && allSeasonsDetails != null && !allSeasonsDetails.isEmpty()) {
-            TMDbApiManager.ApiSeasonDetails currentSeason = allSeasonsDetails.get(currentSeasonIndex);
-            String buttonText = (currentSeason.name != null && !currentSeason.name.isEmpty() ? currentSeason.name : "Season " + currentSeason.seasonNumber);
-            seasonsDropdownButton.setText(buttonText + (isDropdownOpen ? " \u25B2" : " \u25BC"));
-        }
-    }
-
-    private void handleSeasonSelection(int seasonIndex) {
-        if (allSeasonsDetails == null || seasonIndex < 0 || seasonIndex >= allSeasonsDetails.size()) return;
         currentSeasonIndex = seasonIndex;
-        populateSeasonsDropdownOptions(); // Update button text and menu highlighting
-        displayEpisodesForCurrentSeason();
-        if (isDropdownOpen) toggleSeasonsDropdownMenu(); // Close dropdown
+        updateEpisodesDisplay();
     }
 
-    private void hideSeasonsSelectorVisuals() {
-        if (seasonsContainer != null) {
-            seasonsContainer.setVisible(false);
-            seasonsContainer.setManaged(false);
+    private void updateEpisodesDisplay() {
+        if (episodesList == null) {
+            System.err.println("episodesList VBox is null, cannot update display.");
+            return;
         }
-        if (seasonsDropdownScrollPane != null) {
-            seasonsDropdownScrollPane.setVisible(false);
-            seasonsDropdownScrollPane.setManaged(false);
-        }
-        isDropdownOpen = false; // Reset state
-    }
-
-    private void displayEpisodesForCurrentSeason() {
-        if (episodesList == null) return;
         episodesList.getChildren().clear();
 
-        if (!isSeriesView || allSeasonsDetails == null || allSeasonsDetails.isEmpty() ||
-                currentSeasonIndex < 0 || currentSeasonIndex >= allSeasonsDetails.size()) {
-            if (episodesLabel != null) episodesLabel.setText("No episodes to show.");
+        if (currentContent == null || !currentContent.isSeries()) {
+            if (episodesLabel != null) episodesLabel.setText("No episodes to display.");
             return;
         }
 
-        TMDbApiManager.ApiSeasonDetails currentSeason = allSeasonsDetails.get(currentSeasonIndex);
-        List<TMDbApiManager.ApiEpisodeDetails> episodesForSeason = currentSeason.episodes;
+        if (currentContent.getSeasons() == null ||
+                currentSeasonIndex >= currentContent.getSeasons().size() ||
+                currentContent.getSeasons().get(currentSeasonIndex) == null) {
+            if (episodesLabel != null) episodesLabel.setText("Loading episodes...");
+            return;
+        }
 
-        if (episodesForSeason != null && !episodesForSeason.isEmpty()) {
-            for (TMDbApiManager.ApiEpisodeDetails episodeData : episodesForSeason) {
-                episodesList.getChildren().add(createEpisodeItemNode(episodeData));
+        FilmSeriesDetails.SeasonDetails currentSeason = currentContent.getSeasons().get(currentSeasonIndex);
+        List<FilmSeriesDetails.EpisodeDetails> episodes = currentSeason.getEpisodes();
+
+        if (episodes != null && !episodes.isEmpty()) {
+            for (FilmSeriesDetails.EpisodeDetails episode : episodes) {
+                HBox episodeItem = createEpisodeItem(episode);
+                episodesList.getChildren().add(episodeItem);
             }
             if (episodesLabel != null) {
-                episodesLabel.setText(episodesForSeason.size() + (episodesForSeason.size() == 1 ? " episodio" : " episodi"));
+                episodesLabel.setText(episodes.size() + (episodes.size() == 1 ? " episode" : " episodes"));
                 episodesLabel.setVisible(true);
                 episodesLabel.setManaged(true);
             }
         } else {
-            String seasonNameText = currentSeason.name != null ? currentSeason.name : "Season " + currentSeason.seasonNumber;
             if (episodesLabel != null) {
-                episodesLabel.setText("No episodes in " + seasonNameText + ".");
+                episodesLabel.setText("No episodes in this season.");
                 episodesLabel.setVisible(true);
                 episodesLabel.setManaged(true);
             }
-            Label noEpisodesMsg = new Label("No episodes available for " + seasonNameText + ".");
-            noEpisodesMsg.setStyle("-fx-text-fill: #888; -fx-padding: 20;");
-            episodesList.getChildren().add(noEpisodesMsg);
-        }
-        if (seriesTitleLabel != null && titleLabel != null) {
-            seriesTitleLabel.setText(titleLabel.getText());
-            seriesTitleLabel.setVisible(true);
-            seriesTitleLabel.setManaged(true);
         }
     }
 
-    private HBox createEpisodeItemNode(TMDbApiManager.ApiEpisodeDetails episode) {
+
+    private void loadEpisodeThumbnail(String episodeImageUrl, ImageView imageView) {
+        // First, try to load the episode's specific still image
+        if (episodeImageUrl != null && !episodeImageUrl.isEmpty() && !episodeImageUrl.endsWith("null")) {
+            try {
+                imageView.getStyleClass().add("episode-thumbnail-loading");
+                Image image = new Image(episodeImageUrl, true);
+                imageView.setImage(image);
+
+                image.progressProperty().addListener((obs, oldProgress, newProgress) -> {
+                    if (newProgress.doubleValue() == 1.0) {
+                        imageView.getStyleClass().remove("episode-thumbnail-loading");
+                        imageView.getStyleClass().add("episode-thumbnail-loaded");
+                    }
+                });
+
+                image.errorProperty().addListener((obs, wasError, isError) -> {
+                    if (isError) {
+                        System.err.println("Failed to load episode image: " + episodeImageUrl);
+                        imageView.getStyleClass().remove("episode-thumbnail-loading");
+                        imageView.getStyleClass().add("episode-thumbnail-error");
+                        // Fallback to main content poster on error
+                        loadFallbackThumbnail(imageView);
+                    }
+                });
+            } catch (Exception e) {
+                System.err.println("Error creating image object for episode: " + episodeImageUrl + " - " + e.getMessage());
+                imageView.getStyleClass().add("episode-thumbnail-error");
+                // Fallback to main content poster on error
+                loadFallbackThumbnail(imageView);
+            }
+        } else { // Episode still_path is null, empty, or invalid
+            System.out.println("Episode image URL is null, empty, or invalid. Attempting to load main content poster as fallback.");
+            imageView.getStyleClass().add("episode-thumbnail-missing");
+            loadFallbackThumbnail(imageView);
+        }
+    }
+
+
+    private void loadFallbackThumbnail(ImageView imageView) {
+        if (currentContent != null && currentContent.getPosterUrl() != null && !currentContent.getPosterUrl().isEmpty() && !currentContent.getPosterUrl().endsWith("null")) {
+            try {
+                // Remove any previous state classes before adding fallback/loaded
+                imageView.getStyleClass().remove("episode-thumbnail-loading");
+                imageView.getStyleClass().remove("episode-thumbnail-error");
+                imageView.getStyleClass().remove("episode-thumbnail-missing");
+                // Optional: Add a specific class for fallback styling if you want different appearance
+                // imageView.getStyleClass().add("episode-thumbnail-fallback");
+
+                Image fallbackImage = new Image(currentContent.getPosterUrl(), true);
+                imageView.setImage(fallbackImage);
+
+                fallbackImage.progressProperty().addListener((obs, oldProgress, newProgress) -> {
+                    if (newProgress.doubleValue() == 1.0) {
+                        // imageView.getStyleClass().remove("episode-thumbnail-fallback"); // Remove fallback class once loaded
+                        imageView.getStyleClass().add("episode-thumbnail-loaded"); // Add loaded class
+                    }
+                });
+
+                fallbackImage.errorProperty().addListener((obs, wasError, isError) -> {
+                    if (isError) {
+                        System.err.println("Failed to load fallback image (main poster): " + currentContent.getPosterUrl());
+                        // imageView.getStyleClass().remove("episode-thumbnail-fallback");
+                        imageView.getStyleClass().add("episode-thumbnail-error"); // Revert to error state if fallback fails
+                    }
+                });
+
+            } catch (Exception e) {
+                System.err.println("Error creating fallback image object: " + currentContent.getPosterUrl() + " - " + e.getMessage());
+                imageView.getStyleClass().add("episode-thumbnail-error"); // Revert to error state if fallback creation fails
+            }
+        } else {
+            System.err.println("Main content poster URL is also null, empty, or invalid. No fallback image available.");
+            // Keep the "episode-thumbnail-missing" or "episode-thumbnail-error" class already set
+        }
+    }
+
+
+    private HBox createEpisodeItem(FilmSeriesDetails.EpisodeDetails episode) {
         HBox episodeItem = new HBox();
         episodeItem.setAlignment(Pos.CENTER_LEFT);
         episodeItem.setSpacing(15);
         episodeItem.getStyleClass().add("episode-item");
 
-        Label episodeNumberLabel = new Label(String.valueOf(episode.episodeNumber));
-        episodeNumberLabel.getStyleClass().add("episode-number");
+        Label episodeNumber = new Label(String.valueOf(episode.getEpisodeNumber()));
+        episodeNumber.getStyleClass().addAll("episode-number","on-primary");
+        episodeNumber.setTextOverrun(OverrunStyle.CLIP);
 
-        StackPane thumbnailContainer = new StackPane();
-        thumbnailContainer.setPrefSize(120, 70);
-        thumbnailContainer.getStyleClass().add("episode-thumbnail");
 
-        String thumbnailUrl = episode.getFullStillUrl(TMDbApiManager.STILL_IMAGE_SIZE);
-        if (thumbnailUrl != null) {
-            try {
-                Image thumbImg = new Image(thumbnailUrl, 120, 70, false, true, true);
-                ImageView thumbnailView = new ImageView(thumbImg);
-                thumbnailView.setFitHeight(70);
-                thumbnailView.setFitWidth(120);
-                thumbImg.errorProperty().addListener((obs, oldVal, newVal) -> {
-                    if (newVal) System.err.println("Failed to load episode thumbnail: " + thumbnailUrl);
-                });
-                if (!thumbImg.isError()) thumbnailContainer.getChildren().add(thumbnailView);
-            } catch (Exception e) {
-                System.err.println("Error creating image for thumbnail: " + thumbnailUrl + " - " + e.getMessage());
-            }
-        }
+        ImageView episodeThumbnail = new ImageView();
+        episodeThumbnail.setFitWidth(120);
+        episodeThumbnail.setFitHeight(70);
+        episodeThumbnail.setPreserveRatio(true);
+        episodeThumbnail.getStyleClass().add("episode-thumbnail-image");
+        // Use the updated loadEpisodeThumbnail which includes fallback logic
+        loadEpisodeThumbnail(episode.getStillUrl(), episodeThumbnail);
 
-        VBox episodeDetailsVBox = new VBox(5);
-        HBox.setHgrow(episodeDetailsVBox, Priority.ALWAYS);
+        VBox episodeDetails = new VBox(5);
+        HBox.setHgrow(episodeDetails, Priority.ALWAYS);
 
         HBox titleRow = new HBox();
         titleRow.setAlignment(Pos.CENTER_LEFT);
 
-        Label episodeTitleLabel = new Label(episode.name != null ? episode.name : "Episode " + episode.episodeNumber);
-        episodeTitleLabel.getStyleClass().add("episode-title");
-        episodeTitleLabel.setMaxWidth(Double.MAX_VALUE);
-        HBox.setHgrow(episodeTitleLabel, Priority.SOMETIMES);
+        Label episodeTitle = new Label(episode.getName() != null ? episode.getName() : "Title not available");
+        episodeTitle.getStyleClass().addAll("section-title","on-primary");
+        episodeTitle.setMaxWidth(Double.MAX_VALUE);
 
         Region titleSpacer = new Region();
         HBox.setHgrow(titleSpacer, Priority.ALWAYS);
 
-        Label episodeDurationLabel = new Label(episode.runtime > 0 ? episode.runtime + "min" : "--min");
-        episodeDurationLabel.getStyleClass().add("episode-duration");
-        titleRow.getChildren().addAll(episodeTitleLabel, titleSpacer, episodeDurationLabel);
+        String duration = episode.getRuntimeMinutes() > 0 ? episode.getRuntimeMinutes() + "min" : "";
+        Label episodeDuration = new Label(duration);
+        episodeDuration.getStyleClass().add("on-primary");
 
-        Label episodeDescriptionLabel = new Label(episode.overview != null ? episode.overview : "No description.");
-        episodeDescriptionLabel.getStyleClass().add("episode-description");
-        episodeDescriptionLabel.setWrapText(true);
-        episodeDescriptionLabel.setMaxHeight(38); // Approx 2 lines
+        titleRow.getChildren().addAll(episodeTitle, titleSpacer, episodeDuration);
 
-        episodeDetailsVBox.getChildren().addAll(titleRow, episodeDescriptionLabel);
+        String overview = episode.getOverview();
+        String displayOverview = (overview != null && !overview.isEmpty()) ? truncateText(overview) : "";
+        Label episodeDescription = new Label(displayOverview);
+        episodeDescription.getStyleClass().addAll("episode-description","on-primary");
+        episodeDescription.setWrapText(true);
+        episodeDescription.setMaxHeight(40); // Keep existing max height
 
-        episodeItem.setOnMouseClicked(e -> handlePlayEpisode(episode));
-        // Hover effects are handled by CSS .episode-item:hover
+        episodeDetails.getChildren().addAll(titleRow, episodeDescription);
+        episodeItem.setOnMouseClicked(e -> playEpisode(episode));
 
-        episodeItem.getChildren().addAll(episodeNumberLabel, thumbnailContainer, episodeDetailsVBox);
+        episodeItem.getChildren().addAll(episodeNumber, episodeThumbnail, episodeDetails);
+
         return episodeItem;
     }
 
-    private void handlePlayEpisode(TMDbApiManager.ApiEpisodeDetails episode) {
-        String seasonName = "N/A";
-        if (allSeasonsDetails != null && !allSeasonsDetails.isEmpty() && currentSeasonIndex < allSeasonsDetails.size()) {
-            seasonName = allSeasonsDetails.get(currentSeasonIndex).name;
-        }
-        System.out.println("Playing episode: " + episode.name + " (Ep. " + episode.episodeNumber + ") from season " + seasonName);
-        // TODO: Implement actual playback: mainPagesController.playVideo(episode.getVideoStreamUrl(), episode.name);
+    private void playEpisode(FilmSeriesDetails.EpisodeDetails episode) {
+        System.out.println("Playing episode: " + episode.getName());
+        System.out.println("Episode " + episode.getEpisodeNumber() + " - Duration: " + episode.getRuntimeMinutes() + "min");
+        // TODO: Implement actual playback logic
     }
 
-    private ImageView configureBackgroundImage(ImageView newImgView) {
+    private void loadBackdrop(String backdropUrl) {
+        if (backdropUrl != null && !backdropUrl.isEmpty() && !backdropUrl.endsWith("null")) {
+            try {
+                // Background loading (true) is good for UI responsiveness
+                Image image = new Image(backdropUrl, true);
+                heroImageView.setImage(image);
+                heroImageView.setPreserveRatio(false);
+                heroImageView.setFitWidth(backgroundVBox.getWidth());
+                heroImageView.setFitHeight(backgroundVBox.getPrefHeight());
+
+                // The following lines are no longer needed due to FXML bindings:
+                // heroImageView.setFitWidth(backgroundVBox.getWidth());
+                // heroImageView.setFitHeight(backgroundVBox.getPrefHeight());
+
+            } catch (IllegalArgumentException e) {
+                // This can happen if the URL string is malformed
+                System.err.println("Invalid image URL format for backdrop: " + backdropUrl + " - " + e.getMessage());
+                // heroImageView.setImage(null); // or some default error image
+            } catch (Exception e) {
+                // Catch any other unexpected errors during image instantiation or setting
+                System.err.println("Failed to load backdrop image: " + backdropUrl + " - " + e.getMessage());
+                e.printStackTrace(); // Good for debugging
+                // heroImageView.setImage(null); // or some default error image
+            }
+        } else {
+            System.err.println("Backdrop URL is null, empty, or invalid: " + backdropUrl);
+            // heroImageView.setImage(null); // Clear image or set a default placeholder
+        }
+    }
+
+    private void showLoadingState() {
+
+        if (episodesList != null) episodesList.getChildren().clear();
+        hideSeriesSpecificUI();
+    }
+
+    private void showErrorState() {
+        if (episodesList != null) episodesList.getChildren().clear();
+        hideSeriesSpecificUI();
+    }
+
+    public void setProperties(ImageView newBackgroundImageView, MainPagesController mainPagesController) {
+        if (newBackgroundImageView == null || background == null) {
+            System.err.println("Error: Background ImageView or StackPane is null for setProperties.");
+            return;
+        }
+        this.mainPagesController = mainPagesController;
+        background.getChildren().removeIf(node -> node instanceof ImageView && "mainBlurredBackground".equals(node.getId()));
+
+        newBackgroundImageView.setId("mainBlurredBackground");
+        newBackgroundImageView.setEffect(setColorBackground());
+        background.getChildren().addFirst(setImageBackground(newBackgroundImageView));
+    }
+
+    private ImageView setImageBackground(ImageView newImgView) {
         if (background != null) {
             newImgView.fitWidthProperty().bind(background.widthProperty());
             newImgView.fitHeightProperty().bind(background.heightProperty());
@@ -539,55 +752,212 @@ public class FilmSceneController {
         return newImgView;
     }
 
-    private ColorAdjust createBackgroundEffect() {
+    private ColorAdjust setColorBackground() {
         ColorAdjust colorAdjust = new ColorAdjust();
         colorAdjust.setBrightness(-0.65);
-        colorAdjust.setSaturation(-0.2);
-        GaussianBlur blur = new GaussianBlur(15);
+        colorAdjust.setSaturation(-0.3);
+        GaussianBlur blur = new GaussianBlur(10);
         colorAdjust.setInput(blur);
         return colorAdjust;
     }
 
-    @FXML private void closeView() {
-        if (mainPagesController != null) mainPagesController.restorePreviousScene();
-        else System.err.println("mainPagesController is null. Cannot close view.");
-    }
+    @FXML
+    private void closeView() {
+        System.out.println("Close button clicked");
+        removeCloseDropdownFilter();
+        clearContent();
 
-    @FXML private void playContent() {
-        if (currentContentDetails == null) return;
-        System.out.println("Play button clicked for: " + currentContentDetails.getTitle());
-        if (isSeriesView) {
-            if (allSeasonsDetails != null && !allSeasonsDetails.isEmpty() &&
-                    currentSeasonIndex < allSeasonsDetails.size() && currentSeasonIndex >= 0) {
-                TMDbApiManager.ApiSeasonDetails currentSeason = allSeasonsDetails.get(currentSeasonIndex);
-                if (currentSeason.episodes != null && !currentSeason.episodes.isEmpty()) {
-                    handlePlayEpisode(currentSeason.episodes.get(0)); // Play first episode
-                } else System.out.println("No episodes in current season to play.");
-            } else System.out.println("No seasons/episodes to play for this series.");
-        } else { // Movie
-            System.out.println("Playing movie: " + currentContentDetails.getTitle());
-            // TODO: mainPagesController.playVideo(currentContentDetails.getVideoUrl(), currentContentDetails.getTitle());
+        if (mainPagesController != null) {
+            mainPagesController.restorePreviousScene();
         }
     }
 
-    @FXML private void addToList() {
-        if (currentContentDetails == null) return;
-        System.out.println("Add to list: " + currentContentDetails.getTitle());
-        // TODO: Implement add to list functionality
+    @FXML
+    private void playContent() {
+        System.out.println("Play button clicked");
+        if (currentContent != null) {
+            if (currentContent.isSeries()) {
+                if (currentContent.getSeasons() != null &&
+                        currentSeasonIndex < currentContent.getSeasons().size() &&
+                        currentContent.getSeasons().get(currentSeasonIndex) != null) {
+                    FilmSeriesDetails.SeasonDetails currentSeason = currentContent.getSeasons().get(currentSeasonIndex);
+                    if (currentSeason.getEpisodes() != null && !currentSeason.getEpisodes().isEmpty()) {
+                        playEpisode(currentSeason.getEpisodes().get(0));
+                    } else {
+                        System.out.println("No episodes found for the current season.");
+                    }
+                } else {
+                    System.out.println("Current season data not loaded yet.");
+                }
+            } else {
+                System.out.println("Playing movie: " + currentContent.getTitle());
+                // TODO: Implement movie playback
+            }
+        }
     }
 
-    @FXML private void showInfo() {
-        if (currentContentDetails == null) return;
-        System.out.println("Show info for: " + currentContentDetails.getTitle());
-        // TODO: Implement show more info functionality
+    @FXML
+    private void addToList() {
+        System.out.println("Add to list button clicked");
+        if (currentContent != null) {
+            System.out.println("Adding to list: " + currentContent.getTitle());
+            // TODO: Implement add to list functionality
+        }
     }
 
-    public void setTitle(String title) { if (titleLabel != null) titleLabel.setText(title != null ? title : "N/A"); }
-    public void setDescription(String description) { if (descriptionLabel != null) descriptionLabel.setText(description != null ? description : "No description available.");}
-    public void setYear(String year) { if (yearLabel != null) yearLabel.setText(year != null ? year : "N/A"); }
-    public void setCast(String cast) { if (castLabel != null) castLabel.setText(cast != null ? "Cast: " + cast : "Cast: N/A"); }
-    public void setGenres(String genres) { if (genresLabel != null) genresLabel.setText(genres != null ? "Genres: " + genres : "Genres: N/A"); }
-    public void setRating(String rating) { if (ratingLabel != null) ratingLabel.setText(rating != null ? rating : "N/A"); }
-    public void setMaturity(String maturity) { if (maturityLabel != null) maturityLabel.setText(maturity != null ? maturity : ""); }
-    public void setViolenceLabel(String violence) { if (violenceLabel != null) violenceLabel.setText(violence != null ? violence : ""); }
+    @FXML
+    private void showInfo() {
+        System.out.println("Info button clicked");
+        if (currentContent != null) {
+            System.out.println("Showing info for: " + currentContent.getTitle());
+            // TODO: Implement info display
+        }
+    }
+
+    public void setTitle(String title) {
+        if (titleLabel != null) titleLabel.setText(title != null ? title : "Unknown Title");
+    }
+
+    public void setMovieRuntime(int movieRuntime){
+        if(movieRuntime!=0){
+            runtimeOrSeasons.setText(movieRuntime+"min");
+        }
+    }
+
+    public void setSeasonsNumber(int seasonsNumber){
+        if(seasonsNumber !=0){
+            runtimeOrSeasons.setText(seasonsNumber +" Seasons");
+        }
+    }
+
+
+    public void setDescription(String description) { // Already expects potentially truncated text
+        if (descriptionLabel != null)
+            descriptionLabel.setText(description != null && !description.isEmpty() ? description : "");
+    }
+
+    public void setYear(String year) {
+        if (yearLabel != null) yearLabel.setText(year != null ? year : "Unknown Year");
+    }
+
+    public void setCast(String cast) {
+        if (castLabel != null) castLabel.setText(cast != null && !cast.isEmpty() ? cast : "Not available");
+    }
+
+    public void setGenres(String genres) {
+        if (genresLabel != null) genresLabel.setText(genres != null && !genres.isEmpty() ? genres : " Not available");
+    }
+
+    private String getStringOrNull(JsonObject jsonObject, String memberName) {
+        if (jsonObject != null && jsonObject.has(memberName) && !jsonObject.get(memberName).isJsonNull()) {
+            JsonElement element = jsonObject.get(memberName);
+            if (element.isJsonPrimitive() && element.getAsJsonPrimitive().isString()) {
+                return element.getAsString();
+            }
+        }
+        return null;
+    }
+
+    private Integer getIntegerOrNull(JsonObject jsonObject, String memberName, int defaultValue) {
+        if (jsonObject != null && jsonObject.has(memberName) && !jsonObject.get(memberName).isJsonNull()) {
+            JsonElement element = jsonObject.get(memberName);
+            if (element.isJsonPrimitive() && element.getAsJsonPrimitive().isNumber()) {
+                return element.getAsInt();
+            }
+        }
+        return defaultValue;
+    }
+
+    public void clearContent() {
+        currentContent = null;
+        currentSeasonIndex = 0;
+        isDropdownOpen = false;
+        removeCloseDropdownFilter();
+
+        if (titleLabel != null) titleLabel.setText("");
+        if (descriptionLabel != null) descriptionLabel.setText("");
+        if (yearLabel != null) yearLabel.setText("");
+        if (castLabel != null) castLabel.setText("");
+        if (genresLabel != null) genresLabel.setText("");
+        if (episodesLabel != null) episodesLabel.setText("");
+        if (showTypeLabel != null) showTypeLabel.setText("");
+        if (seriesTitleLabel != null) seriesTitleLabel.setText("");
+
+        if (episodesList != null) episodesList.getChildren().clear();
+        if (backgroundVBox != null) {
+            backgroundVBox.getChildren().removeIf(node -> node instanceof ImageView && node.getId() == null);
+        }
+        hideSeriesSpecificUI();
+    }
+
+    private void initializeAllSeasons() {
+        if (currentContent == null || !currentContent.isSeries()) return;
+        int totalSeasons = currentContent.getNumberOfSeasons();
+        if (totalSeasons <= 0) {
+            System.out.println("No seasons reported for this series.");
+            updateEpisodesDisplay();
+            return;
+        }
+        currentContent.initializeSeasonsList(totalSeasons);
+        System.out.println("Starting asynchronous loading for " + totalSeasons + " seasons.");
+
+        for (int i = 1; i <= totalSeasons; i++) {
+            final int seasonNumber = i;
+            String seasonEndpoint = "/tv/" + currentSeriesId + "/season/" + seasonNumber;
+            apiManager.makeRequestAsync(seasonEndpoint)
+                    .thenAccept(seasonJsonString -> {
+                        Platform.runLater(() -> {
+                            try {
+                                JsonObject seasonJson = JsonParser.parseString(seasonJsonString).getAsJsonObject();
+                                FilmSeriesDetails.SeasonDetails seasonDetails = parseSeasonData(seasonJson);
+                                currentContent.setSeasonAtIndex(seasonNumber - 1, seasonDetails);
+                                System.out.println("Season " + seasonNumber + " ('" + seasonDetails.getName() + "') loaded.");
+
+                                if (currentSeasonIndex == seasonNumber - 1 || isDropdownOpen) {
+                                    updateEpisodesDisplay();
+                                }
+                            } catch (Exception e) {
+                                System.err.println("Error parsing season " + seasonNumber + " data: " + e.getMessage());
+                                e.printStackTrace();
+                            }
+                        });
+                    })
+                    .exceptionally(ex -> {
+                        System.err.println("Error loading season " + seasonNumber + ": " + ex.getMessage());
+                        ex.printStackTrace();
+                        if (currentSeasonIndex == seasonNumber - 1) {
+                            Platform.runLater(this::updateEpisodesDisplay);
+                        }
+                        return null;
+                    });
+        }
+    }
+
+    private void removeCloseDropdownFilter() {
+        if (background != null && closeDropdownFilter != null) {
+            background.removeEventFilter(MouseEvent.MOUSE_CLICKED, closeDropdownFilter);
+        }
+    }
+
+    private boolean isNodeInside(Node node, Region container) {
+        if (node == null || container == null) return false;
+        Node current = node;
+        while (current != null) {
+            if (current.equals(container)) return true;
+            current = current.getParent();
+        }
+        return false;
+    }
+
+    public void setMainPagesController(MainPagesController controller) {
+        this.mainPagesController = controller;
+    }
+
+    public FilmSeriesDetails getCurrentContent() {
+        return currentContent;
+    }
+
+    public boolean isLoading() {
+        return titleLabel != null && "Loading...".equals(titleLabel.getText());
+    }
 }
