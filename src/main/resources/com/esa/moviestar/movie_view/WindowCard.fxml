@@ -25,7 +25,7 @@
             </styleClass>
         </Text>
 
-        <HBox fx:id="ratingContainer" alignment="CENTER_LEFT" scaleShape="false" spacing="8.0">
+        <HBox alignment="CENTER_LEFT" scaleShape="false" spacing="8.0">
             <Text fx:id="ratingLabel" text="4/5" textAlignment="CENTER">
                 <styleClass>
                     <String fx:value="small-text" />

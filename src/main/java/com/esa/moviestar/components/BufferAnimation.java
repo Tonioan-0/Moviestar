@@ -43,24 +43,21 @@ public class BufferAnimation extends StackPane {
             setLayoutY(0);
         }};
 
-        // Create small square (inner cube)
-        double smallSize = size * 0.5;
-        smallSquare = new Rectangle(smallSize, smallSize){{
+        // Create a small  cube
+        double smallSize = size * 0.5 ;
+        smallSquare = new Rectangle(smallSize , smallSize){{
             setFill(Color.rgb(31,31,31));
             setArcHeight(24);
             setArcWidth(24);
             setLayoutX((size - smallSize) / 2);
-            setLayoutY((size - smallSize) / 2);
+            setLayoutY((size - smallSize) / 2 );
         }};
 
         // Add the shapes to the container
         container.getChildren().addAll(largeSquare, smallSquare);
-        getChildren().add(container);
+        getChildren().add(container );
 
-        // Create the animation
         animation = createAnimation();
-
-        // Start the animation as soon as the component is created
         animation.play();
     }
 

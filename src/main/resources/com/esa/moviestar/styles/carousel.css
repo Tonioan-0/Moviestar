@@ -31,7 +31,6 @@
     -fx-effect: dropshadow(gaussian, rgba(255, 255, 255, 0.6), 5, 0, 0, 0);
 }
 
-/* Add this to your Carousel main class */
 .carousel > .viewport {
     -fx-background-color: transparent;
 }

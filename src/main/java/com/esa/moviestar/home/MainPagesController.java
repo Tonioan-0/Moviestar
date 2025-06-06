@@ -44,20 +44,17 @@ public class MainPagesController {
     @FXML private StackPane headerContainer;
     @FXML private AnchorPane root;
 
-    // Constants - Made private and final for better encapsulation
-    private static final String PATH_CARD_WINDOW = "/com/esa/moviestar/movie_view/WindowCard.fxml";
-    private static final String PATH_CARD_VERTICAL = "/com/esa/moviestar/movie_view/FilmCard_Vertical.fxml";
-    private static final String PATH_CARD_HORIZONTAL = "/com/esa/moviestar/movie_view/FilmCard_Horizontal.fxml";
-    private static final String FILM_SCENE_PATH ="/com/esa/moviestar/movie_view/filmScene.fxml";
-
-    // UI Colors - Kept as public static final as per original structure
+    // Constants
+    public static final String PATH_CARD_WINDOW = "/com/esa/moviestar/movie_view/WindowCard.fxml";
+    public static final String PATH_CARD_VERTICAL = "/com/esa/moviestar/movie_view/FilmCard_Vertical.fxml";
+    public static final String PATH_CARD_HORIZONTAL = "/com/esa/moviestar/movie_view/FilmCard_Horizontal.fxml";
+    public static final String FILM_SCENE_PATH ="/com/esa/moviestar/movie_view/filmScene.fxml";
     public static final Color FORE_COLOR = Color.rgb(240, 236, 253);
     public static final Color BACKGROUND_COLOR = Color.rgb(16, 16, 16);
 
     // Instance variables
     private User user;
     private Account account;
-    // private TMDbApiManager tmdbApiManager; // Not directly used for FilmScene data loading in this version of MainPagesController
 
     // Page data containers
     private record PageData(Node node, Object controller) {}
@@ -66,24 +63,17 @@ public class MainPagesController {
     private PageData filter_film;
     private PageData filter_series;
     private PageData currentScene;
-    private PageData pageBeforeSearch; // For restoring state after search is cleared
+    private PageData pageBeforeSearch;
     private PageData savedPageData;    // For restoring state after film scene
 
     private boolean transitionInProgress = false;
     private BufferAnimation loadingSpinner;
     private StackPane loadingOverlay;
-    private static final double FADE_DURATION_MS = 300; // Renamed from FADE_DURATION for clarity
+    private static final double FADE_DURATION_MS = 300;
 
-
-    // @FXML
-    // public void initialize() {
-    //     // Initialization logic can be placed here if needed before first_load
-    //     // For example, if tmdbApiManager is needed by other methods before first_load:
-    //     // tmdbApiManager = TMDbApiManager.getInstance();
-    // }
 
     public void first_load(User user, Account account) {
-        if (loadingOverlay == null && root != null) { // Ensure root is not null for overlay
+        if (loadingOverlay == null && root != null) {
             createLoadingOverlay();
             if (!root.getChildren().contains(loadingOverlay)) {
                 root.getChildren().add(loadingOverlay);
@@ -92,11 +82,10 @@ public class MainPagesController {
                 AnchorPane.setLeftAnchor(loadingOverlay, 0.0);
                 AnchorPane.setRightAnchor(loadingOverlay, 0.0);
             }
-        } else if (loadingOverlay == null && body != null) { // Fallback to body if root was null
+        } else if (loadingOverlay == null && body != null) {
             createLoadingOverlay();
             if (!body.getChildren().contains(loadingOverlay)){
                 body.getChildren().add(loadingOverlay);
-                // Anchors for body might be different or not needed if body fills its parent
             }
         }
 
@@ -104,9 +93,9 @@ public class MainPagesController {
         this.user = user;
         this.account = account;
 
-        if (header == null) {
-            loadHeader(); // This also sets up navigation and search listeners
-        }
+        if (header == null)
+            loadHeader();
+
 
         if (this.header == null || this.header.controller() == null) {
             System.err.println("MainPagesController: Critical error - Header or its controller failed to load. Aborting first_load.");
@@ -245,7 +234,8 @@ public class MainPagesController {
                             String pageName = getPageName(pageToReturnTo);
                             loadPageAsync(pageName, () -> pageToReturnTo);
                             if (this.pageBeforeSearch == pageToReturnTo) this.pageBeforeSearch = null;
-                        } else if (currentScene.controller() instanceof SearchController sc) {
+                        } else {
+                            SearchController sc = (SearchController) currentScene.controller();
                             sc.performSearch(""); // Tell search controller to clear/show default
                         }
                     }
@@ -556,6 +546,7 @@ public class MainPagesController {
                     body.getChildren().clear();
                     addNewPageNode(newPageData);
                 } else if (body.getChildren().contains(newPageData.node())) {
+                    assert newPageData.node() != null;
                     newPageData.node().setOpacity(1.0);
                     currentScene = newPageData;
                     transitionInProgress = false;
@@ -612,7 +603,7 @@ public class MainPagesController {
     }
 
     public void cardClickedPlay(int cardId) {
-        System.out.println("Play card clicked (not implemented): " + cardId);
+
     }
 
     public void settingsClick(User user, Account account) {

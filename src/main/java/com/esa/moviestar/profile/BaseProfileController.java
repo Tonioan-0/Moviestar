@@ -110,7 +110,7 @@ public abstract class BaseProfileController {
 
             g.getChildren().add(IconSVG.takeElement(i));
 
-            // Distribuzione delle icone tra gli HBox
+            // Distribution of icons between HBox
             if (i <= 3) {
                 imageScroll1.getChildren().add(g);
             } else if (i <= 7) {
@@ -179,7 +179,7 @@ public abstract class BaseProfileController {
 
         originalProfileImage = clonedGroup;
 
-        // Calcola l'indice dell'immagine selezionata
+        // Calculate the index of the selected image
         for (int j = 0; j < 4; j++) {
             HBox c = (HBox) imageContainer.getChildren().get(j);
             if (c.getChildren().contains(originalGroup)) {
@@ -189,7 +189,7 @@ public abstract class BaseProfileController {
         }
     }
 
-    // Metodi astratti che devono essere implementati dalle classi figlie
+    //Abstract methods that must be implemented by child classes
     protected abstract String getTitleText();
     protected abstract int getInitialImageCode();
     protected abstract void handleCancel();

@@ -27,8 +27,7 @@ public class WindowCardController {
     private HBox infoButton;
     @FXML
     private Text titleLabel;
-    //    @FXML
-//    private Text descriptionLabel;
+
     @FXML
     private Text ratingLabel;
     private int _id;

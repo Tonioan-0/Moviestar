@@ -52,6 +52,7 @@ public class  Carousel extends Control {
         return new CarouselSkin(this);
     }
 
+    //A possible integration could be a control that move the to the left or to the right the objects
     /**
      * Moves to the next item in the carousel.
      */
@@ -80,6 +81,14 @@ public class  Carousel extends Control {
         }
     }
 
+    //Same for start and stop, with the differences the change is automatic
+    public void start(){
+        ((CarouselSkin) getSkin()).start();
+    }
+    public void stop(){
+        ((CarouselSkin) getSkin()).stop();
+    }
+
     /**
      * Moves to the item at the specified index.
      * @param index The index of the item to display.
@@ -89,10 +98,5 @@ public class  Carousel extends Control {
             setCurrentIndex(index);
         }
     }
-    public void start(){
-        ((CarouselSkin) getSkin()).start();
-    }
-    public void stop(){
-        ((CarouselSkin) getSkin()).stop();
-    }
+
 }

@@ -12,17 +12,14 @@ public class Content {
     private String posterUrl;   // Poster URL
     private String videoUrl;
 
-    private int runtimeMinutes;
 
     private int year;
     private double rating;
     private int popularity;
-    private String country;
     private String releaseDate;
 
     private boolean isSeries;
 
-    private int numberOfSeasons;
     private int numberOfEpisodes; // Total episodes in the series
 
     private List<Integer> categories;
@@ -91,13 +88,7 @@ public class Content {
         this.videoUrl = videoUrl;
     }
 
-    public int getRuntimeMinutes() {
-        return runtimeMinutes;
-    }
 
-    public void setRuntimeMinutes(int runtimeMinutes) {
-        this.runtimeMinutes = runtimeMinutes;
-    }
 
     public int getYear() {
         return year;
@@ -123,13 +114,6 @@ public class Content {
         this.popularity = popularity;
     }
 
-    public String getCountry() {
-        return country;
-    }
-
-    public void setCountry(String country) {
-        this.country = country;
-    }
 
     public String getReleaseDate() {
         return releaseDate;
@@ -148,13 +132,7 @@ public class Content {
         this.isSeries = isSeries;
     }
 
-    public int getNumberOfSeasons() {
-        return numberOfSeasons;
-    }
 
-    public void setNumberOfSeasons(int numberOfSeasons) {
-        this.numberOfSeasons = numberOfSeasons;
-    }
 
     public int getNumberOfEpisodes() {
         return numberOfEpisodes;
@@ -196,11 +174,9 @@ public class Content {
                 ", plot='" + (plot != null ? plot.substring(0, Math.min(plot.length(), 50)) + "..." : "N/A") + '\'' +
                 ", imageUrl='" + imageUrl + '\'' +
                 ", posterUrl='" + posterUrl + '\'' +
-                ", runtimeMinutes=" + runtimeMinutes +
                 ", year=" + year +
                 ", rating=" + rating +
                 ", isSeries=" + isSeries +
-                ", numberOfSeasons=" + numberOfSeasons +
                 ", numberOfEpisodes=" + numberOfEpisodes +
                 ", genreNames=" + genreNames +
                 '}';

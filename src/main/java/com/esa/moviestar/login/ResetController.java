@@ -73,7 +73,7 @@ public class ResetController {
     @FXML
     private Button toggleConfirmPasswordButton; // Toggle button for confirm password
 
-    // Attributi per il reset della password
+    // Password Reset Attributes
     private String userEmail;
     private String verificationCode;
 
@@ -191,7 +191,9 @@ public class ResetController {
             newPasswordTextField.setManaged(true);
             newPasswordTextField.requestFocus();
             newPasswordTextField.positionCaret(newPasswordTextField.getText().length());
-            toggleNewPasswordButton.setText("🙈");
+            toggleNewPasswordButton.setText("🙈");////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+            ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
         } else {
             newPasswordField.setText(newPasswordTextField.getText());
             newPasswordTextField.setVisible(false);

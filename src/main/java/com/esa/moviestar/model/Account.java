@@ -22,7 +22,7 @@ public class Account {
     public String getPassword() {return password;}
 
 
-    // Metodo per ottenere gli utenti
+    //Method to get users
     public User[] getUser() {
         return user;
     }

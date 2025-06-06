@@ -20,7 +20,7 @@
     <!-- Metadata pane (initially visible) -->
     <HBox fx:id="metadataPane" alignment="BOTTOM_CENTER" spacing="10" styleClass="media-metadata" StackPane.alignment="BOTTOM_LEFT">
         <!-- Time/Episodes metadata -->
-        <HBox fx:id="timeMetadata" alignment="CENTER_LEFT" maxHeight="48.0" spacing="5">
+        <HBox  alignment="CENTER_LEFT" maxHeight="48.0" spacing="5">
             <SVGPath fx:id="durationIcon" scaleX="1.2" scaleY="1.2" styleClass="on-primary">
                 <HBox.margin>
                     <Insets bottom="8.0" left="8.0" right="4.0" top="8.0" />
@@ -38,7 +38,7 @@
         <Region HBox.hgrow="ALWAYS" />
 
         <!-- Rating metadata -->
-        <HBox fx:id="ratingMetadata" alignment="CENTER_RIGHT" maxHeight="48.0" spacing="5">
+        <HBox  alignment="CENTER_RIGHT" maxHeight="48.0" spacing="5">
             <Label fx:id="ratingLabel" alignment="BOTTOM_LEFT" styleClass="on-primary">
                 <styleClass>
                     <String fx:value="large-text" />

@@ -4,6 +4,7 @@ import com.esa.moviestar.model.User;
 
 import java.sql.*;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.List;
@@ -146,6 +147,51 @@ public class UserDao {
             return false;
         }
     }
+    public void insertHistoryContent(int userId , int contentId){
+        String query = "INSERT INTO History (ID_User,ID_Content,Date) Values (?,?,?);";
+        try(PreparedStatement stmt = connection.prepareStatement(query)){
+            stmt.setInt(1, userId);
+            stmt.setInt(2, contentId);
+            stmt.setTimestamp(3, Timestamp.valueOf(LocalDateTime.now()));
+            stmt.executeUpdate();
+        }catch (SQLException e){
+            System.err.println("userDao : Failed to insert user content into history "+e.getMessage());
+        }
+    }
+
+    public void insertWatchlistContent(int userId , int contentId){
+        String query = "INSERT INTO Watchlist (ID_User,ID_Content,Date) Values (?,?,?);";
+        try(PreparedStatement stmt = connection.prepareStatement(query)){
+            stmt.setInt(1, userId);
+            stmt.setInt(2, contentId);
+            stmt.setTimestamp(3, Timestamp.valueOf(LocalDateTime.now()));
+            stmt.executeUpdate();
+        }catch (SQLException e){
+            System.err.println("userDao : Failed to insert user content into watchlist "+e.getMessage());
+        }
+    }
+    public void deleteHistory(int idUser,int idContent){
+        String query = "DELETE FROM History WHERE ID_User = ? AND ID_Content = ?;";
+        try(PreparedStatement stmt = connection.prepareStatement(query)){
+            stmt.setInt(1,idUser);
+            stmt.setInt(2,idContent);
+            stmt.executeUpdate();
+        }catch (SQLException e){
+            System.err.println("userDao : error deleting history of the user "+e.getMessage());
+        }
+    }
+
+    public void deleteWatchlist(int idUser,int idContent){
+        String query = "DELETE FROM History WHERE ID_User = ? AND ID_Content = ?;";
+        try(PreparedStatement stmt = connection.prepareStatement(query)){
+            stmt.setInt(1,idUser);
+            stmt.setInt(2,idContent);
+            stmt.executeUpdate();
+        }catch (SQLException e){
+            System.err.println("userDao : error deleting watchlist of the user "+e.getMessage());
+        }
+    }
+
 }
 
 

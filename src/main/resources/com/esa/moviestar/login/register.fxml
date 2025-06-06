@@ -9,97 +9,96 @@
 <?import javafx.scene.shape.*?>
 <?import javafx.scene.text.*?>
 
-<StackPane fx:id="mainContainer" prefHeight="980" prefWidth="1720" styleClass="MainPane" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.esa.moviestar.login.Register">
-    <children>
-        <VBox fx:id="ContenitoreImmagine" alignment="TOP_CENTER" spacing="48.0" StackPane.alignment="TOP_CENTER">
-            <StackPane maxHeight="100.0" maxWidth="350.0" minHeight="100.0" minWidth="350.0">
-                <children>
-                    <!-- Immagine in alto -->
-                    <Group scaleX="2.0" scaleY="2.0">
-                        <SVGPath content="%icon-moviestar-bg" styleClass="surface-solid" />
-                        <SVGPath content="%icon-moviestar-fg" fill="WHITE" styleClass="on-primary" />
-                    </Group>
-                </children>
-            </StackPane>
-
-            <!-- VBox Centrale -->
-            <VBox fx:id="registerBox" alignment="TOP_CENTER" maxHeight="550.0" maxWidth="475.0" minHeight="300.0" minWidth="250.0" prefHeight="550.0" prefWidth="475.0" spacing="10.0">
-                <padding>
-                    <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
-                </padding>
-                <children>
-                    <Label fx:id="welcomeText" alignment="CENTER" maxWidth="1.7976931348623157E308" textOverrun="CLIP">
-                        <VBox.margin>
-                            <Insets bottom="20.0" />
-                        </VBox.margin>
-                        <styleClass>
-                            <String fx:value="welcome-text" />
-                            <String fx:value="on-primary" />
-                        </styleClass>
-                    </Label>
-                    <TextField fx:id="emailField" maxWidth="1.7976931348623157E308" styleClass="small-item">
-                        <VBox.margin>
-                            <Insets bottom="20.0" />
-                        </VBox.margin>
-                    </TextField>
-
-                    <!-- Container per il campo password con bottone toggle -->
-                    <StackPane fx:id="passwordContainer" alignment="CENTER_RIGHT" maxWidth="1.7976931348623157E308">
-                        <PasswordField fx:id="passwordField" maxWidth="1.7976931348623157E308" styleClass="small-item" />
-                        <TextField fx:id="passwordTextField" managed="false" maxWidth="1.7976931348623157E308" styleClass="small-item" visible="false" />
-                        <Button fx:id="togglePasswordButton" styleClass="toggle-password-button" text="👁" />
-                        <VBox.margin>
-                            <Insets bottom="20.0" />
-                        </VBox.margin>
-                    </StackPane>
-
-                    <Label fx:id="warning1" maxWidth="1.7976931348623157E308" styleClass="warnings-text1" textAlignment="CENTER" />
-                    <Label fx:id="warning2" maxWidth="1.7976931348623157E308" styleClass="warnings-text2" />
-                    <Label fx:id="warningSpecial" maxWidth="1.7976931348623157E308" styleClass="warnings-text2" />
-                    <Label fx:id="warningSpecial2" maxWidth="1.7976931348623157E308" styleClass="warnings-text2" />
-
-                    <Button fx:id="register" alignment="CENTER" prefHeight="40.0">
-                        <VBox.margin>
-                            <Insets bottom="10.0" />
-                        </VBox.margin>
-                        <styleClass>
-                            <String fx:value="button-text" />
-                            <String fx:value="on-primary" />
-                     <String fx:value="small-item" />
-                        </styleClass>
-                    </Button>
-                    <Button fx:id="backToLogin" alignment="CENTER" maxWidth="1.7976931348623157E308" wrapText="true">
-                        <VBox.margin>
-                            <Insets top="10.0" />
-                        </VBox.margin>
-                        <font>
-                            <Font size="12.0" />
-                        </font>
-                        <styleClass>
-                            <String fx:value="register-text" />
-                            <String fx:value="small-item" />
-                     <String fx:value="on-primary" />
-                        </styleClass>
-                    </Button>
-                </children>
-                <VBox.margin>
-                    <Insets top="30.0" />
-                </VBox.margin>
-                <styleClass>
-                    <String fx:value="register-box" />
-                    <String fx:value="very-large-item" />
-                </styleClass>
-
-            </VBox>
-
-        </VBox>
-
-    </children>
+<StackPane fx:id="mainContainer" prefHeight="980" prefWidth="1720" styleClass="MainPane"
+           xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1"
+           fx:controller="com.esa.moviestar.login.Register">
     <padding>
-        <Insets bottom="48.0" left="48.0" right="48.0" top="48.0" />
+        <Insets bottom="48.0" left="48.0" right="48.0" top="48.0"/>
     </padding>
     <stylesheets>
-        <URL value="@../styles/access.css" />
-        <URL value="@../styles/general.css" />
+        <URL value="@../styles/access.css"/>
+        <URL value="@../styles/general.css"/>
     </stylesheets>
+    <VBox alignment="TOP_CENTER" spacing="48.0" StackPane.alignment="TOP_CENTER">
+        <StackPane maxHeight="100.0" maxWidth="350.0" minHeight="100.0" minWidth="350.0">
+            <!-- Immagine in alto -->
+            <Group scaleX="2.0" scaleY="2.0">
+                <SVGPath content="%icon-moviestar-bg" styleClass="surface-solid"/>
+                <SVGPath content="%icon-moviestar-fg" fill="WHITE" styleClass="on-primary"/>
+            </Group>
+        </StackPane>
+
+        <!-- VBox Centrale -->
+        <VBox fx:id="registerBox" alignment="TOP_CENTER" maxHeight="550.0" maxWidth="475.0" minHeight="300.0"
+              minWidth="250.0" prefHeight="550.0" prefWidth="475.0" spacing="10.0">
+            <padding>
+                <Insets bottom="20.0" left="20.0" right="20.0" top="20.0"/>
+            </padding>
+            <VBox.margin>
+                <Insets top="30.0"/>
+            </VBox.margin>
+            <styleClass>
+                <String fx:value="register-box"/>
+                <String fx:value="very-large-item"/>
+            </styleClass>
+
+            <Label fx:id="welcomeText" alignment="CENTER" maxWidth="1.7976931348623157E308" textOverrun="CLIP">
+                <VBox.margin>
+                    <Insets bottom="20.0"/>
+                </VBox.margin>
+                <styleClass>
+                    <String fx:value="welcome-text"/>
+                    <String fx:value="on-primary"/>
+                </styleClass>
+            </Label>
+            <TextField fx:id="emailField" maxWidth="1.7976931348623157E308" styleClass="small-item">
+                <VBox.margin>
+                    <Insets bottom="20.0"/>
+                </VBox.margin>
+            </TextField>
+
+            <!-- Container per il campo password con bottone toggle -->
+            <StackPane fx:id="passwordContainer" alignment="CENTER_RIGHT" maxWidth="1.7976931348623157E308">
+                <PasswordField fx:id="passwordField" maxWidth="1.7976931348623157E308" styleClass="small-item"/>
+                <TextField fx:id="passwordTextField" managed="false" maxWidth="1.7976931348623157E308"
+                           styleClass="small-item" visible="false"/>
+                <Button fx:id="togglePasswordButton" styleClass="toggle-password-button" text="👁"/>
+                <VBox.margin>
+                    <Insets bottom="20.0"/>
+                </VBox.margin>
+            </StackPane>
+
+            <Label fx:id="warning1" maxWidth="1.7976931348623157E308" styleClass="warnings-text1"
+                   textAlignment="CENTER"/>
+            <Label fx:id="warning2" maxWidth="1.7976931348623157E308" styleClass="warnings-text2"/>
+            <Label fx:id="warningSpecial" maxWidth="1.7976931348623157E308" styleClass="warnings-text2"/>
+            <Label fx:id="warningSpecial2" maxWidth="1.7976931348623157E308" styleClass="warnings-text2"/>
+
+            <Button fx:id="register" alignment="CENTER" prefHeight="40.0">
+                <VBox.margin>
+                    <Insets bottom="10.0"/>
+                </VBox.margin>
+                <styleClass>
+                    <String fx:value="button-text"/>
+                    <String fx:value="on-primary"/>
+                    <String fx:value="small-item"/>
+                </styleClass>
+            </Button>
+            <Button fx:id="backToLogin" alignment="CENTER" maxWidth="1.7976931348623157E308" wrapText="true">
+                <VBox.margin>
+                    <Insets top="10.0"/>
+                </VBox.margin>
+                <font>
+                    <Font size="12.0"/>
+                </font>
+                <styleClass>
+                    <String fx:value="register-text"/>
+                    <String fx:value="small-item"/>
+                    <String fx:value="on-primary"/>
+                </styleClass>
+            </Button>
+        </VBox>
+
+    </VBox>
+
 </StackPane>

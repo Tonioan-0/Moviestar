@@ -6,165 +6,162 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
 
-<GridPane fx:id="aboutContentSetting" prefHeight="467.0" prefWidth="1228.0" stylesheets="@../styles/general.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" >
+<GridPane fx:id="aboutContentSetting" prefHeight="467.0" prefWidth="1228.0" stylesheets="@../styles/general.css"
+          xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1">
     <columnConstraints>
-        <ColumnConstraints hgrow="SOMETIMES" maxWidth="600.0" minWidth="0.0" percentWidth="20.0" prefWidth="235.5999755859375" />
-        <ColumnConstraints hgrow="SOMETIMES" minWidth="0.0" />
-        <ColumnConstraints hgrow="SOMETIMES" maxWidth="600.0" minWidth="10.0" percentWidth="20.0" prefWidth="244.80004882812494" />
+        <ColumnConstraints hgrow="SOMETIMES" maxWidth="600.0" minWidth="0.0" percentWidth="20.0"
+                           prefWidth="235.5999755859375"/>
+        <ColumnConstraints hgrow="SOMETIMES" minWidth="0.0"/>
+        <ColumnConstraints hgrow="SOMETIMES" maxWidth="600.0" minWidth="10.0" percentWidth="20.0"
+                           prefWidth="244.80004882812494"/>
     </columnConstraints>
     <rowConstraints>
-        <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
+        <RowConstraints minHeight="10.0" vgrow="SOMETIMES"/>
     </rowConstraints>
-    <children>
-        <AnchorPane GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.hgrow="NEVER" GridPane.valignment="CENTER" GridPane.vgrow="ALWAYS">
-            <children>
-                <VBox alignment="CENTER_LEFT" prefHeight="200.0" prefWidth="100.0" spacing="15.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-                    <children>
-                        <Label text="About &amp; Support">
-                            <styleClass>
-                                <String fx:value="bold-text" />
-                                <String fx:value="large-text" />
-                                <String fx:value="on-primary" />
-                            </styleClass>
-                        </Label>
-                        <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Welcome to the MovieStar support section. Here you can find answers to frequently asked questions, information about the app and how to contact us in case of problems." wrappingWidth="800.0">
-                            <styleClass>
-                                <String fx:value="medium-text" />
-                                <String fx:value="on-primary" />
-                            </styleClass>
-                        </Text>
-                        <VBox alignment="CENTER_LEFT" spacing="5.0">
-                            <children>
-                                <Label text="FAQ">
-                                    <styleClass>
-                                        <String fx:value="large-text" />
-                                        <String fx:value="bold-text" />
-                                        <String fx:value="on-primary" />
-                                    </styleClass>
-                                </Label>
-                                <HBox>
-                                    <children>
+    <AnchorPane GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.hgrow="NEVER"
+                GridPane.valignment="CENTER" GridPane.vgrow="ALWAYS">
+        <VBox alignment="CENTER_LEFT" prefHeight="200.0" prefWidth="100.0" spacing="15.0"
+              AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0"
+              AnchorPane.topAnchor="0.0">
+            <padding>
+                <Insets bottom="20.0" left="30.0" right="40.0" top="30.0"/>
+            </padding>
+            <Label text="About &amp; Support">
+                <styleClass>
+                    <String fx:value="bold-text"/>
+                    <String fx:value="large-text"/>
+                    <String fx:value="on-primary"/>
+                </styleClass>
+            </Label>
+            <Text strokeType="OUTSIDE" strokeWidth="0.0"
+                  text="Welcome to the MovieStar support section. Here you can find answers to frequently asked questions, information about the app and how to contact us in case of problems."
+                  wrappingWidth="800.0">
+                <styleClass>
+                    <String fx:value="medium-text"/>
+                    <String fx:value="on-primary"/>
+                </styleClass>
+            </Text>
+            <VBox alignment="CENTER_LEFT" spacing="5.0">
+                <Label text="FAQ">
+                    <styleClass>
+                        <String fx:value="large-text"/>
+                        <String fx:value="bold-text"/>
+                        <String fx:value="on-primary"/>
+                    </styleClass>
+                </Label>
+                <HBox>
+                    <Label text="Is MovieStar free to use?">
+                        <styleClass>
+                            <String fx:value="bold-text"/>
+                            <String fx:value="medium-text"/>
+                            <String fx:value="on-primary"/>
+                        </styleClass>
+                    </Label>
+                </HBox>
+                <Separator prefHeight="1" style="-fx-background-color: white;"/>
+                <Text strokeType="OUTSIDE" strokeWidth="0.0"
+                      text="Yes, MovieStar is free to download and use. Some premium features may be added in future updates.">
+                    <styleClass>
+                        <String fx:value="medium-text"/>
+                        <String fx:value="on-primary"/>
+                    </styleClass>
+                </Text>
+                <HBox>
+                    <Label text="How can I reset my password?">
+                        <styleClass>
+                            <String fx:value="bold-text"/>
+                            <String fx:value="medium-text"/>
+                            <String fx:value="on-primary"/>
+                        </styleClass>
+                    </Label>
+                </HBox>
+                <Separator prefHeight="1" style="-fx-background-color: white;"/>
+                <Text strokeType="OUTSIDE" strokeWidth="0.0"
+                      text="To reset your password, go to the login screen and click on 'Forgot Password'. Follow the instructions sent to your email.">
+                    <styleClass>
+                        <String fx:value="medium-text"/>
+                        <String fx:value="on-primary"/>
+                    </styleClass>
+                </Text>
+                <HBox>
+                    <Label text="Can I save and organize my favorite movies?">
+                        <styleClass>
+                            <String fx:value="bold-text"/>
+                            <String fx:value="medium-text"/>
+                            <String fx:value="on-primary"/>
+                        </styleClass>
+                    </Label>
+                </HBox>
+                <Separator prefHeight="1" style="-fx-background-color: white;"/>
+                <Text strokeType="OUTSIDE" strokeWidth="0.0"
+                      text="You can save movies to your favorites list and create custom collections for easy access.">
+                    <styleClass>
+                        <String fx:value="medium-text"/>
+                        <String fx:value="on-primary"/>
+                    </styleClass>
+                </Text>
+                <HBox>
+                    <Label text="How can I change my username or profile picture?">
+                        <styleClass>
+                            <String fx:value="bold-text"/>
+                            <String fx:value="medium-text"/>
+                            <String fx:value="on-primary"/>
+                        </styleClass>
+                    </Label>
+                </HBox>
+                <Separator layoutX="10.0" layoutY="172.0" prefHeight="1"
+                           style="-fx-background-color: white;"/>
+                <Text strokeType="OUTSIDE" strokeWidth="0.0"
+                      text="To update your username or profile picture, go to the Profile section in the app, tap the edit icon, and make your changes. Don’t forget to save before exiting."
+                      wrappingWidth="600.0">
+                    <styleClass>
+                        <String fx:value="medium-text"/>
+                        <String fx:value="on-primary"/>
+                    </styleClass>
+                </Text>
+            </VBox>
 
-                                        <Label text="Is MovieStar free to use?">
-                                            <styleClass>
-                                                <String fx:value="bold-text" />
-                                                <String fx:value="medium-text" />
-                                                <String fx:value="on-primary" />
-                                            </styleClass>
-                                        </Label>
-                                    </children>
-                                </HBox>
-                                <Separator prefHeight="1" style="-fx-background-color: white;" />
-                                <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Yes, MovieStar is free to download and use. Some premium features may be added in future updates.">
-                                    <styleClass>
-                                        <String fx:value="medium-text" />
-                                        <String fx:value="on-primary" />
-                                    </styleClass>
-                                </Text>
-                                <HBox>
-                                    <children>
-
-                                        <Label text="How can I reset my password?">
-                                            <styleClass>
-                                                <String fx:value="bold-text" />
-                                                <String fx:value="medium-text" />
-                                                <String fx:value="on-primary" />
-                                            </styleClass>
-                                        </Label>
-                                    </children>
-                                </HBox>
-                                <Separator prefHeight="1" style="-fx-background-color: white;" />
-                                <Text strokeType="OUTSIDE" strokeWidth="0.0" text="To reset your password, go to the login screen and click on 'Forgot Password'. Follow the instructions sent to your email.">
-                                    <styleClass>
-                                        <String fx:value="medium-text" />
-                                        <String fx:value="on-primary" />
-                                    </styleClass>
-                                </Text>
-                                <HBox>
-                                    <children>
-
-                                        <Label text="Can I save and organize my favorite movies?">
-                                            <styleClass>
-                                                <String fx:value="bold-text" />
-                                                <String fx:value="medium-text" />
-                                                <String fx:value="on-primary" />
-                                            </styleClass>
-                                        </Label>
-                                    </children>
-                                </HBox>
-                                <Separator prefHeight="1" style="-fx-background-color: white;" />
-                                <Text strokeType="OUTSIDE" strokeWidth="0.0" text="You can save movies to your favorites list and create custom collections for easy access.">
-                                    <styleClass>
-                                        <String fx:value="medium-text" />
-                                        <String fx:value="on-primary" />
-                                    </styleClass>
-                                </Text>
-                                <HBox>
-                                    <children>
-
-                                        <Label text="How can I change my username or profile picture?">
-                                            <styleClass>
-                                                <String fx:value="bold-text" />
-                                                <String fx:value="medium-text" />
-                                                <String fx:value="on-primary" />
-                                            </styleClass>
-                                        </Label>
-                                    </children>
-                                </HBox>
-                                <Separator layoutX="10.0" layoutY="172.0" prefHeight="1" style="-fx-background-color: white;" />
-                                <Text strokeType="OUTSIDE" strokeWidth="0.0" text="To update your username or profile picture, go to the Profile section in the app, tap the edit icon, and make your changes. Don’t forget to save before exiting." wrappingWidth="600.0">
-                                    <styleClass>
-                                        <String fx:value="medium-text" />
-                                        <String fx:value="on-primary" />
-                                    </styleClass>
-                                </Text>
-                            </children>
-                        </VBox>
-
-                        <Label text="Contact">
-                            <styleClass>
-                                <String fx:value="large-text" />
-                                <String fx:value="bold-text" />
-                                <String fx:value="on-primary" />
-                            </styleClass>
-                        </Label>
-                        <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Need help? Write to us at moviestarclient@gmail.com . Our team will respond within 24 hours." wrappingWidth="600.0">
-                            <styleClass>
-                                <String fx:value="medium-text" />
-                                <String fx:value="on-primary" />
-                            </styleClass>
-                        </Text>
-                        <Label text="App Information">
-                            <styleClass>
-                                <String fx:value="bold-text" />
-                                <String fx:value="large-text" />
-                                <String fx:value="on-primary" />
-                            </styleClass>
-                        </Label>
-                        <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Version: 1.0.0" wrappingWidth="500.0">
-                            <styleClass>
-                                <String fx:value="medium-text" />
-                                <String fx:value="on-primary" />
-                            </styleClass>
-                        </Text>
-                        <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Last update: May 2025" wrappingWidth="500.0">
-                            <styleClass>
-                                <String fx:value="medium-text" />
-                                <String fx:value="on-primary" />
-                            </styleClass>
-                        </Text>
-                        <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Developed by: ESA Dev Team" wrappingWidth="500.0">
-                            <styleClass>
-                                <String fx:value="medium-text" />
-                                <String fx:value="on-primary" />
-                            </styleClass>
-                        </Text>
-                    </children>
-                    <padding>
-                        <Insets bottom="20.0" left="30.0" right="40.0" top="30.0" />
-                    </padding>
-                </VBox>
-            </children>
-        </AnchorPane>
-    </children>
+            <Label text="Contact">
+                <styleClass>
+                    <String fx:value="large-text"/>
+                    <String fx:value="bold-text"/>
+                    <String fx:value="on-primary"/>
+                </styleClass>
+            </Label>
+            <Text strokeType="OUTSIDE" strokeWidth="0.0"
+                  text="Need help? Write to us at moviestarclient@gmail.com . Our team will respond within 24 hours."
+                  wrappingWidth="600.0">
+                <styleClass>
+                    <String fx:value="medium-text"/>
+                    <String fx:value="on-primary"/>
+                </styleClass>
+            </Text>
+            <Label text="App Information">
+                <styleClass>
+                    <String fx:value="bold-text"/>
+                    <String fx:value="large-text"/>
+                    <String fx:value="on-primary"/>
+                </styleClass>
+            </Label>
+            <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Version: 1.0.0" wrappingWidth="500.0">
+                <styleClass>
+                    <String fx:value="medium-text"/>
+                    <String fx:value="on-primary"/>
+                </styleClass>
+            </Text>
+            <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Last update: May 2025" wrappingWidth="500.0">
+                <styleClass>
+                    <String fx:value="medium-text"/>
+                    <String fx:value="on-primary"/>
+                </styleClass>
+            </Text>
+            <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Developed by: ESA Dev Team"
+                  wrappingWidth="500.0">
+                <styleClass>
+                    <String fx:value="medium-text"/>
+                    <String fx:value="on-primary"/>
+                </styleClass>
+            </Text>
+        </VBox>
+    </AnchorPane>
 </GridPane>

@@ -63,7 +63,8 @@ public class FilmCardController {
         else
             descriptionLabel.setText("");
 
-//it would be good have this data in the card but the api doesn't provide these information :(
+        //In the first design (before the inclusion of the api)we have thought to be a modern and simple user
+        // function to give at the final user a data like the duration of the movie, the number of episodes of a series  or the number of season
 //        if(content.isSeasonDivided()){
 //            timeLabel.setText(content.getSeasonCount()+" Seasons");
 //            durationIcon.setContent(resources.getString("season"));

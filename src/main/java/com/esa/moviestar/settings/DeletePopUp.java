@@ -20,16 +20,21 @@ public class DeletePopUp extends StackPane {
     private Button cancelButton;
     private PasswordField passwordField;
     private VBox passwordVBox;
+    private TextField passwordTextField;
+    private Button togglePasswordButton;
+    private boolean isPasswordVisible = false;
 
     public DeletePopUp(boolean isAccount, Account account) {
         page(isAccount, account);
         passwordProperty();
+        setupPasswordToggle();
+
     }
 
     private void page(boolean isAccount, Account account) {
         StackPane mainPane = new StackPane();
 
-        // StackPane per l'UI principale
+        // StackPane
         mainPane.setMaxHeight(340.0);
         mainPane.setMaxWidth(550.0);
         mainPane.getStylesheets().add(Objects.requireNonNull(getClass().getResource("/com/esa/moviestar/styles/general.css")).toExternalForm());
@@ -37,26 +42,26 @@ public class DeletePopUp extends StackPane {
         mainPane.setPadding(new Insets(25.0));
         StackPane.setAlignment(mainPane, Pos.CENTER);
 
-        // VBox principale
+        // VBox
         VBox mainVBox = new VBox();
         mainVBox.setAlignment(Pos.CENTER);
         StackPane.setAlignment(mainVBox, Pos.CENTER);
         mainVBox.setSpacing(25.0);
 
-        // Label titolo
+        // Label title
         Label titleLabel = new Label(isAccount ? "Delete Account" : "Delete User");
         titleLabel.setPrefHeight(35.0);
         titleLabel.setPrefWidth(405.0);
         titleLabel.getStyleClass().addAll("large-text", "bold-text", "on-primary");
 
-        // Testo descrittivo
+        // Text
         Text descriptionText = new Text(isAccount ? "Are you sure you want to delete your account? By proceeding, you will be logged out and will no longer be able to access it." : "Are you sure you want to delete your user profile? Deleting your profile is an irreversible action and you will lose all data associated with it.");
         descriptionText.setStrokeType(javafx.scene.shape.StrokeType.OUTSIDE);
         descriptionText.setStrokeWidth(0.0);
         descriptionText.setWrappingWidth(400.0);
         descriptionText.getStyleClass().addAll("medium-text", "on-primary");
 
-        // VBox per password
+        // VBox for password
         passwordVBox = new VBox();
         passwordVBox.setSpacing(5.0);
 
@@ -68,11 +73,26 @@ public class DeletePopUp extends StackPane {
         //password
         passwordField = new PasswordField();
         passwordField.getStyleClass().addAll("on-primary", "small-item", "medium-text", "surface-dim-border", "text-area");
+
+        passwordTextField = new TextField();
+        passwordTextField.setVisible(false);
+        passwordTextField.setManaged(false);
+        passwordTextField.getStyleClass().addAll("on-primary", "small-item", "medium-text", "surface-dim-border", "text-area");
+
+        togglePasswordButton = new Button("👁");////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        togglePasswordButton.getStyleClass().add("toggle-password-button");
+
+        StackPane passwordStack = new StackPane(passwordField, passwordTextField, togglePasswordButton);
+        passwordStack.setMaxWidth(Double.MAX_VALUE);
+        StackPane.setAlignment(togglePasswordButton, Pos.CENTER_RIGHT);
+        StackPane.setMargin(togglePasswordButton, new Insets(0, 10, 0, 0));
+        VBox.setMargin(passwordStack, new Insets(0, 40.0, 0, 40.0));
+
         VBox.setMargin(passwordField, new Insets(0, 40.0, 0, 40.0));
 
-        passwordVBox.getChildren().addAll(passwordLabel, passwordField);
+        passwordVBox.getChildren().addAll(passwordLabel, passwordStack);
 
-        // HBox per i pulsanti
+        // Buttons
         HBox buttonHBox = new HBox();
         buttonHBox.setAlignment(Pos.CENTER_RIGHT);
         buttonHBox.setPrefHeight(100.0);
@@ -92,12 +112,12 @@ public class DeletePopUp extends StackPane {
         deleteButton.setPrefWidth(110.0);
         deleteButton.getStyleClass().addAll("small-item", "on-primary", "surface-danger");
 
-        // Il pulsante elimina è inizialmente disabilitato
+        // Delete button is initialized as disable
         deleteButton.setDisable(true);
 
         buttonHBox.getChildren().addAll(cancelButton, deleteButton);
 
-        // Assemblaggio finale
+        // Add all to main
         mainVBox.getChildren().addAll(titleLabel, descriptionText, passwordVBox, buttonHBox);
         mainPane.getChildren().add(mainVBox);
 
@@ -113,7 +133,45 @@ public class DeletePopUp extends StackPane {
         });
     }
 
-    // Getter per accedere ai componenti dall'esterno
+    private void setupPasswordToggle() {
+        passwordField.textProperty().addListener((obs, oldText, newText) -> {
+            if (!passwordTextField.isFocused()) {
+                passwordTextField.setText(newText);
+            }
+        });
+
+        passwordTextField.textProperty().addListener((obs, oldText, newText) -> {
+            if (!passwordField.isFocused()) {
+                passwordField.setText(newText);
+            }
+        });
+
+        togglePasswordButton.setOnAction(event -> togglePasswordVisibility());
+    }
+
+    private void togglePasswordVisibility() {
+        isPasswordVisible = !isPasswordVisible;
+
+        passwordField.setVisible(!isPasswordVisible);
+        passwordField.setManaged(!isPasswordVisible);
+        passwordTextField.setVisible(isPasswordVisible);
+        passwordTextField.setManaged(isPasswordVisible);
+
+        if (isPasswordVisible) {
+            passwordTextField.setText(passwordField.getText());
+            passwordTextField.requestFocus();
+            passwordTextField.positionCaret(passwordTextField.getText().length());
+            togglePasswordButton.setText("🙈");////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        } else {
+            passwordField.setText(passwordTextField.getText());
+            passwordField.requestFocus();
+            passwordField.positionCaret(passwordField.getText().length());
+            togglePasswordButton.setText("👁");////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        }
+    }
+
+
+    // Getter to access at the contents
     public Button getDeleteButton() {
         return deleteButton;
     }

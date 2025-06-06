@@ -12,15 +12,13 @@
 <StackPane fx:id="mainContainer" prefHeight="453.0" prefWidth="608.0" styleClass="MainPane" stylesheets="@../styles/access.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.esa.moviestar.login.Access">
     <StackPane prefHeight="250.0" prefWidth="200.0" styleClass="Hbox-Padre" HBox.hgrow="ALWAYS" StackPane.alignment="TOP_LEFT" />
     <StackPane fx:id="imageContainer" prefHeight="150.0" prefWidth="200.0" StackPane.alignment="TOP_LEFT">
-        <children>
-            <Group scaleX="2.9" scaleY="3.0" StackPane.alignment="CENTER">
-                <SVGPath content="%icon-moviestar-bg" styleClass="surface-solid" />
-                <SVGPath content="%icon-moviestar-fg" fill="WHITE" styleClass="on-primary" />
-                <StackPane.margin>
-                    <Insets left="60.0" top="60.0" />
-                </StackPane.margin>
-            </Group>
-        </children>
+        <Group scaleX="2.9" scaleY="3.0" StackPane.alignment="CENTER">
+            <SVGPath content="%icon-moviestar-bg" styleClass="surface-solid"/>
+            <SVGPath content="%icon-moviestar-fg" fill="WHITE" styleClass="on-primary"/>
+            <StackPane.margin>
+                <Insets left="60.0" top="60.0"/>
+            </StackPane.margin>
+        </Group>
     </StackPane>
     <VBox fx:id="loginBox" alignment="CENTER" fillWidth="false" StackPane.alignment="CENTER">
         <Label fx:id="welcomeText" alignment="CENTER" styleClass="welcome-text" />

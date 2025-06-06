@@ -56,16 +56,12 @@ public class User {
         return contentDao.getWatched(this.codUser,limit);
     }
 
-    public List<Content> getPreferiti(int limit) {
+    public List<Content> getFavourites(int limit) {
         ContentDao accountDao = new ContentDao();
         return accountDao.getFavourites(this.codUser,limit);
     }
 
-    public List<Comment> getCommenti(int limit) {
-//        UserDao utenteDao = new UserDao();
-//        return utenteDao.getCommentiUtente(this.codUser,limit);
-        return null;
-    }
+
     public int getUltimoGuardato() {
         return 5;
     }

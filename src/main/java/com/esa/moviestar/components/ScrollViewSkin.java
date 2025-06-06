@@ -52,13 +52,13 @@ public class ScrollViewSkin extends SkinBase<ScrollView> {
 
     /**
      * Constructor for the ScrollViewSkin.
-     *
      * @param control   The ScrollView control this skin is for.
      *
      */
     public ScrollViewSkin(ScrollView control) {
         super(control);
         // Initialize UI components
+        // I have created the ScrollView divided in top and bottom part in a way is possible to implement a scrollView without the TitleBox
         titleBox = createTitleBox();
         sliderContainer = createSlider();
 
@@ -69,7 +69,6 @@ public class ScrollViewSkin extends SkinBase<ScrollView> {
 
         setupBindings();
 
-        // Initialize buttons to be hidden
         leftButton.setOpacity(0);
         rightButton.setOpacity(0);
 
@@ -82,7 +81,7 @@ public class ScrollViewSkin extends SkinBase<ScrollView> {
      */
     private void setupHoverBehavior() {
         sliderContainer.setOnMouseEntered(e -> {
-            if(!isHovering&& container.getWidth()>scrollPane.getWidth()){
+            if(!isHovering&& container.getWidth( )>scrollPane.getWidth()){
                 isHovering = true;
                 updateButtonVisibility(scrollPane.getHvalue());
             }
@@ -98,8 +97,7 @@ public class ScrollViewSkin extends SkinBase<ScrollView> {
     }
 
     /**
-     * Creates the header section containing the title, separator line, and action button.
-     *
+     * Creates the header section containing the title,  separator line, and action button.
      * @return The StackPane containing the header elements.
      */
     private StackPane createTitleBox() {
@@ -125,7 +123,6 @@ public class ScrollViewSkin extends SkinBase<ScrollView> {
     /**
      * Creates the main slider area including the ScrollPane, item container,
      * navigation buttons, and gradient overlays.
-     *
      * @return An AnchorPane containing the slider components.
      */
     private AnchorPane createSlider() {
@@ -194,7 +191,6 @@ public class ScrollViewSkin extends SkinBase<ScrollView> {
 
     /**
      * Creates a navigation button (left or right).
-     *
      * @param isLeft True to create the left button, false for the right.
      * @return The configured Button.
      */
@@ -236,8 +232,7 @@ public class ScrollViewSkin extends SkinBase<ScrollView> {
 
     /**
      * Estimates the width of a single item in the ScrollView.
-     * Assumes all items have roughly the same width. Uses the first item.
-     *
+     *  I assume all items have the same width
      * @return The estimated width of an item, or 0 if no items exist.
      */
     private double estimateItemWidth() {
@@ -250,7 +245,6 @@ public class ScrollViewSkin extends SkinBase<ScrollView> {
 
     /**
      * Calculates the approximate number of items that are fully visible within the ScrollPane's viewport.
-     *
      * @return The number of visible items (at least 1 if the viewport has width).
      */
     private double calculateVisibleItems() {
@@ -274,8 +268,7 @@ public class ScrollViewSkin extends SkinBase<ScrollView> {
 
     /**
      * Calculates the required change in the ScrollPane's height value to scroll
-     * by approximately (visibleItems - 1) items.
-     *
+     * I approximate at (visibleItems - 1) items.
      * @param visibleItems The number of items currently visible (can be fractional).
      * @param itemCount    The total number of items in the ScrollView.
      * @return The proportional change (0.0 to 1.0) in height value needed for the scroll.
@@ -306,10 +299,11 @@ public class ScrollViewSkin extends SkinBase<ScrollView> {
     }
 
     /**
-     * Animates the ScrollPane's horizontal scroll position (height value) to a target value.
+     * Animates the ScrollPane's horizontal scroll position  to a target value.
      * @param targetValue The target height value (between 0.0 and 1.0).
      */
     private void animateScroll(double targetValue) {
+        // I used a Keyframe to make the animation smooth instead of a transition
         if (scrollAnimation != null && scrollAnimation.getStatus() == Timeline.Status.RUNNING) {
             scrollAnimation.stop();
         }
@@ -328,9 +322,8 @@ public class ScrollViewSkin extends SkinBase<ScrollView> {
     }
 
     /**
-     * Updates the visibility (opacity) of the navigation buttons based on the current
+     * Updates the visibility of the navigation buttons based on the current
      * scroll position (height value) and whether the mouse is hovering over the slider area.
-     *
      * @param scrollValue The current height value of the ScrollPane (0.0 to 1.0).
      */
     private void updateButtonVisibility(double scrollValue) {
@@ -352,8 +345,7 @@ public class ScrollViewSkin extends SkinBase<ScrollView> {
     }
 
     /**
-     * Animates a button to become visible (fade in and slide in).
-     *
+     * Animates a button to become visible (fade in and slide  in ).
      * @param button The button to show.
      * @param isLeft True if it's the left button (affects slide direction).
      */
@@ -377,9 +369,7 @@ public class ScrollViewSkin extends SkinBase<ScrollView> {
     }
 
     /**
-     * Animates a button to become hidden (fade out and slide out).
-     * Makes the button unmanaged after the animation finishes.
-     *
+     * Animates a button to become hidden ( fade out and slide out).
      * @param button The object to hide.
      * @param isLeft True if it's the left button (affects slide direction).
      */
@@ -396,7 +386,6 @@ public class ScrollViewSkin extends SkinBase<ScrollView> {
 
     /**
      * Transition of the buttons
-     *
      * @param button the object
      * @param isLeft the orientation
      * @param duration of the effect
@@ -530,7 +519,6 @@ public class ScrollViewSkin extends SkinBase<ScrollView> {
 
     /**
      * Updates the SVG content and fill color for a button's graphic.
-     * Assumes the graphic is an SVGPath.
      * @param button     The button whose graphic needs updating.
      * @param svgContent The new SVG path data string.
      */
@@ -545,10 +533,10 @@ public class ScrollViewSkin extends SkinBase<ScrollView> {
     }
 
     /**
-     * Applies the foreground color to all relevant UI elements in the skin.
+     * Applies the foreground color to all elements in the skin.
      * @param color The new foreground color.
      */
-    public void updateForeColor (Color color) {
+    private void updateForeColor (Color color) {
         if (color == null) return;
         titleLabel.setFill(color);
         separator.setStroke(getLinearGradient(color));
@@ -561,7 +549,7 @@ public class ScrollViewSkin extends SkinBase<ScrollView> {
      * Return the color of the separator
      * @param color the foreground color
      */
-    public LinearGradient getLinearGradient (Color color) {
+    private LinearGradient getLinearGradient (Color color) {
         return new LinearGradient(
                 0, 0,
                 1, 0,
@@ -577,7 +565,7 @@ public class ScrollViewSkin extends SkinBase<ScrollView> {
      * Return the color of the overlays
      * @param color the edge color, if null the background color
      */
-    public Background getOverlayGradientBackgroundFill(Color color, boolean isLeft) {
+    private Background getOverlayGradientBackgroundFill(Color color, boolean isLeft) {
         return Background.fill(
                 new LinearGradient(isLeft? 0:1,0,
                         isLeft? 1:0, 0,

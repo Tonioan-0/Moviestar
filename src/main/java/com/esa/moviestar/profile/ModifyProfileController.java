@@ -32,15 +32,13 @@ public class ModifyProfileController extends BaseProfileController {
                 " id user : " + user.getID() +
                 " email user : " + user.getEmail());
 
-        if (user != null) {
-            textName.setText(user.getName());
-            codCurrentImage = user.getIDIcon();
+        textName.setText(user.getName());
+        codCurrentImage = user.getIDIcon();
 
-            // Mostra l'icona corrente
-            defaultImagine.getChildren().clear();
-            Group g = new Group(IconSVG.takeElement(codCurrentImage));
-            defaultImagine.getChildren().add(g);
-        }
+        // Mostra l'icona corrente
+        defaultImagine.getChildren().clear();
+        Group g = new Group(IconSVG.takeElement(codCurrentImage));
+        defaultImagine.getChildren().add(g);
     }
 
     public void setSource(Origine source) {

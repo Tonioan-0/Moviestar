@@ -145,14 +145,12 @@ public class AccountSettingController {
                 }
             });
 
-            userPopUp.getCancelButton().setOnMouseClicked(event2 -> {
-                container.getChildren().remove(userPopUp);
-            });
+            userPopUp.getCancelButton().setOnMouseClicked(event2 -> container.getChildren().remove(userPopUp));
 
         });
     }
 
-    ;
+
 
     public void deleteAccount() {
         deleteAccountButton.setOnMouseClicked(event -> {

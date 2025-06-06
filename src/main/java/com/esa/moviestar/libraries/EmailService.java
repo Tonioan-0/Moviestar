@@ -1,4 +1,4 @@
-package com.esa.moviestar.login;
+package com.esa.moviestar.libraries;
 
 import java.util.Properties;
 import jakarta.mail.*;

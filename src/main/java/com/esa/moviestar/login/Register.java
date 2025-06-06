@@ -146,7 +146,9 @@ public class Register {
             passwordTextField.requestFocus();
             passwordTextField.positionCaret(passwordTextField.getText().length());
             togglePasswordButton.setText("🙈");
-        }
+        }////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 
         else {
             passwordField.setText(passwordTextField.getText());
@@ -169,7 +171,7 @@ public class Register {
             if (newScene != null) {
                 newScene.widthProperty().addListener((observable, oldValue, newValue) -> adjustLayout(newValue.doubleValue(), newScene.getHeight()));
                 newScene.heightProperty().addListener((observable, oldValue, newValue) -> adjustLayout(newScene.getWidth(), newValue.doubleValue()));
-                adjustLayout(newScene.getWidth(), newScene.getHeight()); // Adattamento iniziale
+                adjustLayout(newScene.getWidth(), newScene.getHeight());
             }
         });
     }
@@ -204,7 +206,8 @@ public class Register {
                 boolean compactMode = width < MIN_SCREEN_WIDTH;
                 double registerWidth = compactMode ? 280 : REFERENCE_REGISTER_WIDTH * scale;
 
-                // Altezza minima di BASE (percentuale fissa dell'altezza di riferimento)
+
+                //Minimum height of BASE (fixed percentage of reference height)
                 double baseMinHeightPercentage = 0.75; // Prova con 75%
                 double baseMinRegisterHeight = REFERENCE_REGISTER_HEIGHT * baseMinHeightPercentage;
 
@@ -226,13 +229,13 @@ public class Register {
                 registerBox.setMaxWidth(registerWidth);
                 registerBox.setMaxHeight(registerHeight);
 
-                // Padding e Spacing dinamici
-                double paddingValue = Math.max(10, 20 * scale); // Rinominato per chiarezza
+                //dynamic Padding e Spacing
+                double paddingValue = Math.max(10, 20 * scale);
                 double spacing = Math.max(5, 10 * scale);
                 registerBox.setPadding(new Insets(paddingValue));
                 registerBox.setSpacing(spacing);
 
-                // --- IMPOSTAZIONE FONT (prima di usarli per calcoli) ---
+                // --- FONT ---
                 double welcomeTextScale = Math.max(scale, 0.7);
                 double registerButtonScale = Math.max(scale, 0.6);
                 double warningTextScale = Math.max(scale, 0.7);
@@ -253,9 +256,9 @@ public class Register {
                 warningSpecial2.setStyle("-fx-font-size: " + (warningTextScale * 12 + 2) + "px;");
                 backToLogin.setStyle("-fx-font-size: " + (backToLoginScale * 12 + 2) + "px;");
 
-                // Calcola la larghezza disponibile per gli elementi
-                double availableWidth = registerWidth - paddingValue * 2; // Larghezza interna al padding
-                double fieldWidth = Math.min(availableWidth, registerWidth * 0.9); // Larghezza massima dei campi
+                //Calculate the available width for the elements
+                double availableWidth = registerWidth - paddingValue * 2;
+                double fieldWidth = Math.min(availableWidth, registerWidth * 0.9);
 
                 // Set email field width first
                 emailField.setPrefWidth(fieldWidth);
@@ -391,7 +394,7 @@ public class Register {
                 Stage stage = (Stage) mainContainer.getScene().getWindow();
                 stage.setScene(newScene);
             } else {
-                welcomeText.setText("User già esistente");
+                welcomeText.setText("User already exists");
                 AnimationUtils.shake(welcomeText);
             }
         }catch (IOException e) {

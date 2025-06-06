@@ -13,10 +13,10 @@ public class AccountDao {
 
     public AccountDao(){
         try{
-            this.connection = DataBaseManager.getConnection();
+            connection = DataBaseManager.getConnection();
         }
         catch (SQLException e) {
-            System.err.println("accountDao : Database connection error "+e.getMessage());
+            System.err.println("AccountDao : Database connection error "+e.getMessage());
         }
     }
 
@@ -40,7 +40,7 @@ public class AccountDao {
         }
     }
 
-    public boolean deleteAccount(String email) {
+    public void deleteAccount(String email) {
         String query = "DELETE FROM Account WHERE Email = ?;";
         try (PreparedStatement stmt = connection.prepareStatement(query)) {
             stmt.setString(1, email);
@@ -54,7 +54,6 @@ public class AccountDao {
             System.err.println("accountDao: Error removing account – " + e.getMessage());
 
         }
-        return false;
     }
 
 
@@ -79,6 +78,7 @@ public class AccountDao {
         }
         return null;
     }
+
     public void updatePassword(String email, String password) {
         String query = "UPDATE Account SET Password = ? WHERE Email = ?;";
 

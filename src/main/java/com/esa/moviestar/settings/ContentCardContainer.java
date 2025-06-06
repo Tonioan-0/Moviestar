@@ -29,14 +29,10 @@ public class ContentCardContainer {
         contentTitle.setText(content.getTitle());
         contentDescription.setText(content.getPlot());
         contentYear.setText(String.valueOf(content.getYear()));
-        //contentRuntime.setText(((int)content.getDuration()/60)+"h "+((int)content.getDuration()%60)+"min"); content don't have this
 
         try {
             if (content.getImageUrl() == null || content.getImageUrl().isEmpty() || Objects.equals(content.getImageUrl(), "error")) {
-                // System.err.println("Error: Image URL is null or empty for content: " + content.getTitle());
-                imgView.setImage(null); // Clear previous image
-                //  Platform.runLater(this::displayErrorShimmer);
-
+                imgView.setImage(null);
                 return;
             }
             Image img = new Image(content.getImageUrl(), true);
@@ -48,7 +44,6 @@ public class ContentCardContainer {
                 } else {
                     System.err.println("Error loading image '" + content.getImageUrl() + "': Unknown error.");
                 }
-                // Platform.runLater(this::displayErrorShimmer);
             });
             img.progressProperty().addListener((observable, oldValue, newValue) -> {
                 if (newValue.doubleValue() == 1.0) {

@@ -19,7 +19,7 @@ import javafx.util.Duration;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaView;
 import java.net.URL;
-//usage
+// usage
 //String videoUrl = "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4";
 //
 //FXMLLoader videoPlayer =  new FXMLLoader(getClass().getResource("movie_view/FilmPlayer.fxml"), Main.resourceBundle);

@@ -72,7 +72,6 @@ public class HeaderController {
 
     /**
      * Sets the visual style for the active button and resets the previous one.
-     *
      * @param button The Node (StackPane or HBox) that was clicked.
      */
     public void activeButton(Node button) {
@@ -94,8 +93,6 @@ public class HeaderController {
                 }
             }
         }
-
-        // Activate the new button
         currentActive = button;
         if (currentActive != null) {
             currentActive.getStyleClass().remove("surface-transparent");
@@ -172,7 +169,6 @@ public class HeaderController {
             getStyleClass().addAll("medium-text", "on-primary");
         }};
         item.getChildren().addAll(profileIcon, text);
-        // Item click handling moved to controller via callback
         item.setOnMouseClicked(e -> {mainPagesController.profileClick(user);popupMenu.close();});
         popupMenu.addItem(item);
 

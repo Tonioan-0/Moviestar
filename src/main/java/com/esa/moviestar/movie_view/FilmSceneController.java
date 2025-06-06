@@ -48,13 +48,13 @@ public class FilmSceneController {
 
     // Buttons
     @FXML
-    private Button closeButton;
+    private StackPane closeButton;
     @FXML
-    private Button playButton;
+    private HBox playButton;
     @FXML
-    private Button addButton;
+    private HBox addToWatchListButton;
     @FXML
-    private Button infoButton;
+    private HBox addToFavorituesButton;
 
     // Labels for content info
     @FXML
@@ -100,13 +100,13 @@ public class FilmSceneController {
             closeButton.setOnMouseClicked(event -> closeView());
         }
         if (playButton != null) {
-            playButton.setOnAction(event -> playContent());
+            playButton.setOnMouseClicked(event -> playContent());
         }
-        if (addButton != null) {
-            addButton.setOnAction(event -> addToList());
+        if (addToWatchListButton != null) {
+            addToWatchListButton.setOnMouseClicked(event -> addToList());
         }
-        if (infoButton != null) {
-            infoButton.setOnAction(event -> showInfo());
+        if (addToFavorituesButton != null) {
+            addToFavorituesButton.setOnMouseClicked(event -> showInfo());
         }
 
         System.out.println("FilmSceneController initialized.");

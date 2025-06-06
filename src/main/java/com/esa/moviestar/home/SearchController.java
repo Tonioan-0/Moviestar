@@ -30,24 +30,23 @@ import java.util.stream.Collectors;
 
 public class SearchController {
     @FXML
-    private FlowPane recommendations; // Top section for label-like buttons
+    private FlowPane recommendations;
     @FXML
     private Line separatorLine;
     @FXML
-    private Button findOutButton; // Text "Altri titoli da scoprire:" refers to 'recommendations'
+    private Button findOutButton;
     @FXML
-    private FlowPane filmSeriesRecommendations; // Bottom section for rich display
+    private FlowPane filmSeriesRecommendations;
 
     private MainPagesController setupController;
     private HeaderController headerController;
     private User user;
     private TMDbApiManager tmdbApiManager;
 
-    private static final int MAX_PAGES_TO_FETCH_SEARCH = 3; // Number of pages to fetch for search results
-    private static final int TOP_N_COUNT_FOR_RICH_DISPLAY = 20; // Max items for the rich display
-    private static final int MAX_LABEL_LIKE_COUNT = 15;       // Max items for the "Altri titoli" section
+    private static final int MAX_PAGES_TO_FETCH_SEARCH = 3;
+    private static final int TOP_N_COUNT_FOR_RICH_DISPLAY = 20;
+    private static final int MAX_LABEL_LIKE_COUNT = 15;
 
-    // Helper Predicate for distinct by key (e.g., title)
     private static <T> Predicate<T> distinctByKey(Function<? super T, ?> keyExtractor) {
         Set<Object> seen = new HashSet<>();
         return t -> {
@@ -126,7 +125,6 @@ public class SearchController {
                             }
                         } catch (Exception e) {
                             System.err.println("SearchController: Error fetching or joining one page of search results: " + e.getMessage());
-                            // Continue processing other pages
                         }
                     }
 
@@ -134,23 +132,19 @@ public class SearchController {
                     Platform.runLater(() -> {
                         if (allRawResultsFromApi.isEmpty() && pageFutures.stream().allMatch(CompletableFuture::isCompletedExceptionally)) {
                             System.err.println("SearchController: All page fetches failed for query '" + query + "'.");
-                            // Optionally display an error message to the user in the UI
-                            return; // Nothing to process
+                            return;
                         }
 
                         String lowerCaseQuery = query.toLowerCase();
 
-                        // 1. Filter by query, sort by popularity, then make unique by title (case-insensitive)
-                        //    from the combined list of all pages.
                         List<Content> uniquePopularContent = allRawResultsFromApi.stream()
                                 .filter(content -> content != null && content.getTitle() != null &&
                                         !content.getTitle().trim().isEmpty() &&
                                         content.getTitle().toLowerCase().contains(lowerCaseQuery))
                                 .sorted(Comparator.comparingDouble(Content::getPopularity).reversed())
-                                .filter(distinctByKey(content -> content.getTitle().toLowerCase())) // De-duplicate by title
-                                .collect(Collectors.toList()); // Use collect first, then stream again for partitioning
+                                .filter(distinctByKey(content -> content.getTitle().toLowerCase()))
+                                .toList();
 
-                        // 2. Populate 'filmSeriesRecommendations' (bottom pane)
                         List<Content> forRichDisplay = uniquePopularContent.stream()
                                 .limit(TOP_N_COUNT_FOR_RICH_DISPLAY)
                                 .collect(Collectors.toList());
@@ -170,14 +164,12 @@ public class SearchController {
                             }
                         }
 
-                        // 3. Populate 'recommendations' (top pane) with "other" titles
-                        //    These are unique titles not shown in the rich display.
                         List<Content> forLabelLikeDisplay = uniquePopularContent.stream()
-                                .skip(forRichDisplay.size()) // Crucial: Skip items already taken for rich display
-                                .limit(MAX_LABEL_LIKE_COUNT)    // Take the next N items
+                                .skip(forRichDisplay.size())
+                                .limit(MAX_LABEL_LIKE_COUNT)
                                 .collect(Collectors.toList());
 
-                        recommendations.getChildren().clear(); // Clear any previous loading/content
+                        recommendations.getChildren().clear();
                         if (!forLabelLikeDisplay.isEmpty()) {
                             List<Node> labelButtons = createLabelLikeButtons(forLabelLikeDisplay);
                             recommendations.getChildren().addAll(labelButtons);
@@ -188,20 +180,15 @@ public class SearchController {
 
                         if (forRichDisplay.isEmpty() && forLabelLikeDisplay.isEmpty()) {
                             System.out.println("SearchController: No results found for query '" + query + "' after processing all pages.");
-                            // Optionally, display a "No results found" message in one of the panes
-                            // e.g., filmSeriesRecommendations.getChildren().add(new Label("No results found for '" + query + "'."));
                         }
                     });
-                }, tmdbApiManager.getExecutor()) // Use API manager's executor for aggregation
+                }, tmdbApiManager.getExecutor())
                 .exceptionally(ex -> {
                     System.err.println("SearchController: Error during multi-page search operation for query '" + query + "': " + ex.getMessage());
-                    ex.printStackTrace();
                     Platform.runLater(() -> {
                         recommendations.getChildren().clear();
                         filmSeriesRecommendations.getChildren().clear();
                         if (findOutButton != null) findOutButton.setVisible(false);
-                        // Optionally, display an error message to the user
-                        // e.g., filmSeriesRecommendations.getChildren().add(new Label("Search failed. Please try again."));
                     });
                     return null;
                 });

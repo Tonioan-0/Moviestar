@@ -2,6 +2,7 @@ package com.esa.moviestar.login;
 
 import com.esa.moviestar.database.AccountDao;
 import com.esa.moviestar.Main;
+import com.esa.moviestar.libraries.EmailService;
 import com.esa.moviestar.profile.ProfileView;
 import com.esa.moviestar.model.Account;
 import  com.esa.moviestar.libraries.CredentialCryptManager;

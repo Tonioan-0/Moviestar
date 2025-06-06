@@ -59,10 +59,9 @@ public class ProfileView {
         text.setText("Who wants to watch Moviestar?");
         grid.setSpacing(GRID_SPACING);
 
-        // --- tonioan part for TMDb database update ---
         Task<Void> updateDbTask = new Task<>() {
             @Override
-            protected Void call() {updateMessage("Starting database content update..."); // For Task progress
+            protected Void call() {updateMessage("Starting database content update...");
                 System.out.println("ProfileView Task: Attempting to update all content in database.");
 
                 TMDbApiManager tmdbApiManager = TMDbApiManager.getInstance();
@@ -82,7 +81,7 @@ public class ProfileView {
         Thread taskThread = new Thread(updateDbTask);
         taskThread.setDaemon(true);
         taskThread.start();
-        // --- end of tonioan part ---
+
     }
 
     public void setAccount(Account account) {
@@ -205,7 +204,7 @@ public class ProfileView {
     }
 
 
-    //passaggio alla pagina Home
+    //transition to the Home page
     private void homePage(User user) {
         try{
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/esa/moviestar/home/main.fxml"),Main.resourceBundle);
@@ -219,34 +218,27 @@ public class ProfileView {
             stage.setScene(newScene);
 
         }catch(IOException e){
-            warningText.setText("Error to load the home page");  // The user no need to see the error message
             System.err.println("ProfileView: Error to load the home page"+e.getMessage());
         }
     }
 
-    //  passaggio alla pagina di modifica
-    private void editPage(User user) {
+    // Switch to edit page
+    private void editPage(User user ) {
         if (grid.getChildren().size() > 1) {
             try {
-                FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/esa/moviestar/profile/modify-profile-view.fxml"),Main.resourceBundle);  // Carica il FXML per la modifica
-                Parent modifyContent = loader.load();  // Carica la vista della pagina
+                FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/esa/moviestar/profile/modify-profile-view.fxml"),Main.resourceBundle);
+                Parent modifyContent = loader.load();
 
                 ModifyProfileController modifyProfileController = loader.getController();
                 modifyProfileController.setAccount(account);
                 modifyProfileController.setUser(user);
                 modifyProfileController.setSource(ModifyProfileController.Origine.PROFILE);
 
-                //Ottieni la scena corrente
                 Scene currentScene = fatherContainer.getScene();
-
-                // Crea una nuova scena con il nuovo contenuto
                 Scene newScene = new Scene(modifyContent, currentScene.getWidth(), currentScene.getHeight());
-
-                // Ottieni lo Stage corrente e imposta la nuova scena
                 Stage stage = (Stage) fatherContainer.getScene().getWindow();
                 stage.setScene(newScene);
             } catch (IOException e) {
-                warningText.setText("Error loading the edit page:" + e.getMessage());
                 System.err.println("ProfileView : Error loading the edit page:"+e.getMessage());
             }
         } else {
@@ -254,27 +246,19 @@ public class ProfileView {
         }
     }
 
-    //  passaggio alla pagina di creazione utente
+    //  Switch to user creation page
     private void userCreationPage() {
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/esa/moviestar/profile/create-profile-view.fxml"),Main.resourceBundle);  // Carica il FXML per la modifica
-            Parent createContent = loader.load();  // Carica la vista della pagina
-
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/esa/moviestar/profile/create-profile-view.fxml"),Main.resourceBundle);
+            Parent createContent = loader.load();
             CreateProfileController createProfileController = loader.getController();
             createProfileController.setAccount(account);
             createProfileController.setSource(CreateProfileController.Origine.PROFILE);
-
-            //Ottieni la scena corrente
             Scene currentScene = fatherContainer.getScene();
-
-            // Crea una nuova scena con il nuovo contenuto
             Scene newScene = new Scene(createContent, currentScene.getWidth(), currentScene.getHeight());
-
-            // Ottieni lo Stage corrente e imposta la nuova scena
             Stage stage = (Stage) fatherContainer.getScene().getWindow();
             stage.setScene(newScene);
         } catch (IOException e) {
-            warningText.setText("Error loading the creation page: " + e.getMessage());
             System.err.println("ProfileView : Error loading creation page."+e.getMessage());
         }
     }

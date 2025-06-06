@@ -102,11 +102,8 @@ public class TMDbApiManager {
     }
 
     public static TMDbApiManager getInstance() {
-        if (API_KEY == null || API_KEY.trim().isEmpty()) {
-            // Log a severe error or throw an exception immediately if key is missing
+        if (API_KEY.trim().isEmpty()) {
             System.err.println("FATAL ERROR: TMDb API Key is not set in TMDbApiManager.java. API calls will fail.");
-            // Consider throwing an exception here if the app cannot function without the key
-            // throw new IllegalStateException("TMDb API Key is not set.");
         }
         if (instance == null) {
             synchronized (TMDbApiManager.class) {
@@ -141,8 +138,7 @@ public class TMDbApiManager {
 
             Request request = requestBuilder.build();
 
-            // Check if API_KEY is set before proceeding
-            if (API_KEY == null || API_KEY.trim().isEmpty()) {
+            if (API_KEY.trim().isEmpty()) {
                 // Or return a specific error response if you don't throw in getInstance
                 return new Response.Builder()
                         .request(request)
@@ -310,7 +306,7 @@ public class TMDbApiManager {
                 }
             } catch (Exception e) {
                 // Log the exception details including the endpoint and response snippet
-                String responseSnippet = (responseString != null && responseString.length() > 500) ? responseString.substring(0, 500) + "..." : responseString;
+                String responseSnippet = responseString.length() > 500 ? responseString.substring(0, 500) + "..." : responseString;
                 System.err.println("TMDbApiManager: Failed to parse/map content list from JSON for endpoint: " + endpoint + ". Error: " + e.getMessage() + ". Response snippet: " + responseSnippet);
                 // Do NOT re-throw here, just return the potentially empty list.
                 // The caller should handle the case of an empty list.

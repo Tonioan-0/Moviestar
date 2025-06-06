@@ -25,7 +25,7 @@ public class CreateProfileController extends BaseProfileController {
     public enum Origine {
         HOME,
         PROFILE,
-        REGISTER;
+        REGISTER
     }
 
     public void setUser(User user) {
