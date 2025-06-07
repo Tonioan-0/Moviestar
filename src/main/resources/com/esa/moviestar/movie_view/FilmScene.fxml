@@ -70,7 +70,7 @@
                                         <Insets left="15.0"/>
                                     </padding>
                                 </HBox>
-                                <HBox fx:id="addToFavoritesButton" layoutX="10.0" layoutY="10.0"
+                                <HBox fx:id="addToFavouriteButton" layoutX="10.0" layoutY="10.0"
                                       prefHeight="48.0">
                                     <StackPane maxHeight="48.0" maxWidth="48.0" minHeight="48.0" minWidth="48.0"
                                                prefHeight="48.0" prefWidth="48.0">

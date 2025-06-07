@@ -77,7 +77,10 @@ public class FilmCardController {
 //            timeLabel.setText(((int)content.getTime()/60)+"h "+((int)content.getTime()%60)+"min" );
 //            durationIcon.setContent(resources.getString("clock"));}
 
-        ratingLabel.setText(String.valueOf(content.getRating()).substring(0, 3));
+        if(content.getRating() == 10.0)
+            ratingLabel.setText("10");
+        else
+            ratingLabel.setText(String.valueOf(content.getRating()).substring(0,3));
         try {
             String imageUrl = isVertical ? content.getPosterUrl() : content.getImageUrl();
 

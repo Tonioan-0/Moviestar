@@ -1,5 +1,6 @@
 package com.esa.moviestar.settings;
 
+import com.esa.moviestar.Main;
 import com.esa.moviestar.model.Account;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -10,6 +11,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
+import javafx.scene.shape.SVGPath;
 import javafx.scene.text.Text;
 
 import java.util.Objects;
@@ -79,8 +81,9 @@ public class DeletePopUp extends StackPane {
         passwordTextField.setManaged(false);
         passwordTextField.getStyleClass().addAll("on-primary", "small-item", "medium-text", "surface-dim-border", "text-area");
 
-        togglePasswordButton = new Button("👁");////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        togglePasswordButton.getStyleClass().add("toggle-password-button");
+        togglePasswordButton = new Button();
+        togglePasswordButton.setGraphic(new SVGPath(){{setContent(Main.resourceBundle.getString("passwordField.showPassword"));getStyleClass().add("on-primary");}});
+        togglePasswordButton.getStyleClass().add("back-button");
 
         StackPane passwordStack = new StackPane(passwordField, passwordTextField, togglePasswordButton);
         passwordStack.setMaxWidth(Double.MAX_VALUE);
@@ -161,12 +164,12 @@ public class DeletePopUp extends StackPane {
             passwordTextField.setText(passwordField.getText());
             passwordTextField.requestFocus();
             passwordTextField.positionCaret(passwordTextField.getText().length());
-            togglePasswordButton.setText("🙈");////////////////////////////////////////////////////////////////////////////////////////////////////////////
+            togglePasswordButton.setGraphic(new SVGPath(){{setContent(Main.resourceBundle.getString("passwordField.hidePassword"));getStyleClass().add("on-primary");}});;
         } else {
             passwordField.setText(passwordTextField.getText());
             passwordField.requestFocus();
             passwordField.positionCaret(passwordField.getText().length());
-            togglePasswordButton.setText("👁");////////////////////////////////////////////////////////////////////////////////////////////////////////////
+            togglePasswordButton.setGraphic(new SVGPath(){{setContent(Main.resourceBundle.getString("passwordField.showPassword"));getStyleClass().add("on-primary");}});
         }
     }
 

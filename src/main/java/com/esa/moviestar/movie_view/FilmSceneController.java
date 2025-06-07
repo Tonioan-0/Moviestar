@@ -1,9 +1,11 @@
 package com.esa.moviestar.movie_view;
 
 import com.esa.moviestar.Main;
+import com.esa.moviestar.database.UserDao;
 import com.esa.moviestar.home.MainPagesController;
 import com.esa.moviestar.libraries.TMDbApiManager;
 import com.esa.moviestar.model.FilmSeriesDetails;
+import com.esa.moviestar.model.User;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -43,6 +45,7 @@ public class FilmSceneController {
     MainPagesController mainPagesController;
     private TMDbApiManager apiManager;
     private FilmSeriesDetails currentContent;
+    private User user;
 
     // Main containers
     @FXML
@@ -109,10 +112,10 @@ public class FilmSceneController {
             playButton.setOnMouseClicked(event -> playContent());
         }
         if (addToWatchListButton != null) {
-            addToWatchListButton.setOnMouseClicked(event -> addToList());
+            addToWatchListButton.setOnMouseClicked(event -> addToWatchlist());
         }
         if (addToFavouriteButton != null) {
-            addToFavouriteButton.setOnMouseClicked(event -> showInfo());
+            addToFavouriteButton.setOnMouseClicked(event -> addToFavourites());
         }
 
         System.out.println("FilmSceneController initialized.");
@@ -425,7 +428,7 @@ public class FilmSceneController {
             seasonsContainer.setStyle("-fx-padding: 0 0 15 0;");
 
             seasonsDropdownButton = new Button();
-            seasonsDropdownButton.getStyleClass().addAll("seasons-dropdown-button","small-item","on-primary");
+            seasonsDropdownButton.getStyleClass().addAll("seasons-dropdown-button","small-item","on-primary","primary-border");
             seasonsDropdownButton.setPrefHeight(35);
             seasonsDropdownButton.setOnAction(e -> popUpSeasonContainer());
             if (currentContent.getSeasons() != null && !currentContent.getSeasons().isEmpty() && currentContent.getSeasons().get(0) != null) {
@@ -466,7 +469,7 @@ public class FilmSceneController {
         StackPane stackPane = new StackPane();
         stackPane.getStylesheets().add(getClass().getResource("/com/esa/moviestar/styles/general.css").toExternalForm());
         stackPane.setPadding(new Insets(8));
-        stackPane.getStyleClass().addAll("medium-item","surface-dim");
+        stackPane.getStyleClass().addAll("medium-item","surface-dim","primary-border");
         ScrollPane scroll = new ScrollPane();
         scroll.setFitToWidth(true);
         scroll.setMaxHeight(200);
@@ -778,6 +781,8 @@ public class FilmSceneController {
     @FXML
     private void playContent() {
         System.out.println("Play button clicked");
+        UserDao dao = new UserDao();
+        dao.insertHistoryContent(user.getID(), currentContent.getId());
         if (currentContent != null) {
             if (currentContent.isSeries()) {
                 if (currentContent.getSeasons() != null &&
@@ -820,21 +825,17 @@ public class FilmSceneController {
     }
 
     @FXML
-    private void addToList() {
-        System.out.println("Add to list button clicked");
-        if (currentContent != null) {
-            System.out.println("Adding to list: " + currentContent.getTitle());
-            // TODO: Implement add to list functionality
-        }
+    private void addToWatchlist() {
+        System.out.println("Add to watchlist button clicked");
+        UserDao dao = new UserDao();
+        dao.insertWatchlistContent(user.getID(), currentContent.getId());
     }
 
     @FXML
-    private void showInfo() {
-        System.out.println("Info button clicked");
-        if (currentContent != null) {
-            System.out.println("Showing info for: " + currentContent.getTitle());
-            // TODO: Implement info display
-        }
+    private void addToFavourites() {
+        System.out.println("add to favourites button clicked");
+        UserDao dao = new UserDao();
+        dao.insertFavouriteContent(user.getID(),currentContent.getId());
     }
 
     public void setTitle(String title) {
@@ -983,4 +984,6 @@ public class FilmSceneController {
     public boolean isLoading() {
         return titleLabel != null && "Loading...".equals(titleLabel.getText());
     }
+
+    public void setUser(User user){this.user=user;}
 }

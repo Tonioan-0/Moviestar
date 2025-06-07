@@ -52,6 +52,9 @@ public class ProfileView {
     private static final double PENCIL_HOVER = -2.5;
     private static final int PENCIL_POS = 0;
     private static final double CROSS_SIZE = 1.8 ;
+    private static final double CROSS_CONTAINER_SIZE = 190;
+    private static final double CROSS_CONTAINER_SIZE_HOVER = 200;
+
 
 
 
@@ -168,12 +171,7 @@ public class ProfileView {
     }
 
     private VBox createAddUserBox() {
-        StackPane crossContainer = new StackPane();
-        crossContainer.setMinSize(190,190);
-        crossContainer.setTranslateY(-20);
-        crossContainer.setStyle("-fx-background-color: #333333;" +
-                "-fx-background-radius: 48px;" +
-                "-fx-border-radius: 48px;");
+        StackPane crossContainer = getCrossContainerStyle();
 
         SVGPath cross = new SVGPath();
         cross.setContent(Main.resourceBundle.getString("plusButton"));
@@ -181,7 +179,7 @@ public class ProfileView {
         cross.setScaleY(CROSS_SIZE);
         cross.setStyle("-fx-fill: #F0ECFD;");
 
-        // Aggiungi al pane
+
         crossContainer.getChildren().add(cross);
 
         VBox creationContainer = new VBox();
@@ -213,6 +211,26 @@ public class ProfileView {
     }
 
 
+    private static StackPane getCrossContainerStyle() {
+        StackPane crossContainer = new StackPane();
+        crossContainer.setMinSize(CROSS_CONTAINER_SIZE,CROSS_CONTAINER_SIZE);
+        crossContainer.setTranslateY(-20);
+        crossContainer.setStyle("-fx-background-color: #333333;" +
+                "-fx-background-radius: 48px;" +
+                "-fx-border-radius: 48px;");
+
+        crossContainer.setOnMouseExited(event ->
+                crossContainer.setMinSize(CROSS_CONTAINER_SIZE,CROSS_CONTAINER_SIZE)
+        );
+
+        crossContainer.setOnMouseEntered(event ->
+                crossContainer.setMinSize(CROSS_CONTAINER_SIZE_HOVER,CROSS_CONTAINER_SIZE_HOVER)
+        );
+        return crossContainer;
+    }
+
+
+
     //transition to the Home page
     private void homePage(User user) {
         try{
@@ -231,6 +249,8 @@ public class ProfileView {
         }
     }
 
+
+
     // Switch to edit page
     private void editPage(User user ) {
         if (grid.getChildren().size() > 1) {
@@ -247,6 +267,7 @@ public class ProfileView {
                 Scene newScene = new Scene(modifyContent, currentScene.getWidth(), currentScene.getHeight());
                 Stage stage = (Stage) fatherContainer.getScene().getWindow();
                 stage.setScene(newScene);
+
             } catch (IOException e) {
                 System.err.println("ProfileView : Error loading the edit page:"+e.getMessage());
             }
@@ -261,12 +282,15 @@ public class ProfileView {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/esa/moviestar/profile/create-profile-view.fxml"),Main.resourceBundle);
             Parent createContent = loader.load();
             CreateProfileController createProfileController = loader.getController();
+
             createProfileController.setAccount(account);
             createProfileController.setSource(CreateProfileController.Origine.PROFILE);
+
             Scene currentScene = fatherContainer.getScene();
             Scene newScene = new Scene(createContent, currentScene.getWidth(), currentScene.getHeight());
             Stage stage = (Stage) fatherContainer.getScene().getWindow();
             stage.setScene(newScene);
+
         } catch (IOException e) {
             System.err.println("ProfileView : Error loading creation page."+e.getMessage());
         }

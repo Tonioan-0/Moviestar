@@ -1,30 +1,57 @@
 package com.esa.moviestar.settings;
 
+
+
+import com.esa.moviestar.database.ContentDao;
 import com.esa.moviestar.model.Account;
 import com.esa.moviestar.model.User;
 import javafx.fxml.FXML;
+
+import javafx.scene.Node;
+
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+
+
+import java.io.IOException;
+
+import java.util.List;
+
+
 
 public class WatchListController {
     @FXML
     private VBox vboxContainer;
-
-    private Account account;
     private User user;
+    private Account account;
+    private SettingsViewController settingViewController;
 
-    public void setAccount(Account account) {
-        this.account = account;
+
+    public void setAccount(Account account){
+        this.account=account;
+        System.out.println("WatchlistSettingController : email "+account.getEmail());
     }
 
-    public void setUtente(User user) {
+    public void setScene(SettingsViewController container){this.settingViewController = container;}
+
+    public void setUser(User user){
+        vboxContainer.getChildren().clear();
         this.user = user;
+        System.out.println("WatchlistSettingController : user : "+ user.getName()+" email user : "+ user.getEmail()+" id user : "+ user.getID());
+        ContentDao dao = new ContentDao();
+        List<Node> contentList;
+        try {
+            contentList = settingViewController.createFilmNodes(dao.watchlistContent(user.getID()),this);
+            for(int i = 0 ; i < contentList.size() ; i+= 4 ) {
+                HBox row = new HBox();
+                row.setSpacing(20);
+                for (int j = 0 ; j < 4 && i+j<contentList.size(); j++) {
+                    row.getChildren().addAll(contentList.get(i+j));
+                }
+                vboxContainer.getChildren().addAll(row);
+            }
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
-
-
-//    public void addContentToWatchList(Content content) throws IOException {
-//        Node contentNode = createContentNodes(List.of(content)).get(0);
-//        vboxContainer.getChildren().add(contentNode);
-//    }
-//
 }
-

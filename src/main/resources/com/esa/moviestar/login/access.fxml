@@ -28,7 +28,7 @@
         <StackPane fx:id="passwordContainer" alignment="CENTER_RIGHT">
             <PasswordField fx:id="passwordField" text="Eugenio04." />
             <TextField fx:id="passwordTextField" managed="false" text="Eugenio04." visible="false" />
-            <Button fx:id="togglePasswordButton" styleClass="toggle-password-button" text="👁" />
+            <Button fx:id="togglePasswordButton" styleClass="toggle-password-button"  />
         </StackPane>
 
         <Button fx:id="access" alignment="CENTER">

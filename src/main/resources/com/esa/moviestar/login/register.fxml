@@ -62,7 +62,7 @@
                 <PasswordField fx:id="passwordField" maxWidth="1.7976931348623157E308" styleClass="small-item"/>
                 <TextField fx:id="passwordTextField" managed="false" maxWidth="1.7976931348623157E308"
                            styleClass="small-item" visible="false"/>
-                <Button fx:id="togglePasswordButton" styleClass="toggle-password-button" text="👁"/>
+                <Button fx:id="togglePasswordButton" styleClass="toggle-password-button"/>
                 <VBox.margin>
                     <Insets bottom="20.0"/>
                 </VBox.margin>

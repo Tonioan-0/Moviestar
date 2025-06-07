@@ -9,7 +9,21 @@
 <?import javafx.scene.text.*?>
 
 <AnchorPane fx:id="root" prefHeight="718.0" prefWidth="1118.0" styleClass="surface-solid" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.esa.moviestar.movie_view.FilmPlayer">
-   <StackPane fx:id="playerContainer" layoutX="157.0" prefHeight="150.0" prefWidth="200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+   <StackPane fx:id="playerContainer" layoutX="157.0" prefHeight="150.0" prefWidth="200.0" AnchorPane.bottomAnchor="0.0"
+              AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+      <StackPane fx:id="closeButton" alignment="TOP_RIGHT" maxHeight="48.0" maxWidth="48.0" minHeight="48.0"
+                 minWidth="48.0" prefHeight="48.0" prefWidth="48.0" StackPane.alignment="TOP_RIGHT">
+         <styleClass>
+            <String fx:value="small-item"/>
+            <String fx:value="surface-transparent"/>
+            <String fx:value="on-primary-border"/>
+         </styleClass>
+         <StackPane.margin>
+            <Insets right="30.0" top="20.0"/>
+         </StackPane.margin>
+         <SVGPath content="%close" fill="#f5f5f5" scaleX="0.6" scaleY="0.6" StackPane.alignment="CENTER"/>
+      </StackPane>
+   </StackPane>
    <VBox fx:id="bottomBar" layoutX="8.0" layoutY="646.0" spacing="8.0" AnchorPane.bottomAnchor="8.0" AnchorPane.leftAnchor="8.0" AnchorPane.rightAnchor="8.0">
       <AnchorPane style="-fx-view-order: -1;">
          <ProgressBar fx:id="pbrVideo" maxHeight="8.0" prefWidth="200.0" progress="0.25" styleClass="video-progress-bar" AnchorPane.bottomAnchor="8.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="8.0" />
@@ -157,4 +171,3 @@
       <URL value="@../styles/Sliders.css" />
    </stylesheets>
 </AnchorPane>
-

@@ -1,15 +1,19 @@
 package com.esa.moviestar.settings;
 
 import com.esa.moviestar.Main;
+import com.esa.moviestar.database.UserDao;
 import com.esa.moviestar.home.MainPagesController;
 import com.esa.moviestar.model.Account;
+import com.esa.moviestar.model.Content;
 import com.esa.moviestar.model.User;
+import com.esa.moviestar.movie_view.FilmCardController;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
-import javafx.scene.Group;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
+import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Label;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
@@ -19,6 +23,9 @@ import javafx.stage.Stage;
 import java.awt.*;
 import java.io.IOException;
 import java.net.URI;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 
 public class SettingsViewController {
 
@@ -29,17 +36,11 @@ public class SettingsViewController {
     @FXML
     private HBox userContent;
     @FXML
-    private Label userText;
-    @FXML
-    private SVGPath userSVG;
-    @FXML
     private HBox historyContent;
     @FXML
-    private SVGPath historySVG;
-    @FXML
-    private Label historyText;
-    @FXML
     private HBox privacyContent;
+    @FXML
+    private HBox favouritesContent;
     @FXML
     private HBox watchListContent;
     @FXML
@@ -48,10 +49,6 @@ public class SettingsViewController {
     private StackPane backToHome;
     @FXML
     private HBox githubIcon;
-    @FXML
-    private Label userName;
-    @FXML
-    private Group profileImage;
 
     private User user;
     private Account account;
@@ -62,10 +59,12 @@ public class SettingsViewController {
         System.out.println("SettingsViewController: email " + account.getEmail());
     }
 
-    public void setUtente(User user) {
+    public void setUser(User user) {
         this.user = user;
         System.out.println("SettingsViewController = user : " + user.getName() + " email user : " + user.getEmail() + " id user : " + user.getID());
     }
+
+    public static final String PATH_CARD_VERTICAL = "/com/esa/moviestar/movie_view/FilmCard_Vertical.fxml";
 
 
     public void initialize() {
@@ -76,9 +75,8 @@ public class SettingsViewController {
     }
 
     private void backToHome() {
-        // Gestione ritorno alla home
+        // go back to home logic
         backToHome.setOnMouseClicked(event -> {
-            // Controllo sicurezza per dati NULL
             if (account == null) {
                 System.err.println("Account is NULL, unable to navigate to home");
                 return;
@@ -127,17 +125,24 @@ public class SettingsViewController {
             highlightMenu(watchListContent);
             loadView("/com/esa/moviestar/settings/watchlist-setting-view.fxml");
         });
+
+        favouritesContent.setOnMouseClicked(event -> {
+            highlightMenu(favouritesContent);
+            loadView("/com/esa/moviestar/settings/favourite-setting-view.fxml");
+        });
     }
 
     private void highlightMenu(HBox selectedMenu) {
-        // Rimuove la classe selezionata da tutti
+        // remove the selected class
         userContent.getStyleClass().remove("menu-button-selected");
         historyContent.getStyleClass().remove("menu-button-selected");
         privacyContent.getStyleClass().remove("menu-button-selected");
         aboutContent.getStyleClass().remove("menu-button-selected");
         watchListContent.getStyleClass().remove("menu-button-selected");
+        favouritesContent.getStyleClass().remove("menu-button-selected");
 
-        // Aggiunge la classe selezionata a quello cliccato
+
+        //Adds the selected class to the clicked one
         if (!selectedMenu.getStyleClass().contains("menu-button-selected")) {
             selectedMenu.getStyleClass().add("menu-button-selected");
         }
@@ -148,7 +153,7 @@ public class SettingsViewController {
             FXMLLoader loader = new FXMLLoader(getClass().getResource(pathFXML), Main.resourceBundle);
             Parent view = loader.load();
 
-            // Passa l'user solo alla vista account
+
             if (loader.getController() instanceof AccountSettingController controller) {
                 controller.setAccount(account);
                 controller.setUtente(user);
@@ -157,17 +162,29 @@ public class SettingsViewController {
 
             if (loader.getController() instanceof HistorySettingController controller) {
                 controller.setAccount(account);
-                controller.setUtente(user);
+                controller.setScene(this);
+                controller.setUser(user);
             }
 
             if (loader.getController() instanceof WatchListController controller) {
                 controller.setAccount(account);
-                controller.setUtente(user);
+                controller.setScene(this);
+                controller.setUser(user);
+
+
+            }
+            if (loader.getController() instanceof FavouriteSettingController controller) {
+                controller.setAccount(account);
+                controller.setScene(this);
+                controller.setUser(user);
+
+
             }
 
             contentArea.getChildren().setAll(view);
         } catch (IOException e) {
-            System.err.println("Errore nel caricamento della vista: " + pathFXML);
+            System.err.println("Error loading view: " + pathFXML);
+            e.printStackTrace();
         }
     }
 
@@ -181,9 +198,87 @@ public class SettingsViewController {
                     System.err.println("Apertura browser non supportata");
                 }
             } catch (Exception ex) {
-                ex.printStackTrace();
+                System.err.println("Error loading github web page"+ex.getMessage());
             }
         });
+    }
+
+    public java.util.List<Node> createFilmNodes(java.util.List<Content> contentList ,Object obt) throws IOException {
+        List<Node> nodes = new ArrayList<>(contentList.size());
+        String cardPath = PATH_CARD_VERTICAL;
+
+        for (Content content : contentList) {
+            if (content == null || content.getId() == 0) continue;
+
+            FXMLLoader fxmlLoader = new FXMLLoader(
+                    Objects.requireNonNull(getClass().getResource(cardPath), "FXML resource not found: " + cardPath),
+                    Main.resourceBundle
+            );
+            StackPane nodeContainer = new StackPane();
+            Node node = fxmlLoader.load();
+            FilmCardController filmCardController = fxmlLoader.getController();
+            nodeContainer.getChildren().add(node);
+
+            HBox deleteButton = new HBox();
+            deleteButton.getChildren().add(new SVGPath(){{setContent(Main.resourceBundle.getString("bin"));getStyleClass().add("on-primary");}});
+            deleteButton.setMinSize(48,48);
+            deleteButton.setMaxSize(48,48);
+            StackPane.setMargin(deleteButton,new Insets(8));
+            deleteButton.setAlignment(Pos.CENTER);
+            deleteButton.getStyleClass().addAll("small-item","primary");
+
+            StackPane.setAlignment(deleteButton, Pos.TOP_RIGHT);
+
+
+            nodeContainer.getChildren().add(deleteButton);
+            deleteButton.setOnMouseClicked(event -> {
+                UserDao dao  = new UserDao();
+                if(obt instanceof HistorySettingController){
+                    dao.deleteHistory(user.getID(), content.getId());
+                    ((HistorySettingController)obt).setUser(user);
+                }
+
+                else if (obt instanceof WatchListController) {
+                    dao.deleteWatchlist(user.getID(), content.getId());
+                    ((WatchListController)obt).setUser(user);
+
+                }
+
+                else if (obt instanceof FavouriteSettingController){
+                    dao.deleteFavourite(user.getID(), content.getId());
+                    ((FavouriteSettingController)obt).setUser(user);
+
+                }
+
+            });
+
+            if (filmCardController != null) {
+                filmCardController.setContent(content, true);
+                node.setOnMouseClicked(e -> homePage(user , content.getId(), content.isSeries()));
+                nodes.add(nodeContainer);
+            } else {
+                System.err.println("FilmCardController is null for " + cardPath);
+            }
+        }
+
+        return nodes;
+    }
+
+    private void homePage(User user,int content,boolean series) {
+        try{
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/esa/moviestar/home/main.fxml"),Main.resourceBundle);
+            Parent homeContent = loader.load();
+
+            MainPagesController mainPagesController = loader.getController();
+            mainPagesController.filmClicked(user,account,content,series);
+            Scene currentScene = container.getScene();
+            Scene newScene = new Scene(homeContent, currentScene.getWidth(), currentScene.getHeight());
+            Stage stage = (Stage) container.getScene().getWindow();
+            stage.setScene(newScene);
+
+        }catch(IOException e){
+            System.err.println("ProfileView: Error to load the home page"+e.getMessage());
+        }
     }
 
 

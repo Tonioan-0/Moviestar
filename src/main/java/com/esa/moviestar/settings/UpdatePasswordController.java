@@ -109,7 +109,6 @@ public class UpdatePasswordController {
         String confirmPassword = confirmPasswordField.getText();
 
         if (oldPassword.isEmpty() || newPassword.isEmpty() || confirmPassword.isEmpty()) {
-            updateStatus("All fields are required.");
             warningText.setText("All fields are required.");
             AnimationUtils.shake(warningText);
             return;
@@ -119,7 +118,6 @@ public class UpdatePasswordController {
         if (CredentialCryptManager.verifyPassword(account.getPassword(), oldPassword)) {
             boolean oldPasswordCorrect = dao.checkPassword(account.getEmail(), oldPassword);
             if (!oldPasswordCorrect) {
-                updateStatus("The old password is incorrect.");
                 warningText.setText("The old password is incorrect.");
                 AnimationUtils.shake(warningText);
                 return;
@@ -129,7 +127,6 @@ public class UpdatePasswordController {
         }
 
         if (!newPassword.equals(confirmPassword)) {
-            updateStatus("Passwords do not match.");
             warningText.setText("Passwords do not match.");
             AnimationUtils.shake(warningText);
             return;
@@ -137,7 +134,6 @@ public class UpdatePasswordController {
 
         Register tempRegister = new Register();
         if (!Pattern.matches(tempRegister.get_regex(), newPassword)) {
-            updateStatus("The password does not meet the security requirements.");
             warningText.setText("The password does not meet the security requirements.");
             AnimationUtils.shake(warningText);
             return;
@@ -145,29 +141,21 @@ public class UpdatePasswordController {
 
         try {
             changePassword(account.getEmail(), newPassword);
-            updateStatus("Password cambiata con successo");
+
             AnimationUtils.pulse(updateButton);
 
             PauseTransition pause = new PauseTransition(Duration.seconds(0.25));
             pause.setOnFinished(e -> navigateToAccess());
             pause.play();
         } catch (SQLException e) {
-            updateStatus("Errore durante il cambio password: " + e.getMessage());
-            e.printStackTrace();
+            System.err.println("Error while changing password " + e.getMessage());
+
         }
     }
 
     private void changePassword(String email, String newPassword) throws SQLException {
         AccountDao dao = new AccountDao();
         dao.updatePassword(email, CredentialCryptManager.hashPassword(newPassword));
-    }
-
-    private void updateStatus(String message) {
-        if (statusMessage != null) {
-            statusMessage.setText(message);
-        } else {
-            System.out.println("Status message label not found: " + message);
-        }
     }
 
     private void navigateToAccess() {
@@ -185,8 +173,8 @@ public class UpdatePasswordController {
             stage.setScene(newScene);
 
         } catch (IOException e) {
-            e.printStackTrace();
-            updateStatus("Errore durante il caricamento della pagina");
+            System.err.println("Error while loading the page : access"+e.getMessage());
+
         }
     }
 
@@ -195,7 +183,7 @@ public class UpdatePasswordController {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/esa/moviestar/settings/settings-view.fxml"), Main.resourceBundle);
             Parent accountSettingContent = loader.load();
             SettingsViewController settingsViewController = loader.getController();
-            settingsViewController.setUtente(user);
+            settingsViewController.setUser(user);
             settingsViewController.setAccount(account);
 
             Scene currentScene = parentContainer.getScene();
@@ -206,8 +194,7 @@ public class UpdatePasswordController {
             stage.setScene(newScene);
 
         } catch (IOException e) {
-            e.printStackTrace();
-            updateStatus("Errore durante il caricamento della pagina");
+            System.err.println("Error while loading the page : settings"+e.getMessage());
         }
     }
 

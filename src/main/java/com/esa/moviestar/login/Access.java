@@ -20,6 +20,7 @@ import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.*;
+import javafx.scene.shape.SVGPath;
 import javafx.stage.Stage;
 
 import java.io.IOException;
@@ -85,6 +86,8 @@ public class Access {
         access.setText("Access");
         register.setText("Don't have an account? Sign up");
         resetPassword.setText("Password forgotten? get it back");
+        togglePasswordButton.setGraphic(new SVGPath(){{setContent(Main.resourceBundle.getString("passwordField.showPassword"));getStyleClass().add("on-primary");}});
+
 
         setupPasswordToggle();
 
@@ -145,7 +148,7 @@ public class Access {
             passwordTextField.setManaged(true);
             passwordTextField.requestFocus();
             passwordTextField.positionCaret(passwordTextField.getText().length());
-            togglePasswordButton.setText("🙈");
+            togglePasswordButton.setGraphic(new SVGPath(){{setContent(Main.resourceBundle.getString("passwordField.hidePassword"));getStyleClass().add("on-primary");}});;
 
         }
         else {
@@ -157,7 +160,7 @@ public class Access {
             passwordField.setManaged(true);
             passwordField.requestFocus();
             passwordField.positionCaret(passwordField.getText().length());
-            togglePasswordButton.setText("👁");
+            togglePasswordButton.setGraphic(new SVGPath(){{setContent(Main.resourceBundle.getString("passwordField.showPassword"));getStyleClass().add("on-primary");}});
         }
     }
 

@@ -466,6 +466,7 @@ public class MainPagesController {
             filmController.setMainPagesController(this);
             filmController.setProperties(screenshotView, this);
             filmController.loadContent(contentId, !isSeries);
+            filmController.setUser(user);
 
             transitionInProgress = false;
 
@@ -597,7 +598,7 @@ public class MainPagesController {
                 Parent settingContent = loader.load();
                 SettingsViewController settingsViewController = loader.getController();
                 if (settingsViewController != null) {
-                    settingsViewController.setUtente(user);
+                    settingsViewController.setUser(user);
                     settingsViewController.setAccount(account);
                 } else {
                     System.err.println("MainPagesController.settingsClick: SettingsViewController is null.");
@@ -690,5 +691,64 @@ public class MainPagesController {
             System.err.println("MainPagesController.getCurrentAppScene: Cannot get current scene from body or root.");
         }
         return scene;
+    }
+
+    public void filmClicked(User user , Account account,int content,boolean series){
+        if (loadingOverlay == null && root != null) {
+            createLoadingOverlay();
+            if (!root.getChildren().contains(loadingOverlay)) {
+                root.getChildren().add(loadingOverlay);
+                AnchorPane.setTopAnchor(loadingOverlay, 0.0);
+                AnchorPane.setBottomAnchor(loadingOverlay, 0.0);
+                AnchorPane.setLeftAnchor(loadingOverlay, 0.0);
+                AnchorPane.setRightAnchor(loadingOverlay, 0.0);
+            }
+        } else if (loadingOverlay == null && body != null) {
+            createLoadingOverlay();
+            if (!body.getChildren().contains(loadingOverlay)){
+                body.getChildren().add(loadingOverlay);
+            }
+        }
+
+        showLoadingSpinner();
+        this.user = user;
+        this.account = account;
+
+        if (header == null)
+            loadHeader();
+
+
+        if (this.header == null || this.header.controller() == null) {
+            System.err.println("MainPagesController: Critical error - Header or its controller failed to load. Aborting first_load.");
+            hideLoadingSpinner();
+            return;
+        }
+
+        if (this.header.controller() instanceof HeaderController headerCtrl) {
+            headerCtrl.setProfileIcon(user.getIcon());
+        } else {
+            System.err.println("MainPagesController: Header controller is not of type HeaderController.");
+            hideLoadingSpinner();
+            return;
+        }
+
+        CompletableFuture.runAsync(() -> {
+            PageData homeData = loadDynamicBody("home.fxml");
+            if (homeData != null && homeData.controller() instanceof HomeController) {
+                Platform.runLater(() -> {
+                    ((HomeController) homeData.controller()).setRecommendations(user, MainPagesController.this);
+                    this.home = homeData;
+                    transitionToPage(homeData);
+                    openFilmScene(content, series);
+                });
+            } else {
+                Platform.runLater(() -> {
+                    hideLoadingSpinner();
+                    System.err.println("MainPagesController: Home page or its controller failed to load.");
+                });
+            }
+        });
+
+
     }
 }

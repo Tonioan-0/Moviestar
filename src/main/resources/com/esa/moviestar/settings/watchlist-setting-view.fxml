@@ -8,37 +8,43 @@
 
 <GridPane fx:id="watchlistContentSetting" prefHeight="467.0" prefWidth="1228.0" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.esa.moviestar.settings.WatchListController">
     <columnConstraints>
-        <ColumnConstraints hgrow="SOMETIMES" maxWidth="600.0" minWidth="0.0" percentWidth="20.0" prefWidth="235.5999755859375" />
+        <ColumnConstraints hgrow="SOMETIMES" maxWidth="600.0" minWidth="0.0" percentWidth="10.0" prefWidth="235.5999755859375" />
         <ColumnConstraints hgrow="ALWAYS" minWidth="0.0" />
-        <ColumnConstraints hgrow="SOMETIMES" maxWidth="600.0" minWidth="10.0" percentWidth="20.0" prefWidth="244.80004882812494" />
+        <ColumnConstraints hgrow="SOMETIMES" maxWidth="600.0" minWidth="10.0" percentWidth="10.0" prefWidth="244.80004882812494" />
     </columnConstraints>
     <rowConstraints>
         <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
     </rowConstraints>
-    <children>
-        <AnchorPane GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.hgrow="NEVER" GridPane.valignment="CENTER" GridPane.vgrow="ALWAYS">
-            <ScrollPane fitToWidth="true" hbarPolicy="NEVER" hmax="0.0" vbarPolicy="NEVER" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-                <content>
-                    <VBox fx:id="vboxContainer" alignment="CENTER_LEFT" prefHeight="200.0" prefWidth="100.0" spacing="20.0">
-                        <children>
-                            <Label text="WatchList">
-                                <styleClass>
-                                    <String fx:value="bold-text" />
-                                    <String fx:value="on-primary" />
-                                    <String fx:value="large-text" />
-                                </styleClass>
-                            </Label>
-                            <Text strokeType="OUTSIDE" strokeWidth="0.0" text="The Watchlist section is your personalized space to keep track of all the movies and TV shows you’re interested in watching. You can easily add titles with a single tap. It’s the perfect tool to make sure you never miss a film or forget something you wanted to see." wrappingWidth="600.0">
-                                <styleClass>
-                                    <String fx:value="medium-text" />
-                                    <String fx:value="on-primary" />
-                                </styleClass>
-                            </Text>
-                        </children>
-                        <padding>
-                            <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
-                        </padding></VBox>
-                </content></ScrollPane>
-        </AnchorPane>
-    </children>
+    <AnchorPane fx:id="container" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.hgrow="NEVER" GridPane.valignment="CENTER" GridPane.vgrow="ALWAYS">
+        <ScrollPane fitToWidth="true" hbarPolicy="NEVER" hmax="0.0" vbarPolicy="NEVER" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+         <VBox spacing="5.0">
+            <children>
+                   <Label text="WatchList">
+                       <styleClass>
+                           <String fx:value="bold-text" />
+                           <String fx:value="on-primary" />
+                           <String fx:value="large-text" />
+                       </styleClass>
+                   </Label>
+                   <Text strokeType="OUTSIDE" strokeWidth="0.0" text="The Watchlist section is your personalized space to keep track of all the movies and TV shows you’re interested in watching. You can easily add titles with a single tap. It’s the perfect tool to make sure you never miss a film or forget something you wanted to see." wrappingWidth="1200.0">
+                       <styleClass>
+                           <String fx:value="medium-text" />
+                           <String fx:value="on-primary" />
+                       </styleClass>
+                   </Text>
+                  <VBox fx:id="vboxContainer" alignment="CENTER_LEFT" prefHeight="200.0" prefWidth="100.0" spacing="20.0">
+                      <padding>
+                          <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                      </padding>
+                  <VBox.margin>
+                     <Insets top="30.0" />
+                  </VBox.margin>
+                  </VBox>
+            </children>
+            <padding>
+               <Insets left="10.0" top="10.0" />
+            </padding>
+         </VBox>
+        </ScrollPane>
+    </AnchorPane>
 </GridPane>

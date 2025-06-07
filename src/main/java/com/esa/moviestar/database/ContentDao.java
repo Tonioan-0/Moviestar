@@ -85,12 +85,12 @@ public class ContentDao {
                     stmtInsertContent.setString(4, content.getImageUrl() != null ? content.getImageUrl() : "error");
                     stmtInsertContent.setString(5, content.getPosterUrl() != null ? content.getPosterUrl() : "error");
                     stmtInsertContent.setString(6, content.getVideoUrl() != null ? content.getVideoUrl() : "error");
-                    stmtInsertContent.setInt(8, content.getYear());
-                    stmtInsertContent.setDouble(9, content.getRating());
-                    stmtInsertContent.setInt(10, content.getPopularity());
-                    stmtInsertContent.setString(12, content.getReleaseDate() != null ? content.getReleaseDate() : "");
-                    stmtInsertContent.setInt(13, content.isSeries() ? 1 : 0);
-                    stmtInsertContent.setString(15, OffsetDateTime.now(ZoneOffset.UTC).format(DateTimeFormatter.ISO_OFFSET_DATE_TIME));
+                    stmtInsertContent.setInt(7, content.getYear());
+                    stmtInsertContent.setDouble(8, content.getRating());
+                    stmtInsertContent.setInt(9, content.getPopularity());
+                    stmtInsertContent.setString(10, content.getReleaseDate() != null ? content.getReleaseDate() : "");
+                    stmtInsertContent.setInt(11, content.isSeries() ? 1 : 0);
+                    stmtInsertContent.setString(12, OffsetDateTime.now(ZoneOffset.UTC).format(DateTimeFormatter.ISO_OFFSET_DATE_TIME));
                     stmtInsertContent.addBatch();
                     if(content.getCategories()!=null && ! content.getCategories().isEmpty())
                         for (Integer genreId : content.getCategories()) {
@@ -128,7 +128,8 @@ public class ContentDao {
         String selectExpiredSQL = "SELECT ID_Content FROM Content " +
                 "WHERE Fetched_Date < ? " +
                 "AND ID_Content NOT IN (SELECT DISTINCT ID_Content FROM History) " +
-                "AND ID_Content NOT IN (SELECT DISTINCT ID_Content FROM WatchList)";
+                "AND ID_Content NOT IN (SELECT DISTINCT ID_Content FROM WatchList)" +
+                "AND ID_Content NOT IN (SELECT DISTINCT ID_Content FROM Favourite)";
         try {
             if (connection == null || connection.isClosed()) {
                 System.err.println("ContentDao: Database connection is not available for selecting IDs.");
@@ -148,7 +149,8 @@ public class ContentDao {
         String deleteSQL = "DELETE FROM Content " +
                 "WHERE Fetched_Date < ? " +
                 "AND ID_Content NOT IN (SELECT DISTINCT ID_Content FROM History) " +
-                "AND ID_Content NOT IN (SELECT DISTINCT ID_Content FROM WatchList)";
+                "AND ID_Content NOT IN (SELECT DISTINCT ID_Content FROM WatchList)" +
+                "AND ID_Content NOT IN (SELECT DISTINCT ID_Content FROM Favourite)";
 
         try {
             if (connection == null || connection.isClosed()) {
@@ -200,20 +202,12 @@ public class ContentDao {
             System.err.println("ContentDao: Error fetching genre IDs from Taste table for user " + userId + " (orderBy=" + orderBy + ", limit=" + limit + "): " + e.getMessage() + ". Will try fetching all genres.");
         }
 
-        // If no user-specific genres were found (either query returned empty or an error occurred, or connection was bad)
         if (genreIds.isEmpty()) {
-            if (userTastesFetched) { // Only log this if we actually tried and found nothing for the user
-                System.out.println("ContentDao: No specific tastes found for user " + userId + " (orderBy=" + orderBy + ", limit=" + limit + "). Fetching all genres as default.");
-            } else if (! (connection == null) ) {
-                System.out.println("ContentDao: Failed to fetch specific tastes for user " + userId + " (orderBy=" + orderBy + ", limit=" + limit + "). Fetching all genres as default.");
-            }
-            // SQL to fetch all genres.
-            // IMPORTANT: Replace 'Genre' and 'ID_Genre' with your actual table and column names for all genres.
             String allGenresSql = "SELECT ID_Genre FROM Taste ORDER BY ID_Genre";
             try {
                 if (connection == null || connection.isClosed()) {
-                    System.err.println("ContentDao: getGenreIdsStringFromTaste - DB connection not available for fetching all genres.");
-                    return "-1"; // Ultimate fallback
+                    System.out.println("ContentDao: getGenreIdsStringFromTaste - DB connection not available for fetching all genres.");
+                    return "-1";
                 }
                 try (PreparedStatement stmt = connection.prepareStatement(allGenresSql)) {
                     ResultSet rs = stmt.executeQuery();
@@ -226,7 +220,7 @@ public class ContentDao {
             }
 
             if (genreIds.isEmpty()) {
-                System.err.println("ContentDao: No genres found in the Genre table either (or an error occurred). Returning '-1'.");
+                System.out.println("ContentDao: No genres found in the Genre table either (or an error occurred). Returning '-1'.");
                 return "-1";
             }
         }
@@ -254,9 +248,7 @@ public class ContentDao {
                 }
             }
         } catch (Exception e) { // Catching generic Exception is broad; consider specific ones like SQLException
-            System.err.println("ContentDao: Error in getContentFromDB. Query (first 100 chars): " +
-                    (query != null ? query.substring(0, Math.min(100, query.length())) : "null") +
-                    "... Error:" + e.getMessage());
+            System.err.println("ContentDao: Error in getContentFromDB. Query Error:" + e.getMessage());
         }
         return list;
     }
@@ -268,36 +260,35 @@ public class ContentDao {
         String bottomGenresString =  buildGenreFilter(getGenreIdsStringFromTaste(userId, "ASC", 3));
         String firstTopGenreString = buildGenreFilter( getGenreIdsStringFromTaste(userId, "DESC", 1));
         String query =
-                // Popular content from top genres
                 "SELECT DISTINCT  * , 0 AS List FROM (SELECT C.* FROM Content C JOIN Content_Genre CG ON C.ID_Content = CG.ID_Content " +
                         topGenresString +" ORDER BY C.Popularity DESC LIMIT 5) UNION ALL " +
 
                         // Random top genres content
-                        "SELECT * , 1 AS List FROM (SELECT C.* FROM Content C JOIN Content_Genre CG ON C.ID_Content = CG.ID_Content " +
+                        "SELECT DISTINCT * , 1 AS List FROM (SELECT C.* FROM Content C JOIN Content_Genre CG ON C.ID_Content = CG.ID_Content " +
                         topGenresString + " ORDER BY RANDOM() LIMIT 10) UNION ALL " +
                         // New releases
-                        "SELECT * , 2 AS List FROM (SELECT C.* FROM Content C ORDER BY Release_Date DESC LIMIT 8) UNION ALL " +
+                        "SELECT DISTINCT * , 2 AS List FROM (SELECT C.* FROM Content C ORDER BY Release_Date DESC LIMIT 8) UNION ALL " +
                         // Favorite tag(s) but not watched (uses first_top_genre_str which could be one or all)
-                        "SELECT * , 3 AS List FROM (SELECT C.* FROM Content C JOIN Content_Genre CG ON C.ID_Content = CG.ID_Content " +
+                        "SELECT DISTINCT * , 3 AS List FROM (SELECT C.* FROM Content C JOIN Content_Genre CG ON C.ID_Content = CG.ID_Content " +
                         "LEFT JOIN History CR ON C.ID_Content = CR.ID_Content AND CR.ID_User = " + userId + " " +
                         firstTopGenreString + "AND CR.ID_Content IS NULL AND C.Episodes_Count = 0 ORDER BY RANDOM() LIMIT 8) UNION ALL " +
 
-                        "SELECT * , 4 AS List FROM (SELECT C2.* FROM Content_Genre CG1 JOIN Content_Genre CG2 ON CG1.ID_Genre = CG2.ID_Genre AND CG1.ID_Content != CG2.ID_Content " +
+                        "SELECT DISTINCT * , 4 AS List FROM (SELECT C2.* FROM Content_Genre CG1 JOIN Content_Genre CG2 ON CG1.ID_Genre = CG2.ID_Genre AND CG1.ID_Content != CG2.ID_Content " +
                         "JOIN Content C2 ON CG2.ID_Content = C2.ID_Content WHERE CG1.ID_Content = ( SELECT CR.ID_Content FROM History CR WHERE CR.ID_User = " + userId +
                         " ORDER BY CR.Date DESC LIMIT 1 ) ORDER BY RANDOM() LIMIT 7) UNION ALL " +
 
                         // Recently watched
-                        "SELECT * , 5 AS List FROM (SELECT C.* FROM History CR JOIN Content C ON CR.ID_Content = C.ID_Content " +
+                        "SELECT DISTINCT * , 5 AS List FROM (SELECT C.* FROM History CR JOIN Content C ON CR.ID_Content = C.ID_Content " +
                         "WHERE CR.ID_User = " + userId + " ORDER BY CR.Date DESC LIMIT 7) UNION ALL " +
 
                         // Recommended series
-                        "SELECT * , 6 AS List FROM (SELECT C.* FROM Content C JOIN Content_Genre CG ON C.ID_Content = CG.ID_Content " +
+                        "SELECT DISTINCT * , 6 AS List FROM (SELECT C.* FROM Content C JOIN Content_Genre CG ON C.ID_Content = CG.ID_Content " +
                         topGenresString + " AND C.Episodes_Count > 0 ORDER BY RANDOM() LIMIT 7) UNION ALL " +
                         // User favorites (Assuming 'Favourite' table)
-                        "SELECT *, 7 AS List FROM (SELECT C.* FROM Favourite P JOIN Content C ON P.ID_Content = C.ID_Content " +
+                        "SELECT DISTINCT *, 7 AS List FROM (SELECT C.* FROM Favourite P JOIN Content C ON P.ID_Content = C.ID_Content " +
                         "WHERE P.ID_User = " + userId + " ORDER BY RANDOM() LIMIT 7) UNION ALL " +
                         // Other categories (bottom genres - if Taste empty, same as top_genres_str)
-                        "SELECT  * , 8 AS List FROM (SELECT C.* FROM Content C JOIN Content_Genre CG ON C.ID_Content = CG.ID_Content " +
+                        "SELECT DISTINCT * , 8 AS List FROM (SELECT C.* FROM Content C JOIN Content_Genre CG ON C.ID_Content = CG.ID_Content " +
                         bottomGenresString + " ORDER BY RANDOM() LIMIT 7);";
 
         List<List<Content>> results = getContentFromDB(query,9);
@@ -311,101 +302,45 @@ public class ContentDao {
         return "";
     }
     public List<List<Content>> getFilterPageContents(User user, boolean isFilm) {
-        // SECURITY_NOTE: user.getID() is directly concatenated into SQL strings below.
-        // This is a SQL injection vulnerability. Use PreparedStatement placeholders instead.
         int userId = user.getID();
-        String top_genres_str = getGenreIdsStringFromTaste(userId, "DESC", 3); // If Taste empty, will be all genres
+        String top_genres_str = buildGenreFilter(getGenreIdsStringFromTaste(userId, "DESC", 3));
 
         String query;
-        String typeConditionSpecific = isFilm ? " AND C.Seasons = 0 AND C.Episodes_Count = 0 " : "AND (C.Seasons > 0 OR C.Episodes_Count > 0) ";
-        String typeConditionGeneral = isFilm ? " C.Seasons = 0 AND C.Episodes_Count = 0 " : "(C.Seasons > 0 OR C.Episodes_Count > 0) ";
+        String typeConditionSpecific = isFilm ? "  AND C.Episodes_Count = 0 " : " AND  C.Episodes_Count > 0 ";
+        String typeConditionGeneral = isFilm ? "  C.Episodes_Count = 0 " : "  C.Episodes_Count > 0 ";
 
 
         if (isFilm) {
-            query = "SELECT *, 0 AS List FROM ( SELECT C.* FROM Content C JOIN Content_Genre CG ON C.ID_Content = CG.ID_Content  " +
-                    "WHERE CG.ID_Genre IN (" + top_genres_str + ") " + typeConditionSpecific + "ORDER BY Release_Date DESC LIMIT 10 ) AS SubF0 " +
+            query = "SELECT DISTINCT *, 0 AS List FROM ( SELECT C.* FROM Content C JOIN Content_Genre CG ON C.ID_Content = CG.ID_Content  " +
+                    top_genres_str + " " + typeConditionSpecific + "ORDER BY Release_Date DESC LIMIT 10 ) AS SubF0 " +
                     "UNION ALL  " +
-                    "SELECT *, 1 AS List FROM ( SELECT C.* FROM Content C JOIN Content_Genre CG ON C.ID_Content = CG.ID_Content  " +
-                    "WHERE CG.ID_Genre IN (" + top_genres_str + ") " + typeConditionSpecific + "ORDER BY RANDOM() LIMIT 7 ) AS SubF1 " +
+                    "SELECT DISTINCT *, 1 AS List FROM ( SELECT C.* FROM Content C JOIN Content_Genre CG ON C.ID_Content = CG.ID_Content  " +
+                    top_genres_str + " " + typeConditionSpecific + "ORDER BY RANDOM() LIMIT 7 ) AS SubF1 " +
                     "UNION ALL " +
                     // Content from top genre(s) not watched
-                    "SELECT *, 2 AS List FROM ( SELECT C.* FROM Content C JOIN Content_Genre CG ON C.ID_Content = CG.ID_Content  " +
+                    "SELECT DISTINCT *, 2 AS List FROM ( SELECT C.* FROM Content C JOIN Content_Genre CG ON C.ID_Content = CG.ID_Content  " +
                     "LEFT JOIN History CR ON C.ID_Content = CR.ID_Content AND CR.ID_User = " + userId + " " +
-                    "WHERE CG.ID_Genre IN (" + top_genres_str + ") AND CR.ID_Content IS NULL " + typeConditionSpecific + " ORDER BY RANDOM() LIMIT 8 ) AS SubF2  UNION ALL  " +
-                    "SELECT *, 3 AS List FROM ( SELECT C.* FROM Content C WHERE " + typeConditionGeneral + "ORDER BY RANDOM() LIMIT 8 ) AS SubF3 " +
+                    top_genres_str + " AND CR.ID_Content IS NULL " + typeConditionSpecific + " ORDER BY RANDOM() LIMIT 8 ) AS SubF2  UNION ALL  " +
+                    "SELECT DISTINCT *, 3 AS List FROM ( SELECT C.* FROM Content C WHERE " + typeConditionGeneral + "ORDER BY RANDOM() LIMIT 8 ) AS SubF3 " +
                     "UNION ALL " +
-                    "SELECT *, 4 AS List FROM ( SELECT C.* FROM Content C WHERE " + typeConditionGeneral + "ORDER BY RANDOM() LIMIT 8 ) AS SubF4;";
+                    "SELECT DISTINCT *, 4 AS List FROM ( SELECT C.* FROM Content C WHERE " + typeConditionGeneral + "ORDER BY RANDOM() LIMIT 8 ) AS SubF4;";
         } else { // For Series
-            query = "SELECT *, 0 AS List FROM ( SELECT C.* FROM Content C JOIN Content_Genre CG ON C.ID_Content = CG.ID_Content WHERE CG.ID_Genre IN (" + top_genres_str + ") " +
+            query = "SELECT DISTINCT *, 0 AS List FROM ( SELECT C.* FROM Content C JOIN Content_Genre CG ON C.ID_Content = CG.ID_Content " + top_genres_str + " " +
                     typeConditionSpecific + "ORDER BY Release_Date DESC LIMIT 10 ) AS SubS0 UNION ALL " +
-                    "SELECT *, 1 AS List FROM ( SELECT C.* FROM Content C JOIN Content_Genre CG ON C.ID_Content = CG.ID_Content " +
-                    "WHERE CG.ID_Genre IN (" + top_genres_str + ") " + typeConditionSpecific + "ORDER BY RANDOM() LIMIT 7 ) AS SubS1 UNION ALL " +
+                    "SELECT DISTINCT*, 1 AS List FROM ( SELECT C.* FROM Content C JOIN Content_Genre CG ON C.ID_Content = CG.ID_Content " +
+                    top_genres_str + " " + typeConditionSpecific + "ORDER BY RANDOM() LIMIT 7 ) AS SubS1 UNION ALL " +
                     // Content from top genre(s) not watched
-                    "SELECT *, 2 AS List FROM ( SELECT C.* FROM Content C JOIN Content_Genre CG ON C.ID_Content = CG.ID_Content " +
-                    "LEFT JOIN History CR ON C.ID_Content = CR.ID_Content AND CR.ID_User = " + userId + " WHERE CG.ID_Genre IN (" + top_genres_str + ") " +
+                    "SELECT  DISTINCT *, 2 AS List FROM ( SELECT C.* FROM Content C JOIN Content_Genre CG ON C.ID_Content = CG.ID_Content " +
+                    "LEFT JOIN History CR ON C.ID_Content = CR.ID_Content AND CR.ID_User = " + userId + " " + top_genres_str + " " +
                     "AND CR.ID_Content IS NULL " + typeConditionSpecific + "ORDER BY RANDOM() LIMIT 8 ) AS SubS2 UNION ALL " +
-                    "SELECT *, 3 AS List FROM ( SELECT C.* FROM Content C WHERE " + typeConditionGeneral + " ORDER BY RANDOM() LIMIT 8 ) AS SubS3 UNION ALL " +
-                    "SELECT *, 4 AS List FROM ( SELECT C.* FROM Content C WHERE " + typeConditionGeneral + " ORDER BY RANDOM() LIMIT 10 ) AS SubS4;";
+                    "SELECT  DISTINCT *, 3 AS List FROM ( SELECT C.* FROM Content C WHERE " + typeConditionGeneral + " ORDER BY RANDOM() LIMIT 8 ) AS SubS3 UNION ALL " +
+                    "SELECT DISTINCT *, 4 AS List FROM ( SELECT C.* FROM Content C WHERE " + typeConditionGeneral + " ORDER BY RANDOM() LIMIT 10 ) AS SubS4;";
         }
         List<List<Content>> results = getContentFromDB(query,5);
         results.forEach(this::fetchAndSetGenresForContentList);
         return results;
     }
 
-
-    public Content getFiLmDetails(int id) {
-        Content content = cacheManager.get(id); // Try cache first
-
-        String contentQuery = "SELECT * FROM Content WHERE ID_Content = ?;";
-        try {
-            if (connection == null || connection.isClosed()) {
-                System.err.println("ContentDao: getFiLmDetails - Database connection is not available for content ID: " + id);
-                return content;
-            }
-            try (PreparedStatement stmt = connection.prepareStatement(contentQuery)) {
-                stmt.setInt(1, id);
-                ResultSet rs = stmt.executeQuery();
-                if (rs.next()) {
-                    if (content == null) {
-                        content = new Content();
-                        content.setId(id);
-                        populateContentFromResultSet(content, rs);
-                        cacheManager.put(content);
-                    } else {
-                        populateContentFromResultSet(content, rs);
-                    }
-                } else {
-                    if (content != null) {
-                        cacheManager.remove(id);
-                    }
-                    return null;
-                }
-            }
-        } catch (SQLException e) {
-            System.err.println("ContentDao: failed to load main content data for ID: " + id + ". Error: " + e.getMessage());
-            return content;
-        }
-
-        List<Integer> categoryIds = new ArrayList<>();
-        String genreQuery = "SELECT ID_Genre FROM Content_Genre WHERE ID_Content = ?;";
-        try {
-            if (connection == null || connection.isClosed()) {
-                System.err.println("ContentDao: getFiLmDetails - Database connection is not available for genres for content ID: " + id);
-                return content; // Content object exists, but categories might be incomplete/stale
-            }
-            try (PreparedStatement genreStmt = connection.prepareStatement(genreQuery)) {
-                genreStmt.setInt(1, id);
-                ResultSet genreRs = genreStmt.executeQuery();
-                while (genreRs.next()) {
-                    categoryIds.add(genreRs.getInt("ID_Genre"));
-                }
-                content.setCategories(categoryIds.stream().distinct().collect(Collectors.toList()));
-            }
-        } catch (SQLException e) {
-            System.err.println("ContentDao: failed to load genres for content ID: " + id + ". Error: " + e.getMessage());
-        }
-        return content;
-    }
 
 
     private void fetchAndSetGenresForContentList(List<Content> contents) {
@@ -494,34 +429,34 @@ public class ContentDao {
     }
 
 
-public List<Content> historyContent(int userId){
-    List<Content> contentList = new ArrayList<>();
-    String query = "SELECT Content.* FROM History JOIN Content ON History.ID_Content=Content.ID_Content WHERE History.ID_User=?;";
-    try(PreparedStatement stmt = connection.prepareStatement(query)){
-        stmt.setInt(1,userId);
-        ResultSet rs = stmt.executeQuery();
-        while(rs.next()){
-            Content content = new Content();
-            content.setId(rs.getInt("ID_Content"));
-            content.setTitle(rs.getString("Title"));
-            content.setPlot(rs.getString("Plot"));
-            content.setImageUrl(rs.getString("Image_Url"));
-            content.setPosterUrl(rs.getString("Poster_Url"));
-            content.setVideoUrl(rs.getString("Film_Url"));
-            content.setYear(rs.getInt("Year"));
-            content.setRating(rs.getDouble("Rating"));
-            content.setPopularity(rs.getInt("Popularity"));
-            content.setReleaseDate(rs.getString("Release_Date"));
-            content.setIsSeries(rs.getInt("Episodes_Count") > 0);
-            contentList.add(content);
+    public List<Content> historyContent(int userId){
+        List<Content> contentList = new ArrayList<>();
+        String query = "SELECT Content.* FROM History JOIN Content ON History.ID_Content=Content.ID_Content WHERE History.ID_User=?;";
+        try(PreparedStatement stmt = connection.prepareStatement(query)){
+            stmt.setInt(1,userId);
+            ResultSet rs = stmt.executeQuery();
+            while(rs.next()){
+                Content content = new Content();
+                content.setId(rs.getInt("ID_Content"));
+                content.setTitle(rs.getString("Title"));
+                content.setPlot(rs.getString("Plot"));
+                content.setImageUrl(rs.getString("Image_Url"));
+                content.setPosterUrl(rs.getString("Poster_Url"));
+                content.setVideoUrl(rs.getString("Film_Url"));
+                content.setYear(rs.getInt("Year"));
+                content.setRating(rs.getDouble("Rating"));
+                content.setPopularity(rs.getInt("Popularity"));
+                content.setReleaseDate(rs.getString("Release_Date"));
+                content.setIsSeries(rs.getInt("Episodes_Count") > 0);
+                contentList.add(content);
+            }
+
+        }catch (SQLException e) {
+            System.err.println("ContentDao : error select content from history of the user "+e.getMessage());
         }
 
-    }catch (SQLException e) {
-        System.err.println("ContentDao : error select content from history of the user "+e.getMessage());
+        return contentList;
     }
-
-    return contentList;
-}
 
     public List<Content> watchlistContent(int userId){
         List<Content> contentList = new ArrayList<>();
@@ -547,6 +482,35 @@ public List<Content> historyContent(int userId){
 
         }catch (SQLException e) {
             System.err.println("ContentDao : error select content from watchlist of the user "+e.getMessage());
+        }
+        return contentList;
+    }
+
+
+    public List<Content> favoriteListContent(int userId){
+        List<Content> contentList = new ArrayList<>();
+        String query = "SELECT Content.* FROM Favourite JOIN Content ON Favourite.ID_Content=Content.ID_Content WHERE Favourite.ID_User=?;";
+        try(PreparedStatement stmt = connection.prepareStatement(query)){
+            stmt.setInt(1,userId);
+            ResultSet rs = stmt.executeQuery();
+            while(rs.next()){
+                Content content = new Content();
+                content.setId(rs.getInt("ID_Content"));
+                content.setTitle(rs.getString("Title"));
+                content.setPlot(rs.getString("Plot"));
+                content.setImageUrl(rs.getString("Image_Url"));
+                content.setPosterUrl(rs.getString("Poster_Url"));
+                content.setVideoUrl(rs.getString("Film_Url"));
+                content.setYear(rs.getInt("Year"));
+                content.setRating(rs.getDouble("Rating"));
+                content.setPopularity(rs.getInt("Popularity"));
+                content.setReleaseDate(rs.getString("Release_Date"));
+                content.setIsSeries(rs.getInt("Episodes_Count") > 0);
+                contentList.add(content);
+            }
+
+        }catch (SQLException e) {
+            System.err.println("ContentDao : error select content from favourite of the user "+e.getMessage());
         }
         return contentList;
     }

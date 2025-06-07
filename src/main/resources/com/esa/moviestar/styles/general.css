@@ -385,7 +385,6 @@
 /* Season selector */
 .seasons-dropdown-button {
     -fx-background-color: transparent;
-    -fx-border-color: white;
     -fx-border-width: 1px;
     -fx-font-weight: bold;
     -fx-padding: 8 16 8 16;
@@ -395,7 +394,6 @@
 
 .seasons-dropdown-button:hover {
     -fx-background-color: rgba(255, 255, 255, 0.1);
-    -fx-border-color: white;
 }
 
 .seasons-dropdown-button:pressed {
@@ -404,10 +402,7 @@
 
 .seasons-dropdown-menu {
     -fx-background-color: rgba(15,15,15,0.97);
-    -fx-border-color: #262626;
     -fx-border-width: 1px;
-    -fx-border-radius: 4px;
-    -fx-background-radius: 4px;
     -fx-padding: 8;
     -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.5), 10, 0, 0, 4);
     -fx-spacing: 2px;

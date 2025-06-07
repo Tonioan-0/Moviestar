@@ -126,7 +126,7 @@ public class ModifyProfileController extends BaseProfileController {
         Parent settings = loader.load();
 
         SettingsViewController settingsViewController = loader.getController();
-        settingsViewController.setUtente(user);
+        settingsViewController.setUser(user);
         settingsViewController.setAccount(account);
 
         Scene currentScene = modifyPageContainer.getScene();

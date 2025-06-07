@@ -60,7 +60,7 @@
                     <String fx:value="primary" />
                 </styleClass>
             </HBox>
-            <HBox fx:id="btnInfo" alignment="CENTER" prefHeight="48.0" prefWidth="128.0" spacing="8.0">
+            <HBox fx:id="infoButton" alignment="CENTER" prefHeight="48.0" prefWidth="128.0" spacing="8.0">
                 <SVGPath content="%info" styleClass="on-primary" />
                 <Text text="Info">
                     <styleClass>

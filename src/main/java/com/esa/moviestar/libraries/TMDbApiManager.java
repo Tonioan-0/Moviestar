@@ -19,7 +19,7 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
-import java.util.Comparator;
+
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
@@ -29,7 +29,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.function.Function;
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 //Hint for the prof: we have ordered all methods in a way they could be easily readable collapsed
 public class TMDbApiManager {
@@ -170,18 +169,7 @@ public class TMDbApiManager {
             }
         }, executor);
     }
-    public CompletableFuture<List<Content>> getTrendingMoviesAsMoviestarContent(String timeWindow) {
-        return fetchAsMoviestarContentList("/trending/movie/" + timeWindow, ContentType.MOVIE);
-    }
-    public CompletableFuture<List<Content>> getTrendingTvShowsAsMoviestarContent(String timeWindow) {
-        return fetchAsMoviestarContentList("/trending/tv/" + timeWindow, ContentType.TV);
-    }
-    public CompletableFuture<List<Content>> getPopularMoviesAsMoviestarContent() {
-        return fetchAsMoviestarContentList("/movie/popular", ContentType.MOVIE);
-    }
-    public CompletableFuture<List<Content>> getPopularTvShowsAsMoviestarContent() {
-        return fetchAsMoviestarContentList("/tv/popular", ContentType.TV);
-    }
+
     public CompletableFuture<List<Content>> searchMultiContent(String query, int page) {
         if (query == null || query.trim().isEmpty()) {
             return CompletableFuture.completedFuture(new ArrayList<>()); // Return empty list for empty query
@@ -193,7 +181,7 @@ public class TMDbApiManager {
             System.err.println("TMDbApiManager: UTF-8 encoding error for query '" + query + "': " + e.getMessage());
             return CompletableFuture.failedFuture(new RuntimeException("Failed to encode query.", e));
         }
-        String endpointWithQuery = "/search/multi?query=" + encodedQuery + "&page=" + page + "";
+        String endpointWithQuery = "/search/multi?query=" + encodedQuery + "&page=" + page ;
         return fetchAsMoviestarContentList(endpointWithQuery, ContentType.UNKNOWN);
     }
     @Nullable
@@ -303,9 +291,10 @@ public class TMDbApiManager {
                                     content.setCategories(categoryIds);
                                 }
                                 // Video URL is typically fetched with full details, not list results
-                                 content.setVideoUrl("http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerFun.mp4"); // Default placeholder
+                                content.setVideoUrl("http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerFun.mp4"); // Default placeholder
 
                                 cacheManager.put(content); // Cache the partially populated content
+
                             }
                             contentList.add(content);
                         }
@@ -314,6 +303,16 @@ public class TMDbApiManager {
             } catch (Exception e) {
                 String responseSnippet = responseString.length() > 500 ? responseString.substring(0, 500) + "..." : responseString;
                 System.err.println("TMDbApiManager: Failed to parse/map content list from JSON for endpoint: " + endpoint + ". Error: " + e.getMessage() + ". Response snippet: " + responseSnippet);
+            }
+            if (contentDao != null && !contentList.isEmpty()) {
+                CompletableFuture.runAsync(() -> {
+                    try {
+                        contentDao.insertContents(contentList);
+                        System.out.println("TMDbApiManager: Successfully inserted " + contentList.size() + " contents to database asynchronously.");
+                    } catch (Exception e) {
+                        System.err.println("TMDbApiManager: Error inserting contents to database: " + e.getMessage());
+                    }
+                }, executor);
             }
             return contentList;
         }, executor);
@@ -336,14 +335,14 @@ public class TMDbApiManager {
             System.err.println("TMDbApiManager: ContentDao not initialized. Cannot update database.");
             return CompletableFuture.failedFuture(new IllegalStateException("ContentDao not initialized."));
         }
-
+        contentDao.deleteExpiredContent();
         List<CompletableFuture<List<Content>>> futures = List.of(
-//                getPopularMoviesAsMoviestarContent(),
-//                getTrendingMoviesAsMoviestarContent("week"),
-//                getPopularTvShowsAsMoviestarContent(),
-//                getTrendingTvShowsAsMoviestarContent("week")
-                getDiscoverFilmsAsMoviestarContent(),
-                getDiscoverTvShowsAsMoviestarContent()
+                getDiscoverFilmsAsMoviestarContent(1),
+                getDiscoverTvShowsAsMoviestarContent(1),
+                getDiscoverFilmsAsMoviestarContent(2),
+                getDiscoverTvShowsAsMoviestarContent(2),
+                getDiscoverFilmsAsMoviestarContent(3),
+                getDiscoverTvShowsAsMoviestarContent(3)
         );
 
         // Use handle to collect results or exceptions from all futures
@@ -360,12 +359,10 @@ public class TMDbApiManager {
                             })
                             .filter(Objects::nonNull).filter(c -> c.getId() != 0)
                             .filter(distinctByKey(Content::getId))
-                            .collect(Collectors.toList());
+                            .toList();
 
                     if (!allContentFromApi.isEmpty()) {
                         try {
-                            // Perform database insert on the executor thread pool
-                            contentDao.insertContents(allContentFromApi);
                             return CompletableFuture.completedFuture(null); // Indicate success
                         } catch (Exception e) {
                             System.err.println("TMDbApiManager: Error during DAO insert: " + e.getMessage());
@@ -378,13 +375,13 @@ public class TMDbApiManager {
                 }, executor);
     }
 
-    private CompletableFuture<List<Content>> getDiscoverTvShowsAsMoviestarContent() {
-        return fetchAsMoviestarContentList("/tv?include_adult=false&include_video=false&language=en-US&page=1&sort_by=popularity.desc", ContentType.TV);
+    private CompletableFuture<List<Content>> getDiscoverTvShowsAsMoviestarContent(int page) {
+        return fetchAsMoviestarContentList("/discover/tv?include_adult=false&sort_by=popularity.desc&page=" + page, ContentType.TV);
 
     }
 
-    private CompletableFuture<List<Content>> getDiscoverFilmsAsMoviestarContent() {
-        return fetchAsMoviestarContentList("/movie?include_adult=false&include_video=false&language=en-US&page=1&sort_by=popularity.desc", ContentType.MOVIE);
+    private CompletableFuture<List<Content>> getDiscoverFilmsAsMoviestarContent(int page) {
+        return fetchAsMoviestarContentList("/discover/movie?include_adult=false&sort_by=popularity.desc&page=" + page, ContentType.MOVIE);
     }
 
     // Helper to filter distinct elements in a stream

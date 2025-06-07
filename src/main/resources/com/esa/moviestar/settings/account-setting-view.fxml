@@ -7,174 +7,161 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
 
-<GridPane fx:id="accountContentSetting" prefHeight="467.0" prefWidth="1228.0" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.esa.moviestar.settings.AccountSettingController">
-  <columnConstraints>
-    <ColumnConstraints hgrow="SOMETIMES" maxWidth="600.0" minWidth="0.0" percentWidth="20.0" prefWidth="235.5999755859375" />
-    <ColumnConstraints hgrow="SOMETIMES" minWidth="0.0" />
-      <ColumnConstraints hgrow="SOMETIMES" maxWidth="600.0" minWidth="10.0" percentWidth="20.0" prefWidth="244.80004882812494" />
-  </columnConstraints>
-  <rowConstraints>
-    <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
-  </rowConstraints>
-   <children>
-      <AnchorPane GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.hgrow="NEVER" GridPane.valignment="CENTER" GridPane.vgrow="ALWAYS">
-         <children>
-            <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0" spacing="25.0" stylesheets="@../styles/general.css" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-               <children>
-                  <HBox>
-                     <children>
-                        <Label text="USER">
-                           <styleClass>
-                              <String fx:value="bold-text" />
-                              <String fx:value="large-text" />
-                              <String fx:value="on-primary" />
-                           </styleClass>
-                        </Label>
-                     </children>
-                  </HBox>
-                  <VBox prefWidth="823.0">
-                     <VBox.margin>
-                        <Insets />
-                     </VBox.margin>
-                     <children>
-                        <HBox alignment="CENTER_LEFT" prefHeight="112.0" prefWidth="224.0" spacing="35.0" styleClass="large-item">
-                           <children>
-                              <VBox alignment="CENTER" spacing="30.0">
-                                 <children>
-                                    <StackPane minHeight="150.0" minWidth="150.0">
-                                       <children>
-                                          <Group fx:id="profileImage" scaleX="5.5" scaleY="5.5" />
-                                       </children>
-                                    </StackPane>
-                                 </children>
-                                 <HBox.margin>
-                                    <Insets />
-                                 </HBox.margin>
-                              </VBox>
-                              <VBox alignment="CENTER_LEFT" prefHeight="150.0" prefWidth="250.0" spacing="15.0">
-                                 <children>
-                                    <Label fx:id="userName">
-                                       <styleClass>
-                                          <String fx:value="large-text" />
-                                          <String fx:value="bold-text" />
-                                          <String fx:value="on-primary" />
-                                       </styleClass>
-                                    </Label>
-                                    <Label fx:id="registrationDate">
-                                       <styleClass>
-                                          <String fx:value="on-primary" />
-                                          <String fx:value="small-text" />
-                                       </styleClass>
-                                    </Label>
-                                    <Label fx:id="Email">
-                                       <styleClass>
-                                          <String fx:value="small-text" />
-                                          <String fx:value="on-primary" />
-                                       </styleClass>
-                                    </Label>
-                                    <HBox alignment="CENTER_LEFT" spacing="30.0">
-                                       <children>
-                                          <Button fx:id="modifyUserButton" mnemonicParsing="false" prefHeight="25.0" prefWidth="90.0" text="Edit User">
-                                             <styleClass>
-                                                <String fx:value="grey-button" />
-                                                <String fx:value="bold-text" />
-                                                <String fx:value="on-primary" />
-                                                <String fx:value="medium-item" />
-                                                <String fx:value="on-primary-border" />
-                                             </styleClass>
-                                          </Button>
-                                          <Button fx:id="deleteUserButton" mnemonicParsing="false" prefHeight="25.0" prefWidth="90.0" text="Delete User">
-                                             <styleClass>
-                                                <String fx:value="surface-danger" />
-                                                <String fx:value="bold-text" />
-                                                <String fx:value="on-primary" />
-                                                <String fx:value="medium-item" />
-                                             </styleClass>
-                                          </Button>
-                                       </children>
-                                    </HBox>
-                                 </children>
-                              </VBox>
-                           </children>
-                           <padding>
-                              <Insets bottom="16.0" left="16.0" right="16.0" top="16.0" />
-                           </padding>
-                        </HBox>
-                     </children>
+<GridPane fx:id="accountContentSetting" prefHeight="467.0" prefWidth="1228.0" xmlns="http://javafx.com/javafx/17.0.12"
+          xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.esa.moviestar.settings.AccountSettingController">
+   <columnConstraints>
+      <ColumnConstraints hgrow="SOMETIMES" maxWidth="600.0" minWidth="0.0" percentWidth="20.0"
+                         prefWidth="235.5999755859375"/>
+      <ColumnConstraints hgrow="SOMETIMES" minWidth="0.0"/>
+      <ColumnConstraints hgrow="SOMETIMES" maxWidth="600.0" minWidth="10.0" percentWidth="20.0"
+                         prefWidth="244.80004882812494"/>
+   </columnConstraints>
+   <rowConstraints>
+      <RowConstraints minHeight="10.0" vgrow="SOMETIMES"/>
+   </rowConstraints>
+   <AnchorPane GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.hgrow="NEVER" GridPane.valignment="CENTER"
+               GridPane.vgrow="ALWAYS">
+      <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0" spacing="25.0"
+            stylesheets="@../styles/general.css" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0"
+            AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+         <HBox>
+            <Label text="USER">
+               <styleClass>
+                  <String fx:value="bold-text"/>
+                  <String fx:value="large-text"/>
+                  <String fx:value="on-primary"/>
+               </styleClass>
+            </Label>
+         </HBox>
+         <VBox prefWidth="823.0">
+            <VBox.margin>
+               <Insets/>
+            </VBox.margin>
+            <styleClass>
+               <String fx:value="medium-item"/>
+               <String fx:value="surface-dim-opaque"/>
+            </styleClass>
+            <HBox alignment="CENTER_LEFT" prefHeight="112.0" prefWidth="224.0" spacing="35.0"
+                  styleClass="large-item">
+               <padding>
+                  <Insets bottom="16.0" left="16.0" right="16.0" top="16.0"/>
+               </padding>
+               <VBox alignment="CENTER" spacing="30.0">
+                  <HBox.margin>
+                     <Insets/>
+                  </HBox.margin>
+                  <StackPane minHeight="150.0" minWidth="150.0">
+                     <Group fx:id="profileImage" scaleX="5.5" scaleY="5.5"/>
+                  </StackPane>
+               </VBox>
+               <VBox alignment="CENTER_LEFT" prefHeight="150.0" prefWidth="250.0" spacing="15.0">
+                  <Label fx:id="userName">
                      <styleClass>
-                        <String fx:value="medium-item" />
-                        <String fx:value="surface-dim-opaque" />
+                        <String fx:value="large-text"/>
+                        <String fx:value="bold-text"/>
+                        <String fx:value="on-primary"/>
                      </styleClass>
-                  </VBox>
-                  <HBox prefHeight="19.0" prefWidth="738.0">
-                     <children>
-                        <Label text="ACCOUNT">
-                           <styleClass>
-                              <String fx:value="bold-text" />
-                              <String fx:value="large-text" />
-                              <String fx:value="on-primary" />
-                           </styleClass>
-                        </Label>
-                     </children>
+                  </Label>
+                  <Label fx:id="registrationDate">
+                     <styleClass>
+                        <String fx:value="on-primary"/>
+                        <String fx:value="small-text"/>
+                     </styleClass>
+                  </Label>
+                  <Label fx:id="Email">
+                     <styleClass>
+                        <String fx:value="small-text"/>
+                        <String fx:value="on-primary"/>
+                     </styleClass>
+                  </Label>
+                  <HBox alignment="CENTER_LEFT" spacing="30.0">
+                     <Button fx:id="modifyUserButton" mnemonicParsing="false" prefHeight="25.0"
+                             prefWidth="90.0" text="Edit User">
+                        <styleClass>
+                           <String fx:value="bold-text"/>
+                           <String fx:value="on-primary"/>
+                           <String fx:value="medium-item"/>
+                           <String fx:value="on-primary-border"/>
+                           <String fx:value="surface-transparent"/>
+                        </styleClass>
+                     </Button>
+                     <Button fx:id="deleteUserButton" mnemonicParsing="false" prefHeight="25.0"
+                             prefWidth="90.0" text="Delete User">
+                        <styleClass>
+                           <String fx:value="surface-danger"/>
+                           <String fx:value="bold-text"/>
+                           <String fx:value="on-primary"/>
+                           <String fx:value="medium-item"/>
+                        </styleClass>
+                     </Button>
                   </HBox>
-                  <VBox spacing="15.0">
-                     <children>
-                        <VBox alignment="CENTER_LEFT" spacing="15.0">
-                           <children>
-                              <Label text="Edit password">
-                                 <styleClass>
-                                    <String fx:value="bold-text" />
-                                    <String fx:value="medium-text" />
-                                    <String fx:value="on-primary" />
-                                 </styleClass>
-                              </Label>
-                              <Text strokeType="OUTSIDE" strokeWidth="0.0" text="To change your password, enter a new secure one. We recommend using at least 8 characters, including numbers and symbols." wrappingWidth="700.0">
-                                 <styleClass>
-                                    <String fx:value="medium-text" />
-                                    <String fx:value="on-primary" />
-                                 </styleClass>
-                              </Text>
-                              <Button fx:id="modifyPasswordButton" mnemonicParsing="false" prefHeight="35.0" prefWidth="120.0" text="Change Password">
-                                 <styleClass>
-                                    <String fx:value="bold-text" />
-                                    <String fx:value="medium-item" />
-                                    <String fx:value="grey-button" />
-                                    <String fx:value="on-primary" />
-                                    <String fx:value="on-primary-border" />
-                                 </styleClass>
-                              </Button>
-                           </children>
-                        </VBox>
-                        <VBox alignment="CENTER_LEFT" spacing="15.0">
-                           <children>
-                              <Label text="Delete account">
-                                 <styleClass>
-                                    <String fx:value="bold-text" />
-                                    <String fx:value="medium-text" />
-                                    <String fx:value="on-primary" />
-                                 </styleClass>
-                              </Label>
-                              <Text strokeType="OUTSIDE" strokeWidth="0.0" text="You can permanently delete your account. This action is irreversible and will erase all your information, preferences, and user profiles." wrappingWidth="700.0">
-                                 <styleClass>
-                                    <String fx:value="medium-text" />
-                                    <String fx:value="on-primary" />
-                                 </styleClass>
-                              </Text>
-                              <Button fx:id="deleteAccountButton" alignment="CENTER" mnemonicParsing="false" prefHeight="35.0" prefWidth="110.0" text="Delete Account">
-                                 <styleClass>
-                                    <String fx:value="medium-item" />
-                                    <String fx:value="bold-text" />
-                                    <String fx:value="surface-danger" />
-                                    <String fx:value="on-primary" />
-                                 </styleClass>
-                              </Button>
-                           </children>
-                        </VBox>
-                     </children>
-                  </VBox>
-               </children>
+               </VBox>
+            </HBox>
+         </VBox>
+         <HBox prefHeight="19.0" prefWidth="738.0">
+            <Label text="ACCOUNT">
+               <styleClass>
+                  <String fx:value="bold-text"/>
+                  <String fx:value="large-text"/>
+                  <String fx:value="on-primary"/>
+               </styleClass>
+            </Label>
+         </HBox>
+         <VBox spacing="15.0">
+            <VBox alignment="CENTER_LEFT" spacing="15.0">
+               <Label text="Edit password">
+                  <styleClass>
+                     <String fx:value="bold-text"/>
+                     <String fx:value="medium-text"/>
+                     <String fx:value="on-primary"/>
+                  </styleClass>
+               </Label>
+               <Text strokeType="OUTSIDE" strokeWidth="0.0"
+                     text="To change your password, enter a new secure one. We recommend using at least 8 characters, including numbers and symbols."
+                     wrappingWidth="700.0">
+                  <styleClass>
+                     <String fx:value="medium-text"/>
+                     <String fx:value="on-primary"/>
+                  </styleClass>
+               </Text>
+               <Button fx:id="modifyPasswordButton" mnemonicParsing="false" prefHeight="35.0"
+                       prefWidth="120.0" text="Change Password">
+                  <styleClass>
+                     <String fx:value="bold-text"/>
+                     <String fx:value="medium-item"/>
+                     <String fx:value="on-primary"/>
+                     <String fx:value="on-primary-border"/>
+                     <String fx:value="surface-transparent"/>
+                  </styleClass>
+               </Button>
             </VBox>
-         </children>
-      </AnchorPane>
-   </children>
+            <VBox alignment="CENTER_LEFT" spacing="15.0">
+               <Label text="Delete account">
+                  <styleClass>
+                     <String fx:value="bold-text"/>
+                     <String fx:value="medium-text"/>
+                     <String fx:value="on-primary"/>
+                  </styleClass>
+               </Label>
+               <Text strokeType="OUTSIDE" strokeWidth="0.0"
+                     text="You can permanently delete your account. This action is irreversible and will erase all your information, preferences, and user profiles."
+                     wrappingWidth="700.0">
+                  <styleClass>
+                     <String fx:value="medium-text"/>
+                     <String fx:value="on-primary"/>
+                  </styleClass>
+               </Text>
+               <Button fx:id="deleteAccountButton" alignment="CENTER" mnemonicParsing="false"
+                       prefHeight="35.0" prefWidth="110.0" text="Delete Account">
+                  <styleClass>
+                     <String fx:value="medium-item"/>
+                     <String fx:value="bold-text"/>
+                     <String fx:value="surface-danger"/>
+                     <String fx:value="on-primary"/>
+                  </styleClass>
+               </Button>
+            </VBox>
+         </VBox>
+      </VBox>
+   </AnchorPane>
 </GridPane>

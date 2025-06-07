@@ -60,7 +60,10 @@ public class WindowCardController {
         _id= film.getId();
         titleLabel.setText(film.getTitle());
         // descriptionLabel.setText(film.getPlot());
-        ratingLabel.setText(String.valueOf(film.getRating()));
+        if(film.getRating() == 10.0)
+            ratingLabel.setText("10");
+        else
+            ratingLabel.setText(String.valueOf(film.getRating()).substring(0,3));
         if(!Objects.equals(film.getImageUrl(), "error"))
             imgView.setImage(new Image(film.getImageUrl(),true));
     }
@@ -73,7 +76,7 @@ public class WindowCardController {
         return playButton;
     }
     public Node getInfoButton() {
-        return playButton;
+        return infoButton;
     }
 }
 

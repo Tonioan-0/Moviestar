@@ -19,6 +19,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
+import javafx.scene.shape.SVGPath;
 import javafx.stage.Stage;
 
 import java.io.IOException;
@@ -85,6 +86,8 @@ public class Register {
         passwordTextField.setPromptText("Password");
         mainContainer.setMinWidth(1080);
         mainContainer.setMinHeight(700);
+        togglePasswordButton.setGraphic(new SVGPath(){{setContent(Main.resourceBundle.getString("passwordField.showPassword"));getStyleClass().add("on-primary");}});
+
 
         // Setup password toggle functionality
         setupPasswordToggle();
@@ -145,9 +148,8 @@ public class Register {
             passwordTextField.setManaged(true);
             passwordTextField.requestFocus();
             passwordTextField.positionCaret(passwordTextField.getText().length());
-            togglePasswordButton.setText("🙈");
-        }////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+            togglePasswordButton.setGraphic(new SVGPath(){{setContent(Main.resourceBundle.getString("passwordField.hidePassword"));getStyleClass().add("on-primary");}});
+        }
 
 
         else {
@@ -158,7 +160,8 @@ public class Register {
             passwordField.setManaged(true);
             passwordField.requestFocus();
             passwordField.positionCaret(passwordField.getText().length());
-            togglePasswordButton.setText("👁");
+
+            togglePasswordButton.setGraphic(new SVGPath(){{setContent(Main.resourceBundle.getString("passwordField.showPassword"));getStyleClass().add("on-primary");}});
         }
     }
 

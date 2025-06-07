@@ -80,20 +80,6 @@ public class UserDao {
     }
 
 
-    /*public int findUserCode(String email) {
-        String query = "SELECT ID_User FROM User WHERE Email = ?;";
-        try(PreparedStatement stmt = connection.prepareStatement(query)){
-            stmt.setString(1,email);
-            ResultSet rs = stmt.executeQuery();
-            if (rs.next()) {
-                return rs.getInt("ID_User");
-            }
-
-        }catch(SQLException e){
-            System.err.println("UserDao : User code retrieval error "+e.getMessage());        }
-        return -1;
-    }*/
-
     // Gets all users in which have the same email
     public List<User> findAllUsers(String email) {
         List<User> users = new ArrayList<>();
@@ -175,20 +161,48 @@ public class UserDao {
         try(PreparedStatement stmt = connection.prepareStatement(query)){
             stmt.setInt(1,idUser);
             stmt.setInt(2,idContent);
-            stmt.executeUpdate();
+            int rowsAffected = stmt.executeUpdate();
+            if (rowsAffected == 0) {
+                throw new SQLException("deleteHistory : No content with id : "+idContent+" for the user :  "+idUser);
+            }
         }catch (SQLException e){
             System.err.println("userDao : error deleting history of the user "+e.getMessage());
         }
     }
 
     public void deleteWatchlist(int idUser,int idContent){
-        String query = "DELETE FROM History WHERE ID_User = ? AND ID_Content = ?;";
+        String query = "DELETE FROM WatchList WHERE ID_User = ? AND ID_Content = ?;";
         try(PreparedStatement stmt = connection.prepareStatement(query)){
             stmt.setInt(1,idUser);
             stmt.setInt(2,idContent);
+            int rowsAffected = stmt.executeUpdate();
+            if (rowsAffected == 0) {
+                throw new SQLException("deleteWatchlist : No content with id : "+idContent+" for the user :  "+idUser);
+            }        }catch (SQLException e){
+            System.err.println("userDao : error deleting watchlist of the user "+e.getMessage());
+        }
+    }
+
+    public void insertFavouriteContent(int userId , int contentId){
+        String query = "INSERT INTO Favourite (ID_User,ID_Content) Values (?,?);";
+        try(PreparedStatement stmt = connection.prepareStatement(query)){
+            stmt.setInt(1, userId);
+            stmt.setInt(2, contentId);
             stmt.executeUpdate();
         }catch (SQLException e){
-            System.err.println("userDao : error deleting watchlist of the user "+e.getMessage());
+            System.err.println("userDao : Failed to insert user content into favorites "+e.getMessage());
+        }
+    }
+    public void deleteFavourite(int idUser, int idContent){
+        String query = "DELETE FROM Favourite WHERE ID_User = ? AND ID_Content = ?;";
+        try(PreparedStatement stmt = connection.prepareStatement(query)){
+            stmt.setInt(1,idUser);
+            stmt.setInt(2,idContent);
+            int rowsAffected = stmt.executeUpdate();
+            if (rowsAffected == 0) {
+                throw new SQLException("deleteFavourites : No content with id : "+idContent+" for the user :  "+idUser);
+            }        }catch (SQLException e){
+            System.err.println("userDao : error deleting favorite of the user "+e.getMessage());
         }
     }
 

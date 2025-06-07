@@ -6,31 +6,27 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
 
-<GridPane fx:id="historyContentSetting" prefHeight="467.0" prefWidth="1228.0" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.esa.moviestar.settings.HistorySettingController">
+<GridPane fx:id="favoriteContentSetting" prefHeight="467.0" prefWidth="1228.0" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.esa.moviestar.settings.FavouriteSettingController">
     <columnConstraints>
         <ColumnConstraints hgrow="SOMETIMES" maxWidth="600.0" minWidth="0.0" percentWidth="10.0" prefWidth="235.5999755859375" />
-        <ColumnConstraints hgrow="SOMETIMES" minWidth="0.0" />
+        <ColumnConstraints hgrow="ALWAYS" minWidth="0.0" />
         <ColumnConstraints hgrow="SOMETIMES" maxWidth="600.0" minWidth="10.0" percentWidth="10.0" prefWidth="244.80004882812494" />
     </columnConstraints>
     <rowConstraints>
         <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
     </rowConstraints>
     <AnchorPane fx:id="container" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.hgrow="NEVER" GridPane.valignment="CENTER" GridPane.vgrow="ALWAYS">
-        <ScrollPane hbarPolicy="NEVER" hmax="0.0" vbarPolicy="NEVER" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+        <ScrollPane fitToWidth="true" hbarPolicy="NEVER" hmax="0.0" vbarPolicy="NEVER" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <VBox spacing="5.0">
             <children>
-                   <Label text="History">
-   
-                          <styleClass>
+                   <Label text="Favourites">
+                       <styleClass>
                            <String fx:value="bold-text" />
                            <String fx:value="on-primary" />
                            <String fx:value="large-text" />
                        </styleClass>
-                       <VBox.margin>
-                           <Insets top="10.0" />
-                       </VBox.margin>
                    </Label>
-                   <Text strokeType="OUTSIDE" strokeWidth="0.0" text="View and manage all the videos you've watched. If you delete a video from your watch history, only this list is affected — the video will still appear when you browse MovieStar. Each profile has its own list. To view and manage titles watched with a different profile, switch to that profile." wrappingWidth="1200.0">
+                   <Text strokeType="OUTSIDE" strokeWidth="0.0" text="The Favourites section is your personal collection of the movies and TV shows you love the most. It’s where you keep all your top picks in one place, ready to revisit anytime. With just a tap, you can add any title to your list—perfect for building your go-to library of must-watch content." wrappingWidth="1200.0">
                        <styleClass>
                            <String fx:value="medium-text" />
                            <String fx:value="on-primary" />
