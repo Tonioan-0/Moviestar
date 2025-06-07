@@ -35,7 +35,7 @@ public class HomeController {
                 Node body = loader.load();
                 WindowCardController windowCardController  = loader.getController();
                 windowCardController.setContent(c);
-                windowCardController.getPlayButton().setOnMouseClicked(e->mainPagesController.cardClickedPlay(windowCardController.getCardId()));
+                windowCardController.getPlayButton().setOnMouseClicked(e->mainPagesController.cardClickedPlay(c.getVideoUrl()));
                 windowCardController.getInfoButton().setOnMouseClicked(e->mainPagesController.openFilmScene(windowCardController.getCardId(),c.isSeries()));
                 carouselList.add(body);
             }

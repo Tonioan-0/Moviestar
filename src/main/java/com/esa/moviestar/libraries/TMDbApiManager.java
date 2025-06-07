@@ -31,28 +31,22 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
+//Hint for the prof: we have ordered all methods in a way they could be easily readable collapsed
 public class TMDbApiManager {
+
+    // Constants
     private static final String BASE_URL = "https://api.themoviedb.org/3";
     private static final String API_KEY = "";
-    private static final String LANGUAGE = "en-US"; // Default language
+    private static final String LANGUAGE = "en-US"; // The language we have chose for owr project (the content in it-IT )
     private static final String IMAGE_BASE_URL = "https://image.tmdb.org/t/p/";
     private static final String DEFAULT_IMAGE_SIZE = "w500";
     private static final String BACKDROP_IMAGE_SIZE_DETAILS = "w1280"; // For film scene background
     private static final String STILL_IMAGE_SIZE = "w300"; // For episode stills
 
-
-    private static volatile TMDbApiManager instance;
-    private final OkHttpClient client;
-    private final ExecutorService executor;
-    private ContentDao contentDao; // Keep ContentDao, but handle its potential nullness
-    private final ContentCacheManager cacheManager;
-
+    // Enum and classes to make code more readable and usable
     public enum ContentType {
         MOVIE, TV, UNKNOWN
     }
-
-    // Helper classes for TV Season/Episode details from TMDb API
     public static class ApiSeasonDetails {
         public int seasonNumber;
         public String name;
@@ -66,45 +60,41 @@ public class TMDbApiManager {
             episodes = new ArrayList<>();
         }
 
-        // Convenience method to get full poster URL
         public String getFullPosterUrl(String size) {
-            // Use the instance to get the image URL, handling potential null path
             return TMDbApiManager.getInstance().getImageUrl(posterPath, size);
         }
     }
-
     public static class ApiEpisodeDetails {
         public int episodeNumber;
         public String name;
         public String overview;
-        public String stillPath; // Relative path
+        public String stillPath;
         public int runtime; // in minutes
         public String airDate;
         public double voteAverage;
-        public int id; // TMDb episode ID
+        public int id;
 
-        // Convenience method to get full still URL
         public String getFullStillUrl(String size) {
-            // Use the instance to get the image URL, handling potential null path
             return TMDbApiManager.getInstance().getImageUrl(stillPath, size);
         }
     }
 
+    // Singleton instance
+    private static volatile TMDbApiManager instance;
+    private final OkHttpClient client;
+    private final ExecutorService executor;
+    private ContentDao contentDao;
+    private final ContentCacheManager cacheManager;
 
+    // Constructor and singleton implementation
     private TMDbApiManager() {
         this.client = new OkHttpClient.Builder()
                 .addInterceptor(new AuthInterceptor())
                 .build();
-        // Using a fixed thread pool for API calls is generally better than cached
-        // to prevent unbounded thread creation under heavy load. Adjust size as needed.
         this.executor = Executors.newFixedThreadPool(10);
         this.cacheManager = ContentCacheManager.getInstance();
     }
-
     public static TMDbApiManager getInstance() {
-        if (API_KEY.trim().isEmpty()) {
-            System.err.println("FATAL ERROR: TMDb API Key is not set in TMDbApiManager.java. API calls will fail.");
-        }
         if (instance == null) {
             synchronized (TMDbApiManager.class) {
                 if (instance == null) {
@@ -114,15 +104,9 @@ public class TMDbApiManager {
         }
         return instance;
     }
-
     public ExecutorService getExecutor() {
         return executor;
     }
-
-    public void setContentDao(ContentDao contentDao) {
-        this.contentDao = contentDao;
-    }
-
     private static class AuthInterceptor implements Interceptor {
         @NotNull
         @Override
@@ -138,21 +122,11 @@ public class TMDbApiManager {
 
             Request request = requestBuilder.build();
 
-            if (API_KEY.trim().isEmpty()) {
-                // Or return a specific error response if you don't throw in getInstance
-                return new Response.Builder()
-                        .request(request)
-                        .protocol(Protocol.HTTP_1_1)
-                        .code(500) // Internal Server Error
-                        .message("API Key Not Set")
-                        .body(ResponseBody.create("{\"status_code\":500,\"status_message\":\"TMDb API Key is not set.\"}", MediaType.get("application/json")))
-                        .build();
-            }
-
             return chain.proceed(request);
         }
     }
 
+    //Requests
     private Request buildRequest(String endpointPathAndQuery) {
         HttpUrl parsedUrl = HttpUrl.parse(BASE_URL + endpointPathAndQuery);
         if (parsedUrl == null) {
@@ -167,7 +141,6 @@ public class TMDbApiManager {
         }
         return new Request.Builder().url(urlBuilder.build()).get().build();
     }
-
     public String makeRequest(String endpoint) throws IOException {
         Request request = buildRequest(endpoint);
         try (Response response = client.newCall(request).execute()) {
@@ -185,7 +158,6 @@ public class TMDbApiManager {
             return body != null ? body.string() : "";
         }
     }
-
     public CompletableFuture<String> makeRequestAsync(String endpoint) {
         // Use handle to process both success and failure, then propagate failure
         return CompletableFuture.supplyAsync(() -> {
@@ -198,13 +170,49 @@ public class TMDbApiManager {
             }
         }, executor);
     }
+    public CompletableFuture<List<Content>> getTrendingMoviesAsMoviestarContent(String timeWindow) {
+        return fetchAsMoviestarContentList("/trending/movie/" + timeWindow, ContentType.MOVIE);
+    }
+    public CompletableFuture<List<Content>> getTrendingTvShowsAsMoviestarContent(String timeWindow) {
+        return fetchAsMoviestarContentList("/trending/tv/" + timeWindow, ContentType.TV);
+    }
+    public CompletableFuture<List<Content>> getPopularMoviesAsMoviestarContent() {
+        return fetchAsMoviestarContentList("/movie/popular", ContentType.MOVIE);
+    }
+    public CompletableFuture<List<Content>> getPopularTvShowsAsMoviestarContent() {
+        return fetchAsMoviestarContentList("/tv/popular", ContentType.TV);
+    }
+    public CompletableFuture<List<Content>> searchMultiContent(String query, int page) {
+        if (query == null || query.trim().isEmpty()) {
+            return CompletableFuture.completedFuture(new ArrayList<>()); // Return empty list for empty query
+        }
+        String encodedQuery;
+        try {
+            encodedQuery = URLEncoder.encode(query, StandardCharsets.UTF_8.name());
+        } catch (UnsupportedEncodingException e) {
+            System.err.println("TMDbApiManager: UTF-8 encoding error for query '" + query + "': " + e.getMessage());
+            return CompletableFuture.failedFuture(new RuntimeException("Failed to encode query.", e));
+        }
+        String endpointWithQuery = "/search/multi?query=" + encodedQuery + "&page=" + page + "";
+        return fetchAsMoviestarContentList(endpointWithQuery, ContentType.UNKNOWN);
+    }
+    @Nullable
+    public String getImageUrl(@Nullable String imagePath, String size) {
+        if (imagePath == null || imagePath.trim().isEmpty() || "null".equalsIgnoreCase(imagePath.trim())) {
+            return null;
+        }
+        String finalSize = (size != null && !size.trim().isEmpty()) ? size : DEFAULT_IMAGE_SIZE;
+        String finalImagePath = imagePath.startsWith("/") ? imagePath : "/" + imagePath;
+        return IMAGE_BASE_URL + finalSize + finalImagePath;
+    }
 
+    //Receives
     public CompletableFuture<List<Content>> fetchAsMoviestarContentList(String endpoint, @Nullable ContentType expectedType) {
         return makeRequestAsync(endpoint).thenApplyAsync(responseString -> {
             List<Content> contentList = new ArrayList<>();
             if (responseString == null || responseString.isEmpty()) {
                 System.err.println("TMDbApiManager: Empty or null response for endpoint: " + endpoint);
-                return contentList; // Return empty list on empty response
+                return contentList;
             }
             try {
                 JsonObject jsonResponse = JsonParser.parseString(responseString).getAsJsonObject();
@@ -227,23 +235,22 @@ public class TMDbApiManager {
                                 if ("movie".equalsIgnoreCase(mediaTypeStr)) currentItemType = ContentType.MOVIE;
                                 else if ("tv".equalsIgnoreCase(mediaTypeStr)) currentItemType = ContentType.TV;
                                 else {
-                                    // Log unknown media types
-                                    System.err.println("TMDbApiManager: Skipping content item with unknown media_type '" + mediaTypeStr + "' for ID " + id + " from " + endpoint);
-                                    continue; // Skip items with unknown media type
+                                    continue;
                                 }
                             }
                             if (currentItemType == null) {
-                                System.err.println("TMDbApiManager: Skipping content item with null determined type for ID " + id + " from " + endpoint);
                                 continue;
                             }
-
+                            // We have noted the api has a little problem, everyone can add their films, to prevent this problem, and give at the users a clear page and a correct experience
+                            if (tmdbObjectJson.get("vote_count").getAsDouble()<500||tmdbObjectJson.get("vote_average").isJsonNull())
+                                continue;
                             Content content = cacheManager.get(id);
                             if (content == null) {
                                 content = new Content();
                                 content.setId(id);
                                 // Populate basic fields from the list result
                                 content.setPlot(getStringOrNull(tmdbObjectJson, "overview"));
-                                content.setRating(tmdbObjectJson.has("vote_average") && !tmdbObjectJson.get("vote_average").isJsonNull() ? tmdbObjectJson.get("vote_average").getAsDouble() : 0.0);
+                                content.setRating(tmdbObjectJson.get("vote_average").getAsDouble());
                                 content.setPopularity(tmdbObjectJson.has("popularity") && !tmdbObjectJson.get("popularity").isJsonNull() ? (int) tmdbObjectJson.get("popularity").getAsDouble() : 0);
 
                                 String posterPath = getStringOrNull(tmdbObjectJson, "poster_path");
@@ -296,7 +303,7 @@ public class TMDbApiManager {
                                     content.setCategories(categoryIds);
                                 }
                                 // Video URL is typically fetched with full details, not list results
-                                // content.setVideoUrl("http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerFun.mp4"); // Default placeholder
+                                 content.setVideoUrl("http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerFun.mp4"); // Default placeholder
 
                                 cacheManager.put(content); // Cache the partially populated content
                             }
@@ -305,58 +312,38 @@ public class TMDbApiManager {
                     }
                 }
             } catch (Exception e) {
-                // Log the exception details including the endpoint and response snippet
                 String responseSnippet = responseString.length() > 500 ? responseString.substring(0, 500) + "..." : responseString;
                 System.err.println("TMDbApiManager: Failed to parse/map content list from JSON for endpoint: " + endpoint + ". Error: " + e.getMessage() + ". Response snippet: " + responseSnippet);
-                // Do NOT re-throw here, just return the potentially empty list.
-                // The caller should handle the case of an empty list.
             }
             return contentList;
-        }, executor); // Use the API manager's executor for processing
+        }, executor);
     }
-
-
     private String getStringOrNull(JsonObject jsonObject, String memberName) {
         if (jsonObject != null && jsonObject.has(memberName) && !jsonObject.get(memberName).isJsonNull()) {
             JsonElement element = jsonObject.get(memberName);
             if (element.isJsonPrimitive() && element.getAsJsonPrimitive().isString()) {
                 return element.getAsString();
             }
-            // Handle cases where the member exists but is not a string primitive (e.g., number, boolean, object, array)
             System.err.println("TMDbApiManager: Expected string for member '" + memberName + "', but found " + element.getClass().getSimpleName());
         }
         return null;
     }
-
-    public CompletableFuture<List<Content>> getTrendingMoviesAsMoviestarContent(String timeWindow) {
-        return fetchAsMoviestarContentList("/trending/movie/" + timeWindow, ContentType.MOVIE);
+    public void setContentDao(ContentDao contentDao) {
+        this.contentDao = contentDao;
     }
-
-    public CompletableFuture<List<Content>> getTrendingTvShowsAsMoviestarContent(String timeWindow) {
-        return fetchAsMoviestarContentList("/trending/tv/" + timeWindow, ContentType.TV);
-    }
-
-    public CompletableFuture<List<Content>> getPopularMoviesAsMoviestarContent() {
-        return fetchAsMoviestarContentList("/movie/popular", ContentType.MOVIE);
-    }
-
-    public CompletableFuture<List<Content>> getPopularTvShowsAsMoviestarContent() {
-        return fetchAsMoviestarContentList("/tv/popular", ContentType.TV);
-    }
-
     public CompletableFuture<Void> updateAllContentInDatabase() {
         if (contentDao == null) {
             System.err.println("TMDbApiManager: ContentDao not initialized. Cannot update database.");
-            // Return a completed future, but log the error. Or return a failed future.
-            // Returning a failed future is better if the caller needs to know this failed.
             return CompletableFuture.failedFuture(new IllegalStateException("ContentDao not initialized."));
         }
 
         List<CompletableFuture<List<Content>>> futures = List.of(
-                getPopularMoviesAsMoviestarContent(),
-                getTrendingMoviesAsMoviestarContent("day"),
-                getPopularTvShowsAsMoviestarContent(),
-                getTrendingTvShowsAsMoviestarContent("day")
+//                getPopularMoviesAsMoviestarContent(),
+//                getTrendingMoviesAsMoviestarContent("week"),
+//                getPopularTvShowsAsMoviestarContent(),
+//                getTrendingTvShowsAsMoviestarContent("week")
+                getDiscoverFilmsAsMoviestarContent(),
+                getDiscoverTvShowsAsMoviestarContent()
         );
 
         // Use handle to collect results or exceptions from all futures
@@ -365,16 +352,14 @@ public class TMDbApiManager {
                     List<Content> allContentFromApi = futures.stream()
                             .flatMap(future -> {
                                 try {
-                                    // Get the result. If the future completed exceptionally, join() will throw.
                                     return future.join().stream();
                                 } catch (Exception e) {
-                                    // Log the error for this specific future but allow others to proceed
                                     System.err.println("TMDbApiManager: Error fetching content for one category: " + e.getMessage());
-                                    return Stream.empty(); // Return empty stream for this failed category
+                                    return Stream.empty();
                                 }
                             })
                             .filter(Objects::nonNull).filter(c -> c.getId() != 0)
-                            .filter(distinctByKey(Content::getId)) // Filter out duplicates by ID
+                            .filter(distinctByKey(Content::getId))
                             .collect(Collectors.toList());
 
                     if (!allContentFromApi.isEmpty()) {
@@ -384,14 +369,22 @@ public class TMDbApiManager {
                             return CompletableFuture.completedFuture(null); // Indicate success
                         } catch (Exception e) {
                             System.err.println("TMDbApiManager: Error during DAO insert: " + e.getMessage());
-                            // Return a failed future if the database operation fails
                             return CompletableFuture.failedFuture(e);
                         }
                     } else {
                         System.out.println("TMDbApiManager: No content fetched from API to update database.");
                         return CompletableFuture.completedFuture(null); // Indicate success (no content to insert)
                     }
-                }, executor); // Perform the stream processing and DAO insert on the executor
+                }, executor);
+    }
+
+    private CompletableFuture<List<Content>> getDiscoverTvShowsAsMoviestarContent() {
+        return fetchAsMoviestarContentList("/tv?include_adult=false&include_video=false&language=en-US&page=1&sort_by=popularity.desc", ContentType.TV);
+
+    }
+
+    private CompletableFuture<List<Content>> getDiscoverFilmsAsMoviestarContent() {
+        return fetchAsMoviestarContentList("/movie?include_adult=false&include_video=false&language=en-US&page=1&sort_by=popularity.desc", ContentType.MOVIE);
     }
 
     // Helper to filter distinct elements in a stream
@@ -400,34 +393,6 @@ public class TMDbApiManager {
         return t -> seen.add(keyExtractor.apply(t));
     }
 
-    public CompletableFuture<List<Content>> searchMultiContent(String query, int page) {
-        if (query == null || query.trim().isEmpty()) {
-            return CompletableFuture.completedFuture(new ArrayList<>()); // Return empty list for empty query
-        }
-        String encodedQuery;
-        try {
-            encodedQuery = URLEncoder.encode(query, StandardCharsets.UTF_8.name());
-        } catch (UnsupportedEncodingException e) {
-            System.err.println("TMDbApiManager: UTF-8 encoding error for query '" + query + "': " + e.getMessage());
-            // Return a failed future to signal the encoding error
-            return CompletableFuture.failedFuture(new RuntimeException("Failed to encode query.", e));
-        }
-        String endpointWithQuery = "/search/multi?query=" + encodedQuery + "&page=" + page + "&include_adult=false";
-        return fetchAsMoviestarContentList(endpointWithQuery, ContentType.UNKNOWN);
-    }
 
-    @Nullable
-    public String getImageUrl(@Nullable String imagePath, String size) {
-        if (imagePath == null || imagePath.trim().isEmpty() || "null".equalsIgnoreCase(imagePath.trim())) {
-            return null; // Return null if path is null, empty, or "null" string
-        }
-        // Ensure size is not null or empty, use default if needed
-        String finalSize = (size != null && !size.trim().isEmpty()) ? size : DEFAULT_IMAGE_SIZE;
-        // Ensure path starts with '/'
-        String finalImagePath = imagePath.startsWith("/") ? imagePath : "/" + imagePath;
-        return IMAGE_BASE_URL + finalSize + finalImagePath;
-    }
 
-    // Add a setCast method to Content model
-    // (This requires modifying Content.java)
 }

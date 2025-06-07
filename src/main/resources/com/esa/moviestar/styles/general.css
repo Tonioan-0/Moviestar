@@ -14,6 +14,7 @@
 /* Application primary colors */
 .primary {
     -fx-background-color: #7341BE;
+    -fx-cursor: hand;
 }
 .primary:hover{
     -fx-background-color: #593294;
@@ -61,6 +62,7 @@
 
 .surface-dim{
     -fx-background-color: #262626;
+
 }
 
 .surface-dim-border{
@@ -95,6 +97,7 @@
 
 .surface-danger{
     -fx-background-color: #9E3536;
+    -fx-cursor: hand;
 }
 
 .surface-danger:hover{
@@ -107,6 +110,7 @@
 
 .surface-transparent {
     -fx-background-color: transparent;
+    -fx-cursor: hand;
 }
 
 .surface-transparent:hover {
@@ -120,22 +124,8 @@
 .bg-color{
     -fx-background-color: radial-gradient(focus-angle 254deg, focus-distance 20%, center 50% 50%, radius 55%, #7341BE, #101010);
 }
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-.grey-button{
-    -fx-background-color: #232323;
-}
-
-.grey-button:hover {
-    -fx-background-color: #141414;
-}
-
-.grey-button:pressed {
-    -fx-background-color: #121212;
-}
 
 /* ========== STANDARDIZED DIMENSION SYSTEM ========== */
-
-/* Dimensions for border-radius and background-radius */
 .small-item{
     -fx-border-radius: 16px;
     -fx-background-radius: 16px;
@@ -155,12 +145,7 @@
     -fx-border-radius: 48px;
     -fx-background-radius: 48px;
 }
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-.very-large-item-filmScene{
-    -fx-border-radius: 0 0 48px 48px;
-    -fx-background-radius: 0 0 48px 48px;
-}
 
 /* Text dimensions */
 .small-text{
@@ -234,119 +219,8 @@
 
 /* ========== ACCESS SPECIFIC ELEMENTS (EXTENSIONS) ========== */
 
-/* Specific backgrounds for login/register */
-.root-pane {
-    -fx-background-color: radial-gradient(focus-angle 254deg, focus-distance 20%, center 50% 50%, radius 55%, #7341BE, #101010);
-    -fx-background-radius: 0;
-    -fx-background-insets: 0;
-    -fx-fill-height: true;
-}
 
-.MainPane {
-    -fx-background-image: url('../images/background.jpg');
-    -fx-background-size: cover;
-    -fx-background-position: center;
-}
 
-.Hbox-Padre {
-    -fx-background-color: linear-gradient(to right, rgba(31, 31, 31, 0) 40%, rgba(0, 0, 0, 0.9) 60%);
-}
-
-.main-vbox {
-    -fx-background-color: radial-gradient(focus-angle 54deg, focus-distance 10%, center 50% 50%, radius 250%, transparent, rgba(255, 255, 255, 0.3));
-    -fx-alignment: center;
-}
-
-/* Specific containers for forms */
-.VBox-style {
-    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.5), 15, 0, 0, 5);
-}
-
-.vbox-background {
-    -fx-background-color: rgba(51, 51, 51, 0);
-}
-
-.vbox-title {
-    -fx-padding: 20px;
-}
-
-.register-box, .register-box2 {
-    -fx-background-color: rgba(37, 37, 37, 0.97);
-    -fx-border-color: #262626;
-    -fx-border-width: 2px;
-    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.5), 15, 0, 0, 5);
-}
-
-/* Specific texts for access forms */
-.welcome-text {
-    -fx-text-fill: #F0ECFD;
-    -fx-alignment: center;
-    -fx-font-weight: bold;
-    -fx-padding: 5px;
-}
-
-.title-text {
-    -fx-text-fill: white;
-    -fx-font-weight: bold;
-    -fx-padding: 5px;
-}
-
-.register-text {
-    -fx-background-color: transparent;
-    -fx-alignment: center;
-}
-
-.register-text-recommendation-mid {
-    -fx-background-color: transparent;
-    -fx-alignment: center;
-}
-
-.register-text-recommendation-big {
-    -fx-background-color: transparent;
-}
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-.register-text:hover, .register-text-recommendation-mid:hover {
-    -fx-underline: true;
-}
-
-.warnings-text1 {
-    -fx-text-fill: white;
-    -fx-font-weight: bold;
-    -fx-width: 200px;
-}
-
-.warnings-text2 {
-    -fx-text-fill: white;
-    -fx-font-weight: bold;
-    -fx-alignment: center-left;
-}
-
-/* Specific toggle password button */
-.toggle-password-button {
-    -fx-background-color: transparent;
-    -fx-border-color: transparent;
-    -fx-text-fill: #9E9E9E;
-    -fx-pref-width: 30px;
-    -fx-pref-height: 30px;
-    -fx-min-width: 30px;
-    -fx-min-height: 30px;
-    -fx-max-width: 30px;
-    -fx-max-height: 30px;
-    -fx-cursor: hand;
-    -fx-padding: 0;
-    -fx-effect: null;
-}
-
-.toggle-password-button:hover {
-    -fx-background-color: rgba(255, 255, 255, 0.1);
-    -fx-text-fill: white;
-}
-
-.toggle-password-button:pressed {
-    -fx-background-color: rgba(115, 65, 190, 0.3);
-    -fx-text-fill: #F0ECFD;
-}
 
 /* ========== STREAMING INTERFACE ELEMENTS ========== */
 
@@ -617,23 +491,6 @@
     -fx-background-radius: 5em;
 }
 
-.transparent-scroll {
-    -fx-background-color: transparent;
-    -fx-background: transparent;
-}
-
-.transparent-scroll .viewport {
-    -fx-background-color: transparent;
-}
-
-.transparent-scroll .scroll-bar {
-    -fx-background-color: rgba(255, 255, 255, 0.1);
-}
-
-.transparent-scroll .scroll-bar .thumb {
-    -fx-background-color: rgba(255, 255, 255, 0.3);
-    -fx-background-radius: 5px;
-}
 
 /* ========== RESPONSIVE MEDIA QUERIES ========== */
 

@@ -2,15 +2,14 @@ package com.esa.moviestar.home;
 
 import com.esa.moviestar.Main;
 import com.esa.moviestar.model.User;
+import com.esa.moviestar.movie_view.FilmPlayer;
 import com.esa.moviestar.profile.CreateProfileController;
 import com.esa.moviestar.settings.SettingsViewController;
 import com.esa.moviestar.components.BufferAnimation;
 import com.esa.moviestar.model.Account;
 import com.esa.moviestar.model.Content;
-// import com.esa.moviestar.model.FilmSeriesDetails; // Not directly used by MainPagesController for FilmScene in this version
 import com.esa.moviestar.movie_view.FilmCardController;
 import com.esa.moviestar.movie_view.FilmSceneController;
-// import com.esa.moviestar.libraries.TMDbApiManager; // Not directly used by MainPagesController for FilmScene in this version
 
 import javafx.animation.FadeTransition;
 import javafx.application.Platform;
@@ -20,7 +19,6 @@ import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.SnapshotParameters;
 import javafx.scene.image.ImageView;
 import javafx.scene.image.WritableImage;
 import javafx.scene.layout.*;
@@ -48,7 +46,7 @@ public class MainPagesController {
     public static final String PATH_CARD_WINDOW = "/com/esa/moviestar/movie_view/WindowCard.fxml";
     public static final String PATH_CARD_VERTICAL = "/com/esa/moviestar/movie_view/FilmCard_Vertical.fxml";
     public static final String PATH_CARD_HORIZONTAL = "/com/esa/moviestar/movie_view/FilmCard_Horizontal.fxml";
-    public static final String FILM_SCENE_PATH ="/com/esa/moviestar/movie_view/filmScene.fxml";
+    public static final String FILM_SCENE_PATH = "/com/esa/moviestar/movie_view/FilmScene.fxml";
     public static final Color FORE_COLOR = Color.rgb(240, 236, 253);
     public static final Color BACKGROUND_COLOR = Color.rgb(16, 16, 16);
 
@@ -352,36 +350,13 @@ public class MainPagesController {
     private PageData loadDynamicBody(String fxmlFile) {
         try {
             String pathToLoad;
-            if (fxmlFile.startsWith("/")) {
+            if (fxmlFile.startsWith("/"))
                 pathToLoad = fxmlFile;
-            } else {
-                // Determine base path for relative FXMLs
-                String baseResourcePath = "/com/esa/moviestar/";
-                switch (fxmlFile) {
-                    case "home.fxml", "search.fxml", "header.fxml":
-                        pathToLoad = baseResourcePath + "home/" + fxmlFile;
-                        break;
-                    case "filter.fxml":
-                        pathToLoad = baseResourcePath + "filter/" + fxmlFile;
-                        break;
-                    default:
-                        // Handles cases like "movie_view/filmScene.fxml"
-                        if (fxmlFile.contains("/")) {
-                            pathToLoad = baseResourcePath + fxmlFile;
-                        } else {
-                            // Fallback for simple names not covered, try home package
-                            System.err.println("MainPagesController: Uncategorized FXML file '" + fxmlFile + "', attempting to load from home package.");
-                            pathToLoad = baseResourcePath + "home/" + fxmlFile;
-                        }
-                        break;
-                }
-            }
-            // Correctly handle FILM_SCENE_PATH if it's passed as a simple name
-            if (fxmlFile.equals(FILM_SCENE_PATH.substring(1))) { // remove leading / for comparison
+             else
+                pathToLoad =  "/com/esa/moviestar/home/"+fxmlFile;
+            if (fxmlFile.equals(FILM_SCENE_PATH.substring(1))) {
                 pathToLoad = FILM_SCENE_PATH;
             }
-
-
             var resource = getClass().getResource(pathToLoad);
             if (resource == null) {
                 System.err.println("MainPagesController: Resource not found: " + pathToLoad + " (Original: " + fxmlFile + ")");
@@ -397,13 +372,8 @@ public class MainPagesController {
                 AnchorPane.setRightAnchor(pageNode, 0.0);
             }
             return new PageData(pageNode, loader.getController());
-        } catch (IOException e) {
-            System.err.println("MainPagesController: IOException while loading " + fxmlFile + ". Details: " + e.getMessage());
-            e.printStackTrace();
-            return null;
         } catch (Exception e) {
             System.err.println("MainPagesController: Unexpected error while loading " + fxmlFile + ". Details: " + e.getMessage());
-            e.printStackTrace();
             return null;
         }
     }
@@ -413,7 +383,7 @@ public class MainPagesController {
             System.err.println("MainPagesController: Cannot capture screenshot, root, scene or window not available.");
             return new ImageView();
         }
-        WritableImage screenshot = root.snapshot(null, null); // Use null for default SnapshotParameters
+        WritableImage screenshot = root.snapshot(null, null);
         return new ImageView(screenshot);
     }
 
@@ -473,7 +443,7 @@ public class MainPagesController {
         showLoadingSpinner();
 
         ImageView screenshotView = captureScreenshotView();
-        PageData filmDetailPd = loadDynamicBody(FILM_SCENE_PATH); // FILM_SCENE_PATH is absolute
+        PageData filmDetailPd = loadDynamicBody(FILM_SCENE_PATH);
 
         if (filmDetailPd != null && filmDetailPd.controller() instanceof FilmSceneController filmController) {
             this.savedPageData = this.currentScene;
@@ -495,10 +465,7 @@ public class MainPagesController {
 
             filmController.setMainPagesController(this);
             filmController.setProperties(screenshotView, this);
-            filmController.loadContent(contentId, !isSeries); // !isSeries because FilmSceneController.loadContent expects isMovie
-
-            // The FilmSceneController is now responsible for its own loading indicators
-            // and hiding the main spinner once its primary content is ready or if an error occurs within it.
+            filmController.loadContent(contentId, !isSeries);
 
             transitionInProgress = false;
 
@@ -602,8 +569,25 @@ public class MainPagesController {
         return nodes;
     }
 
-    public void cardClickedPlay(int cardId) {
+    public void cardClickedPlay(String urlVideo) {
+        Platform.runLater(() -> {
+            try {
+                FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/esa/moviestar/movie_view/FilmPlayer.fxml"), Main.resourceBundle);
+                Scene currentSceneNode = getCurrentAppScene();
+                if (currentSceneNode == null) return;
+                Parent scene = loader.load();
+                ((FilmPlayer)loader.getController()).initializePlayer(urlVideo);
+                ((FilmPlayer)loader.getController()).play();
+                Scene newScene = new Scene(scene, currentSceneNode.getWidth(), currentSceneNode.getHeight());
+                Stage stage = (Stage) currentSceneNode.getWindow();
+                if (stage != null) stage.setScene(newScene);
+                else System.err.println("MainPagesController.settingsClick: Stage is null.");
 
+            } catch (IOException e) {
+                System.err.println("MainPagesController: Errore caricamento pagina dei setting: " + e.getMessage());
+                e.printStackTrace();
+            }
+        });
     }
 
     public void settingsClick(User user, Account account) {
@@ -628,9 +612,7 @@ public class MainPagesController {
                 else System.err.println("MainPagesController.settingsClick: Stage is null.");
 
             } catch (IOException e) {
-                System.err.println("MainPagesController: Errore caricamento pagina dei setting: " + e.getMessage());
-                e.printStackTrace();
-            }
+                System.err.println("MainPagesController: Error loading settings page: " + e.getMessage());}
         });
     }
 
@@ -648,8 +630,7 @@ public class MainPagesController {
                 else System.err.println("MainPagesController.emailClick: Stage is null.");
 
             } catch (IOException ex) {
-                System.err.println("MainPagesController: Errore caricamento pagina di accesso dell'account: " + ex.getMessage());
-                ex.printStackTrace();
+                System.err.println("MainPagesController: Error loading access page: " + ex.getMessage());
             }
         });
     }
@@ -697,8 +678,7 @@ public class MainPagesController {
                 else System.err.println("MainPagesController.createProfileUser: Stage is null.");
 
             }catch(IOException e){
-                System.err.println("MainPagesController : errore caricamento pagina di creazione profili: " + e.getMessage());
-                e.printStackTrace();
+                System.err.println("MainPagesController : Error to switch profile: " + e.getMessage());
             }
         });
     }

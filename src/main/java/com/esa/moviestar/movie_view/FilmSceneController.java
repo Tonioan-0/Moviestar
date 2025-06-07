@@ -1,5 +1,6 @@
 package com.esa.moviestar.movie_view;
 
+import com.esa.moviestar.Main;
 import com.esa.moviestar.home.MainPagesController;
 import com.esa.moviestar.libraries.TMDbApiManager;
 import com.esa.moviestar.model.FilmSeriesDetails;
@@ -9,9 +10,12 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.OverrunStyle;
@@ -23,7 +27,9 @@ import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
 import javafx.stage.Popup;
+import javafx.stage.Stage;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -54,7 +60,7 @@ public class FilmSceneController {
     @FXML
     private HBox addToWatchListButton;
     @FXML
-    private HBox addToFavorituesButton;
+    private HBox addToFavouriteButton;
 
     // Labels for content info
     @FXML
@@ -105,8 +111,8 @@ public class FilmSceneController {
         if (addToWatchListButton != null) {
             addToWatchListButton.setOnMouseClicked(event -> addToList());
         }
-        if (addToFavorituesButton != null) {
-            addToFavorituesButton.setOnMouseClicked(event -> showInfo());
+        if (addToFavouriteButton != null) {
+            addToFavouriteButton.setOnMouseClicked(event -> showInfo());
         }
 
         System.out.println("FilmSceneController initialized.");
@@ -197,7 +203,7 @@ public class FilmSceneController {
         movie.setBackdropUrl(apiManager.getImageUrl(getStringOrNull(movieJson, "backdrop_path"), "w1280"));
         movie.setReleaseDate(getStringOrNull(movieJson, "release_date"));
         movie.setMovieRuntime(getIntegerOrNull(movieJson, "runtime", 0));
-
+        movie.setVideoUrl("http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerFun.mp4");
 
         if (movie.getReleaseDate() != null && movie.getReleaseDate().length() >= 4) {
             try {
@@ -554,7 +560,6 @@ public class FilmSceneController {
 
 
     private void loadEpisodeThumbnail(String episodeImageUrl, ImageView imageView) {
-        // First, try to load the episode's specific still image
         if (episodeImageUrl != null && !episodeImageUrl.isEmpty() && !episodeImageUrl.endsWith("null")) {
             try {
                 imageView.getStyleClass().add("episode-thumbnail-loading");
@@ -684,9 +689,7 @@ public class FilmSceneController {
     }
 
     private void playEpisode(FilmSeriesDetails.EpisodeDetails episode) {
-        System.out.println("Playing episode: " + episode.getName());
-        System.out.println("Episode " + episode.getEpisodeNumber() + " - Duration: " + episode.getRuntimeMinutes() + "min");
-        // TODO: Implement actual playback logic
+        openPlayerScene();
     }
 
     private void loadBackdrop(String backdropUrl) {
@@ -782,7 +785,7 @@ public class FilmSceneController {
                         currentContent.getSeasons().get(currentSeasonIndex) != null) {
                     FilmSeriesDetails.SeasonDetails currentSeason = currentContent.getSeasons().get(currentSeasonIndex);
                     if (currentSeason.getEpisodes() != null && !currentSeason.getEpisodes().isEmpty()) {
-                        playEpisode(currentSeason.getEpisodes().get(0));
+                        playEpisode(currentSeason.getEpisodes().getFirst());
                     } else {
                         System.out.println("No episodes found for the current season.");
                     }
@@ -790,10 +793,30 @@ public class FilmSceneController {
                     System.out.println("Current season data not loaded yet.");
                 }
             } else {
-                System.out.println("Playing movie: " + currentContent.getTitle());
-                // TODO: Implement movie playback
+                openPlayerScene();
             }
         }
+    }
+
+    private void openPlayerScene() {
+        Platform.runLater(() -> {
+            try {
+                FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/esa/moviestar/movie_view/FilmPlayer.fxml"), Main.resourceBundle);
+                Scene currentSceneNode = (background != null && background.getScene() != null) ? background.getScene() : null;
+                if (currentSceneNode == null) return;
+                Parent scene = loader.load();
+                ((FilmPlayer)loader.getController()).initializePlayer(currentContent.getVideoUrl());
+                ((FilmPlayer)loader.getController()).play();
+                Scene newScene = new Scene(scene, currentSceneNode.getWidth(), currentSceneNode.getHeight());
+                Stage stage = (Stage) currentSceneNode.getWindow();
+                if (stage != null) stage.setScene(newScene);
+                else System.err.println("FilmSceneController: Stage is null.");
+
+            } catch (IOException e) {
+                System.err.println("\"FilmSceneController: Error to load player, message: " + e.getMessage());
+                e.printStackTrace();
+            }
+        });
     }
 
     @FXML

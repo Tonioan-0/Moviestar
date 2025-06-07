@@ -9,6 +9,7 @@ public class FilmSeriesDetails {
     private String plot; // Overview
     private String posterUrl;   // Main poster image URL for the show/movie
     private String backdropUrl; // Main backdrop image URL for the show/movie
+    private String videoUrl;
     private int movieRuntime;
 
     private int year; // Release year or first air year
@@ -114,6 +115,14 @@ public class FilmSeriesDetails {
     public void addSeason(SeasonDetails season) {
         if (this.seasons == null) this.seasons = new ArrayList<>();
         this.seasons.add(season);
+    }
+
+    public String getVideoUrl() {
+        return videoUrl;
+    }
+
+    public void setVideoUrl(String videoUrl) {
+        this.videoUrl = videoUrl;
     }
 
     // --- Inner Classes for Season and Episode Details ---

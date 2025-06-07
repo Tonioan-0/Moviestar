@@ -13,11 +13,11 @@
                 <VBox prefHeight="380.0" prefWidth="300.0" spacing="45.0" styleClass="surface-opaque" BorderPane.alignment="TOP_LEFT" VBox.vgrow="ALWAYS">
                <StackPane alignment="TOP_LEFT" prefHeight="129.0" prefWidth="383.0">
                   <children>
-                      <SVGPath content="%icon-moviestar-bg" styleClass="surface-solid" />
-                      <SVGPath content="%icon-moviestar-fg" fill="WHITE" styleClass="on-primary" />
+                      <SVGPath content="%icon-moviestar-bg" styleClass="surface-solid" StackPane.alignment="BOTTOM_CENTER" />
+                      <SVGPath content="%icon-moviestar-fg" fill="WHITE" styleClass="on-primary" StackPane.alignment="BOTTOM_CENTER" />
                   </children>
                   <padding>
-                     <Insets left="20.0" top="40.0" />
+                     <Insets top="40.0" />
                   </padding>
                </StackPane>
                     <VBox spacing="25.0" VBox.vgrow="ALWAYS">

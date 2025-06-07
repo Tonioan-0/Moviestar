@@ -22,7 +22,6 @@ import java.net.URL;
 // usage
 //String videoUrl = "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4";
 //
-//FXMLLoader videoPlayer =  new FXMLLoader(getClass().getResource("movie_view/FilmPlayer.fxml"), Main.resourceBundle);
 //
 //Scene scene = new Scene(videoPlayer.load());
 //        ((FilmPlayer)videoPlayer.getController()).initializePlayer(videoUrl);

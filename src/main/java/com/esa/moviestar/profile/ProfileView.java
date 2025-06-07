@@ -46,8 +46,8 @@ public class ProfileView {
     private static final int GRID_SPACING = 40;
     private static final int BOX_USER_SPACING = 10;
     private static final int BOX_USER_PADDING = 10;
-    private static final int SVG_SIZE = 8;
-    private static final int SVG_SIZE_HOVER = 8;
+    private static final double SVG_SIZE = 8;
+    private static final double SVG_SIZE_HOVER = 8.5;
     private static final double PENCIL_SIZE = 0.5;
     private static final double PENCIL_HOVER = -2.5;
     private static final int PENCIL_POS = 0;
@@ -67,11 +67,11 @@ public class ProfileView {
                 TMDbApiManager tmdbApiManager = TMDbApiManager.getInstance();
                 TMDbApiManager.getInstance().setContentDao(new ContentDao());
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////uncommenting the app will send request to the api, for now is better to disable that
-//                try {
-//                    tmdbApiManager.updateAllContentInDatabase().join();
-//                } catch (Exception e) {
-//                    System.err.println("ProfileView Task: Exception during TMDb content update: " + e.getMessage());
-//                }
+                try {
+                    tmdbApiManager.updateAllContentInDatabase().join();
+                } catch (Exception e) {
+                    System.err.println("ProfileView Task: Exception during TMDb content update: " + e.getMessage());
+                }
                 return null;
             }
         };
@@ -189,12 +189,21 @@ public class ProfileView {
         plusText.setText("Add");
         plusText.setTranslateY(-18);
         plusText.getStyleClass().addAll("on-primary", "bold-text", "large-text");
-
         creationContainer.getChildren().addAll(crossContainer,plusText);
+        creationContainer.setOnMouseEntered(event -> {
+            cross.setScaleX(SVG_SIZE_HOVER);
+            cross.setScaleY(SVG_SIZE_HOVER);
+        });
+
+        creationContainer.setOnMouseExited(event -> {
+            cross.setScaleX(SVG_SIZE);
+            cross.setScaleY(SVG_SIZE);
+        });
+
         creationContainer.setSpacing(20);
         creationContainer.setAlignment(Pos.CENTER);
 
-        creationContainer.setOnMouseEntered(event -> cross.setStyle("-fx-fill: #121212;"));
+        creationContainer.setOnMouseEntered(event -> cross.setStyle("-fx-fill: #7341BE;"));
 
         creationContainer.setOnMouseExited(event -> cross.setStyle("-fx-fill: #F0ECFD;"));
 
