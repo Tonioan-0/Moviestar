@@ -466,7 +466,7 @@ public class MainPagesController {
             filmController.setMainPagesController(this);
             filmController.setProperties(screenshotView, this);
             filmController.loadContent(contentId, !isSeries);
-            filmController.setUser(user);
+            filmController.setUserAndAccount(user,account);
 
             transitionInProgress = false;
 
@@ -577,7 +577,7 @@ public class MainPagesController {
                 Scene currentSceneNode = getCurrentAppScene();
                 if (currentSceneNode == null) return;
                 Parent scene = loader.load();
-                ((FilmPlayer)loader.getController()).initializePlayer(urlVideo);
+                ((FilmPlayer)loader.getController()).initializePlayer(urlVideo,user,account);
                 ((FilmPlayer)loader.getController()).play();
                 Scene newScene = new Scene(scene, currentSceneNode.getWidth(), currentSceneNode.getHeight());
                 Stage stage = (Stage) currentSceneNode.getWindow();
@@ -738,7 +738,29 @@ public class MainPagesController {
                 Platform.runLater(() -> {
                     ((HomeController) homeData.controller()).setRecommendations(user, MainPagesController.this);
                     this.home = homeData;
-                    transitionToPage(homeData);
+
+                    if (homeData.node() == null)
+                        return;
+
+                    if (currentScene == homeData && body.getChildren().contains(homeData.node()) && !transitionInProgress) {
+                        hideLoadingSpinner();
+                        return;
+                    }
+
+                    Node oldNode = body.getChildren().isEmpty() ? null : body.getChildren().getFirst();
+
+                    if (oldNode == null && !body.getChildren().contains(homeData.node())) {
+                        body.getChildren().clear();
+                        addNewPageNode(homeData);
+                    } else if (body.getChildren().contains(homeData.node())) {
+                        homeData.node().setOpacity(1.0);
+                        currentScene = homeData;
+                        transitionInProgress = false;
+                        hideLoadingSpinner();
+                    } else {
+                        body.getChildren().clear();
+                        addNewPageNode(homeData);
+                    }
                     openFilmScene(content, series);
                 });
             } else {
@@ -748,7 +770,6 @@ public class MainPagesController {
                 });
             }
         });
-
 
     }
 }

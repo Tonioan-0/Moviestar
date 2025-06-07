@@ -218,9 +218,7 @@ public class ContentDao {
             } catch (SQLException e) {
                 return "-1";
             }
-
             if (genreIds.isEmpty()) {
-                System.out.println("ContentDao: No genres found in the Genre table either (or an error occurred). Returning '-1'.");
                 return "-1";
             }
         }

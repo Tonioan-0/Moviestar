@@ -1,10 +1,16 @@
 package com.esa.moviestar.movie_view;
 
 import com.esa.moviestar.Main;
+import com.esa.moviestar.home.MainPagesController;
+import com.esa.moviestar.model.Account;
+import com.esa.moviestar.model.User;
 import javafx.animation.FadeTransition;
 import javafx.animation.Timeline;
 import javafx.animation.KeyFrame;
 import javafx.application.Platform;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.control.Slider;
 import javafx.scene.input.MouseEvent;
@@ -18,6 +24,8 @@ import javafx.stage.Stage;
 import javafx.util.Duration;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaView;
+
+import java.io.IOException;
 import java.net.URL;
 // usage
 //String videoUrl = "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4";
@@ -66,19 +74,22 @@ public class FilmPlayer {
     private Timeline hideControlsTimer;
     private FadeTransition fadeOutTransition; // For bottomBar
     private FadeTransition fadeInTransition;  // For bottomBar
-    private FadeTransition fadeOutTransitionCloseButton; // For closeButton
-    private FadeTransition fadeInTransitionCloseButton;  // For closeButton
+    private FadeTransition fadeOutTransitionCloseButton;
+    private FadeTransition fadeInTransitionCloseButton;
     private boolean controlsVisible = true;
     private static final double HIDE_DELAY_SECONDS = 3.0;
     private static final double FADE_DURATION_MILLIS = 300.0;
+    private User user;
+    private Account account;
 
     public void initialize() {
         setupControlActions();
-        setupAutoHideControls(); // This will now also set up transitions for closeButton
+        setupAutoHideControls(); //and also closeButton
         sliderVolume.setValue(100);
         sliderVideo.setValue(0);
         pbrVolume.progressProperty().bind(sliderVolume.valueProperty().divide(100));
         pbrVideo.progressProperty().bind(sliderVideo.valueProperty().divide(100));
+        closeButton.setOnMouseClicked(e-> returnToMainPages());
     }
 
     private void setupAutoHideControls() {
@@ -190,7 +201,9 @@ public class FilmPlayer {
         hideControlsTimer.stop();
     }
 
-    public void initializePlayer(String videoUrl) {
+    public void initializePlayer(String videoUrl, User user, Account account) {
+        this.user = user;
+        this.account = account;
         this.videoUrl = videoUrl;
         try {
             Media media = new Media(new URL(videoUrl).toExternalForm());
@@ -201,7 +214,6 @@ public class FilmPlayer {
             mediaView.fitWidthProperty().bind(playerContainer.widthProperty());
             mediaView.fitHeightProperty().bind(playerContainer.heightProperty());
 
-            playerContainer.getChildren().clear();
             playerContainer.getChildren( ).addFirst(mediaView);
             if (closeButton != null) closeButton.setOpacity(1.0);
             bottomBar.setOpacity(1.0);
@@ -519,6 +531,23 @@ public class FilmPlayer {
         }
         if (mediaView != null) {
             mediaView.setMediaPlayer(null);
+        }
+    }
+    public void returnToMainPages() {
+        try{
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/esa/moviestar/home/main.fxml"),Main.resourceBundle);
+            Parent homeContent = loader.load();
+
+            MainPagesController mainPagesController = loader.getController();
+            mainPagesController.first_load(user,account);
+            Scene currentScene = root.getScene();
+            this.dispose();
+            Scene newScene = new Scene(homeContent, currentScene.getWidth(), currentScene.getHeight());
+            Stage stage = (Stage) root.getScene().getWindow();
+            stage.setScene(newScene);
+
+        }catch(IOException e){
+            System.err.println("ProfileView: Error to load the home page"+e.getMessage());
         }
     }
 }

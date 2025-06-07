@@ -4,6 +4,7 @@ import com.esa.moviestar.Main;
 import com.esa.moviestar.database.UserDao;
 import com.esa.moviestar.home.MainPagesController;
 import com.esa.moviestar.libraries.TMDbApiManager;
+import com.esa.moviestar.model.Account;
 import com.esa.moviestar.model.FilmSeriesDetails;
 import com.esa.moviestar.model.User;
 import com.google.gson.JsonArray;
@@ -46,6 +47,7 @@ public class FilmSceneController {
     private TMDbApiManager apiManager;
     private FilmSeriesDetails currentContent;
     private User user;
+    private Account account;
 
     // Main containers
     @FXML
@@ -810,7 +812,7 @@ public class FilmSceneController {
                 Scene currentSceneNode = (background != null && background.getScene() != null) ? background.getScene() : null;
                 if (currentSceneNode == null) return;
                 Parent scene = loader.load();
-                ((FilmPlayer)loader.getController()).initializePlayer(currentContent.getVideoUrl());
+                ((FilmPlayer)loader.getController()).initializePlayer(currentContent.getVideoUrl(), user, account);
                 ((FilmPlayer)loader.getController()).play();
                 Scene newScene = new Scene(scene, currentSceneNode.getWidth(), currentSceneNode.getHeight());
                 Stage stage = (Stage) currentSceneNode.getWindow();
@@ -985,5 +987,5 @@ public class FilmSceneController {
         return titleLabel != null && "Loading...".equals(titleLabel.getText());
     }
 
-    public void setUser(User user){this.user=user;}
+    public void setUserAndAccount(User user,Account account){this.user=user;this.account=account;}
 }
