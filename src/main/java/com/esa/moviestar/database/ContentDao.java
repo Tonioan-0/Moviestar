@@ -12,207 +12,248 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class ContentDao {
-    private static Connection connection;
+    // private static Connection connection; // REMOVED STATIC CONNECTION
     private final ContentCacheManager cacheManager;
-
 
     public ContentDao() {
         this.cacheManager = ContentCacheManager.getInstance();
-        try {
-            connection = DataBaseManager.getConnection();
-        } catch (SQLException e) {
-            System.err.println("ContentDao: " + e.getMessage());
-        }
+        System.out.println("ContentDao: Initialized.");
     }
 
     private void populateContentFromResultSet(Content content, ResultSet rs) throws SQLException {
         content.setTitle(rs.getString("Title"));
         content.setPlot(rs.getString("Plot"));
+
         content.setImageUrl(rs.getString("Image_Url"));
         content.setPosterUrl(rs.getString("Poster_Url"));
         content.setVideoUrl(rs.getString("Film_Url"));
+
+
         content.setYear(rs.getInt("Year"));
         content.setRating(rs.getDouble("Rating"));
         content.setPopularity(rs.getInt("Popularity"));
         content.setReleaseDate(rs.getString("Release_Date"));
+        content.setIsSeries(rs.getInt("Episodes_Count") > 0);
     }
 
-    // Refactored createContent to use the cache
     private Content createContentFromResultSet(ResultSet rs) throws SQLException {
         int contentId = rs.getInt("ID_Content");
-        if (contentId == 0)
+        if (contentId == 0) {
+            System.err.println("ContentDao: createContentFromResultSet - Attempted to create content with ID 0. Skipping.");
             return null;
+        }
 
         Content content = cacheManager.get(contentId);
         if (content != null) {
-            // If content is from cache, its fields might be stale, repopulate them
             populateContentFromResultSet(content, rs);
         } else {
             content = new Content();
             content.setId(contentId);
             populateContentFromResultSet(content, rs);
-            cacheManager.put(content); // Add newly created and populated content to cache
+            cacheManager.put(content);
         }
+
+        if (hasColumn(rs))
+            content.setIsSeries(rs.getInt("Episodes_Count") > 0);
+
         return content;
     }
 
+    private boolean hasColumn(ResultSet rs ) throws SQLException {
+        ResultSetMetaData metadata = rs.getMetaData();
+        int columns = metadata.getColumnCount();
+        for (int x = 1; x <= columns; x++)
+            if ("Episodes_Count".equals(metadata.getColumnName(x)))
+                return true;
 
-    public void insertContents(List<Content> contents) {
+        return false;
+    }
+
+
+    public void insertContents(List<Content> contents ) {
+        if (contents == null ||  contents.isEmpty()) {
+            System.out.println( "ContentDao: insertContents - No contents to insert.");
+            return;
+        }
+        System.out.println( "ContentDao: Starting insertContents for " + contents.size() + " items.");
+
         String insertContentSQL = "INSERT OR REPLACE INTO Content " +
-                "(ID_Content, Title, Plot, Image_Url,Poster_Url, Film_Url,  Year, Rating, Popularity,  Release_date, Episodes_Count,  Fetched_Date) " +
+                "(ID_Content, Title, Plot, Image_Url, Poster_Url, Film_Url, Year, Rating, Popularity, Release_date, Episodes_Count, Fetched_Date) " +
                 "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
         String insertGenreSQL = "INSERT OR IGNORE INTO Content_Genre (ID_Content, ID_Genre) VALUES (?, ?)";
 
-        try {
-            if (connection == null || connection.isClosed()) {
-                System.err.println("ContentDao: insertContents - Database connection is not available.");
-                throw new SQLException("Database connection is not available.");
-            }
-            connection.setAutoCommit(false);
-            try (PreparedStatement stmtInsertContent = connection.prepareStatement(insertContentSQL);
-                 PreparedStatement genreStmt = connection.prepareStatement(insertGenreSQL)) {
+        int contentBatchCount  = 0;
+        int genreBatchCount = 0 ;
+
+        try (Connection conn = DataBaseManager.getConnection()) {
+            if (conn == null)
+                throw new SQLException("Database connection is not available for insertContents.");
+
+
+            conn.setAutoCommit(false);
+
+            try (PreparedStatement stmtInsertContent = conn.prepareStatement(insertContentSQL);
+                 PreparedStatement genreStmt = conn.prepareStatement(insertGenreSQL)) {
 
                 for (Content content : contents) {
-
                     if (content.getId() == 0)
                         continue;
 
+
                     cacheManager.put(content);
 
-                    stmtInsertContent.setInt(1, content.getId());
-                    stmtInsertContent.setString(2, content.getTitle());
-                    stmtInsertContent.setString(3, content.getPlot());
-                    stmtInsertContent.setString(4, content.getImageUrl() != null ? content.getImageUrl() : "error");
-                    stmtInsertContent.setString(5, content.getPosterUrl() != null ? content.getPosterUrl() : "error");
-                    stmtInsertContent.setString(6, content.getVideoUrl() != null ? content.getVideoUrl() : "error");
-                    stmtInsertContent.setInt(7, content.getYear());
+                    stmtInsertContent.setInt( 1, content.getId( ));
+                    stmtInsertContent.setString( 2, content.getTitle()) ;
+                    stmtInsertContent.setString(3, content.getPlot()) ;
+                    stmtInsertContent.setString(4, content.getImageUrl()  != null ? content.getImageUrl() : "error"    );
+                    stmtInsertContent.setString( 5 , content.getPosterUrl() != null ? content.getPosterUrl() : "error" );
+                    stmtInsertContent.setString(6,  content.getVideoUrl() != null ? content.getVideoUrl() : "error"    );
+                    stmtInsertContent.setInt( 7, content.getYear() );
                     stmtInsertContent.setDouble(8, content.getRating());
                     stmtInsertContent.setInt(9, content.getPopularity());
-                    stmtInsertContent.setString(10, content.getReleaseDate() != null ? content.getReleaseDate() : "");
-                    stmtInsertContent.setInt(11, content.isSeries() ? 1 : 0);
+                    stmtInsertContent.setString(10 , content.getReleaseDate() != null ? content.getReleaseDate() : ""  );
+                    stmtInsertContent.setInt( 11, content.isSeries() ? 1 : 0);
                     stmtInsertContent.setString(12, OffsetDateTime.now(ZoneOffset.UTC).format(DateTimeFormatter.ISO_OFFSET_DATE_TIME));
                     stmtInsertContent.addBatch();
-                    if(content.getCategories()!=null && ! content.getCategories().isEmpty())
+                    contentBatchCount++ ;
+
+                    if (content.getCategories() != null && !content.getCategories().isEmpty()) {
                         for (Integer genreId : content.getCategories()) {
                             genreStmt.setInt(1, content.getId());
                             genreStmt.setInt(2, genreId);
                             genreStmt.addBatch();
-                        }
+                            genreBatchCount++;
+                         }
+                    }
                 }
-                stmtInsertContent.executeBatch();
-                genreStmt.executeBatch();
-                connection.commit();
+
+                if (contentBatchCount > 0)
+                    stmtInsertContent.executeBatch();
+
+                if (genreBatchCount > 0 )
+                    genreStmt.executeBatch();
+
+                conn.commit();
+                System.out.println("ContentDao: Successfully inserted/replaced  " +  contentBatchCount + " content items and " + genreBatchCount + " genre links.");
+
+            } catch (SQLException  e) {
+                System.err.println("ContentDao: Error inserting contents. Attempting rollback. Error: " + e.getMessage() );
+                try {
+                    if (!conn.getAutoCommit()) {
+                        conn.rollback();
+                        System.err.println("ContentDao: Rollback successful.");
+                    }
+                } catch (SQLException ex) {
+                    System.err.println("ContentDao: Error rolling back transaction: " + ex.getMessage() );
+                }
+                throw new RuntimeException( "ContentDao: Error inserting contents", e);
             }
         } catch (SQLException e) {
-            System.err.println("ContentDao: Error inserting contents. Attempting rollback. Error: " + e.getMessage());
-            try {
-                if (connection != null && !connection.isClosed()) connection.rollback();
-            } catch (SQLException ex) {
-                System.err.println("ContentDao: Error rolling back transaction: " + ex.getMessage());
-            }
-            throw new RuntimeException("ContentDao: Error inserting contents", e);
-        } finally {
-            try {
-                if (connection != null && !connection.isClosed()) connection.setAutoCommit(true);
-            } catch (SQLException e) {
-                System.err.println("ContentDao: Error resetting auto-commit: " + e.getMessage());
-            }
+            System.err.println("ContentDao: Database operation failed during insertContents: " + e.getMessage());
+            throw new RuntimeException("ContentDao: Database operation failed during insertContents", e);
         }
     }
 
     public void deleteExpiredContent() {
-        OffsetDateTime oneWeekAgo = OffsetDateTime.now(ZoneOffset.UTC).minusWeeks(1);
-        String oneWeekAgoStr = oneWeekAgo.format(DateTimeFormatter.ISO_OFFSET_DATE_TIME);
+        System.out.println("ContentDao: Starting deleteExpiredContent (older than 1 day).");
+        OffsetDateTime oneDayAgo = OffsetDateTime.now(ZoneOffset.UTC).minusDays(1); // Changed from minusWeeks(1)
+        String oneDayAgoStr = oneDayAgo.format(DateTimeFormatter.ISO_OFFSET_DATE_TIME);
 
-        List<Integer> idsToDelete = new ArrayList<>();
+        List<Integer> idList = new ArrayList<>();
         String selectExpiredSQL = "SELECT ID_Content FROM Content " +
                 "WHERE Fetched_Date < ? " +
-                "AND ID_Content NOT IN (SELECT DISTINCT ID_Content FROM History) " +
+                "AND ID_Content NOT IN (SELECT DISTINCT ID_Content FROM History)  " +
                 "AND ID_Content NOT IN (SELECT DISTINCT ID_Content FROM WatchList)" +
                 "AND ID_Content NOT IN (SELECT DISTINCT ID_Content FROM Favourite)";
-        try {
-            if (connection == null || connection.isClosed()) {
-                System.err.println("ContentDao: Database connection is not available for selecting IDs.");
-            } else {
-                try (PreparedStatement selectStmt = connection.prepareStatement(selectExpiredSQL)) {
-                    selectStmt.setString(1, oneWeekAgoStr);
-                    ResultSet rs = selectStmt.executeQuery();
-                    while (rs.next()) {
-                        idsToDelete.add(rs.getInt("ID_Content"));
-                    }
-                }
+
+        try (Connection connSelect = DataBaseManager.getConnection();
+             PreparedStatement selectStmt = connSelect.prepareStatement(selectExpiredSQL)) {
+            selectStmt.setString(1, oneDayAgoStr);
+            try (ResultSet rs = selectStmt.executeQuery()) {
+                while (rs.next())
+                    idList.add(rs.getInt("ID_Content"));
             }
+            System.out.println("ContentDao: Found " + idList.size() + " expired content IDs to delete.");
         } catch (SQLException e) {
-            System.err.println("ContentDao: Error selecting expired content IDs for cache removal: " + e.getMessage());
+            System.err.println("ContentDao: Error selecting expired content IDs: " + e.getMessage());
+            return;
         }
 
-        String deleteSQL = "DELETE FROM Content " +
-                "WHERE Fetched_Date < ? " +
-                "AND ID_Content NOT IN (SELECT DISTINCT ID_Content FROM History) " +
-                "AND ID_Content NOT IN (SELECT DISTINCT ID_Content FROM WatchList)" +
-                "AND ID_Content NOT IN (SELECT DISTINCT ID_Content FROM Favourite)";
+        if (idList.isEmpty()) {
+            System.out.println("ContentDao: No expired content found to delete.");
+            return;
+        }
 
-        try {
-            if (connection == null || connection.isClosed()) {
-                System.err.println("ContentDao: deleteExpiredContent - Database connection is not available for deletion.");
+        String deleteSQL = "DELETE FROM Content WHERE ID_Content = ?";
+
+
+        try (Connection  connDelete = DataBaseManager.getConnection()) {
+            if (connDelete == null) {
+                System.err.println("ContentDao: deleteExpiredContent - Failed to acquire database connection for deleting content.");
                 return;
             }
-            try (PreparedStatement stmt = connection.prepareStatement(deleteSQL)) {
-                stmt.setString(1, oneWeekAgoStr);
-                int rowsAffected = stmt.executeUpdate();
-                if (rowsAffected > 0) {
-                    idsToDelete.forEach(cacheManager::remove); // Remove deleted items from cache
+            connDelete.setAutoCommit(false);
+            try (PreparedStatement stmt = connDelete.prepareStatement(deleteSQL)) {
+                for (Integer  id : idList) {
+                    stmt.setInt(1, id);
+                    stmt.addBatch();
                 }
-                System.out.println("ContentDao: Deleted " + rowsAffected + " expired content items. Removed from cache: " + idsToDelete.size());
+                int[] batchResults = stmt.executeBatch();
+                connDelete.commit();
+
+
+                idList.forEach(cacheManager::remove );
+
+            } catch (SQLException e) {
+                System.err.println("ContentDao: Error deleting expired content. Attempting rollback. Error:  " +  e.getMessage());
+                try {
+                    if ( !connDelete.getAutoCommit()) {
+                        connDelete.rollback();
+                        System.err.println("ContentDao: Rollback successful for delete operation." );
+                    }
+                } catch (SQLException ex) {
+                    System.err.println( "ContentDao: Error rolling back delete transaction: "  +  ex.getMessage());
+                }
             }
         } catch (SQLException e) {
-            System.err.println("ContentDao: Error deleting expired content: " + e.getMessage());
+             System.err.println( "ContentDao: deleteExpiredContent - Database connection error during delete phase: "  + e.getMessage());
         }
     }
 
-    /**
-     * Fetches genre IDs. Tries user-specific tastes first from the Taste table.
-     *
-     * @param userId  The ID of the user.
-     * @param orderBy SQL keyword for ordering user tastes (e.g., "DESC" or "ASC").
-     * @param limit   The maximum number of genre IDs to return from user tastes. This limit
-     *                is not applied when fetching all genres as a default.
-     * @return A comma-separated string of genre IDs
-     */
-    private String getGenreIdsStringFromTaste(int userId, String orderBy, int limit) {
+    private  String getGenreIdsStringFromTaste( int userId, String orderBy , int limit) {
+        System.out.println("ContentDao: Attempting to fetch genre IDs from taste for user  " + userId + ", orderBy " + orderBy + ", limit " + limit);
         List<String> genreIds = new ArrayList<>();
-        String userTasteSql = "SELECT ID_Genre FROM Taste WHERE ID_User = ? ORDER BY Weight " + orderBy + " LIMIT ?";
+        String userTasteSql = " SELECT ID_Genre FROM Taste WHERE ID_User = ? ORDER BY Weight " + orderBy + " LIMIT ?";
 
-        boolean userTastesFetched = false;
-        try {
-            if (connection == null || connection.isClosed()) {
-                System.err.println("ContentDao: getGenreIdsStringFromTaste - DB connection not available for user tastes. UserID: " + userId);
+        try (Connection conn = DataBaseManager.getConnection()) {
+            if (conn == null) {
+                System.err.println(" ContentDao: getGenreIdsStringFromTaste - DB connection not available for user tastes. UserID: " + userId);
             } else {
-                try (PreparedStatement stmt = connection.prepareStatement(userTasteSql)) {
+                try (PreparedStatement stmt = conn.prepareStatement(userTasteSql)) {
                     stmt.setInt(1, userId);
                     stmt.setInt(2, limit);
-                    ResultSet rs = stmt.executeQuery();
-                    while (rs.next()) {
-                        genreIds.add(String.valueOf(rs.getInt("ID_Genre")));
+                    try (ResultSet rs = stmt.executeQuery()) {
+                        while (rs.next()) {
+                            genreIds.add(String.valueOf(rs.getInt( "ID_Genre") ));
+                        }
                     }
-                    userTastesFetched = true;
                 }
             }
         } catch (SQLException e) {
-            System.err.println("ContentDao: Error fetching genre IDs from Taste table for user " + userId + " (orderBy=" + orderBy + ", limit=" + limit + "): " + e.getMessage() + ". Will try fetching all genres.");
+            System.err.println( "ContentDao: Error fetching genre IDs from Taste table for user " + userId + ": " + e.getMessage() + ". Will try fetching all genres.");
         }
 
         if (genreIds.isEmpty()) {
+            System.out.println( "ContentDao: No user-specific tastes found for user " + userId + " or error occurred. Fetching all genres as fallback.");
             String allGenresSql = "SELECT ID_Genre FROM Taste ORDER BY ID_Genre";
-            try {
-                if (connection == null || connection.isClosed()) {
-                    System.out.println("ContentDao: getGenreIdsStringFromTaste - DB connection not available for fetching all genres.");
-                    return "-1";
-                }
-                try (PreparedStatement stmt = connection.prepareStatement(allGenresSql)) {
-                    ResultSet rs = stmt.executeQuery();
-                    while (rs.next()) {
-                        genreIds.add(String.valueOf(rs.getInt("ID_Genre")));
+            try ( Connection conn = DataBaseManager.getConnection()) {
+                if (conn == null)
+                     return "-1" ;
+
+                try ( PreparedStatement stmt = conn.prepareStatement(allGenresSql)) {
+                    try (ResultSet rs = stmt.executeQuery() ) {
+                        while (rs.next())
+                            genreIds.add(String.valueOf(rs.getInt("ID_Genre")));
                     }
                 }
             } catch (SQLException e) {
@@ -222,43 +263,55 @@ public class ContentDao {
                 return "-1";
             }
         }
-
-        return String.join(",", genreIds);
+        String result = String.join(",", genreIds);
+        System.out.println("ContentDao: Successfully fetched genre IDs string: " + result);
+        return result;
     }
 
+    private List<List<Content>> getContentFromDB(String query, int numberOfLists) {
+        System.out.println("ContentDao: Attempting to get content from DB with " + numberOfLists + " lists. Query (first 150 chars): " +
+                (query.length() > 150 ? query.substring(0, 150) + "..." : query));
+        List<List<Content>> resultList = new Vector<>();
+        for (int i = 0; i < numberOfLists; i++) {
+            resultList.add(new Vector<>());
+        }
 
-    private List<List<Content>> getContentFromDB( String query,int numberOfLists) {
-        List<List<Content>> list = new Vector<>();
-        for(int i=0;i<numberOfLists;i++)
-            list.add(new Vector<>());
-        try {
-            if (connection == null || connection.isClosed()) {
+        try (Connection conn = DataBaseManager.getConnection() ) {
+            if (conn == null) {
                 System.err.println("ContentDao: getContentFromDB - Database connection is not available.");
-                return list;
+                return resultList; // Return empty initialized list
             }
-            try (PreparedStatement stmt = connection.prepareStatement(query)) {
-                ResultSet rs = stmt.executeQuery();
+            try (PreparedStatement stmt = conn.prepareStatement(query);
+                 ResultSet rs = stmt.executeQuery()) {
+                int count = 0;
                 while (rs.next()) {
                     Content content = createContentFromResultSet(rs);
                     if (content != null) {
-                        list.get(rs.getInt("List")).add(content);
+                        int listIndex = rs.getInt("List" );
+                        if (listIndex >= 0 && listIndex < numberOfLists) {
+                            resultList.get(listIndex).add(content);
+                            count++;
+                        } else {
+                            System.err.println("ContentDao: getContentFromDB - Invalid list index  " + listIndex + " from query for content ID " + content.getId());
+                        }
                     }
                 }
+                System.out.println("ContentDao: getContentFromDB - Successfully fetched " + count + "  content items into respective lists.");
             }
-        } catch (Exception e) { // Catching generic Exception is broad; consider specific ones like SQLException
-            System.err.println("ContentDao: Error in getContentFromDB. Query Error:" + e.getMessage());
+        } catch (SQLException e) {
+             System.err.println( "ContentDao: Error in getContentFromDB. Query Error: " + e.getMessage());
         }
-        return list;
+        return resultList;
     }
 
-
     public List<List<Content>> getHomePageContents(User user) {
+        System.out.println("ContentDao: Starting getHomePageContents for user ID: " + user.getID());
         int userId = user.getID();
-        String topGenresString = buildGenreFilter( getGenreIdsStringFromTaste(userId, "DESC", 3));
-        String bottomGenresString =  buildGenreFilter(getGenreIdsStringFromTaste(userId, "ASC", 3));
+        String topGenresString     = buildGenreFilter( getGenreIdsStringFromTaste(userId, "DESC", 3));
+        String bottomGenresString  =   buildGenreFilter(getGenreIdsStringFromTaste(userId, "ASC", 3));
         String firstTopGenreString = buildGenreFilter( getGenreIdsStringFromTaste(userId, "DESC", 1));
         String query =
-                "SELECT DISTINCT  * , 0 AS List FROM (SELECT C.* FROM Content C JOIN Content_Genre CG ON C.ID_Content = CG.ID_Content " +
+                "SELECT DISTINCT   * , 0 AS List FROM (SELECT C.* FROM Content C JOIN Content_Genre CG ON C.ID_Content = CG.ID_Content " +
                         topGenresString +" ORDER BY C.Popularity DESC LIMIT 5) UNION ALL " +
 
                         // Random top genres content
@@ -289,24 +342,26 @@ public class ContentDao {
                         "SELECT DISTINCT * , 8 AS List FROM (SELECT C.* FROM Content C JOIN Content_Genre CG ON C.ID_Content = CG.ID_Content " +
                         bottomGenresString + " ORDER BY RANDOM() LIMIT 7);";
 
-        List<List<Content>> results = getContentFromDB(query,9);
-        results.forEach(this::fetchAndSetGenresForContentList);
+        List<List<Content>> results = getContentFromDB(query, 9);
+        results.forEach(this::fetchAndSetGenresForContentList ); // fetchAndSetGenresForContentList will use its own connection
+        System.out.println( "ContentDao: Successfully completed getHomePageContents for user ID: " + user.getID());
         return results;
     }
+
     public String buildGenreFilter(String genreIdsString) {
-        if (genreIdsString != null && !genreIdsString.equals("-1")) {
+        if (genreIdsString != null && !genreIdsString.isEmpty() && !genreIdsString.equals("-1"))
             return "WHERE CG.ID_Genre IN (" + genreIdsString + ") ";
-        }
         return "";
     }
+
     public List<List<Content>> getFilterPageContents(User user, boolean isFilm) {
+        System.out.println("ContentDao: Starting getFilterPageContents for user ID: " + user.getID() + ",  isFilm: " + isFilm);
         int userId = user.getID();
-        String top_genres_str = buildGenreFilter(getGenreIdsStringFromTaste(userId, "DESC", 3));
+        String top_genres_str =  buildGenreFilter(getGenreIdsStringFromTaste(userId, "DESC", 3) );
 
         String query;
         String typeConditionSpecific = isFilm ? "  AND C.Episodes_Count = 0 " : " AND  C.Episodes_Count > 0 ";
-        String typeConditionGeneral = isFilm ? "  C.Episodes_Count = 0 " : "  C.Episodes_Count > 0 ";
-
+        String typeConditionGeneral = isFilm  ? "  C.Episodes_Count = 0 "     : "  C.Episodes_Count > 0 "    ;
 
         if (isFilm) {
             query = "SELECT DISTINCT *, 0 AS List FROM ( SELECT C.* FROM Content C JOIN Content_Genre CG ON C.ID_Content = CG.ID_Content  " +
@@ -334,12 +389,11 @@ public class ContentDao {
                     "SELECT  DISTINCT *, 3 AS List FROM ( SELECT C.* FROM Content C WHERE " + typeConditionGeneral + " ORDER BY RANDOM() LIMIT 8 ) AS SubS3 UNION ALL " +
                     "SELECT DISTINCT *, 4 AS List FROM ( SELECT C.* FROM Content C WHERE " + typeConditionGeneral + " ORDER BY RANDOM() LIMIT 10 ) AS SubS4;";
         }
-        List<List<Content>> results = getContentFromDB(query,5);
-        results.forEach(this::fetchAndSetGenresForContentList);
-        return results;
+        List<List<Content>> results = getContentFromDB(query, 5);
+        results.forEach(this::fetchAndSetGenresForContentList) ;
+        System.out.println("ContentDao: Successfully completed getFilterPageContents for user ID: " + user.getID() + ", isFilm: " + isFilm);
+        return results ;
     }
-
-
 
     private void fetchAndSetGenresForContentList(List<Content> contents) {
         if (contents == null || contents.isEmpty()) {
@@ -349,168 +403,166 @@ public class ContentDao {
         if (validContents.isEmpty()) {
             return;
         }
+        System.out.println("ContentDao: Attempting to fetch and set genres for  " + validContents.size() +  " content items.");
 
         String idsString = validContents.stream()
-                .map(c -> String.valueOf(c.getId()))
+                .map(c -> String.valueOf(c.getId() ))
                 .distinct()
                 .collect(Collectors.joining(","));
 
-        if (idsString.isEmpty()) return;
+        if (idsString.isEmpty()) {
+            System.out.println("ContentDao: fetchAndSetGenresForContentList - No content IDs to fetch genres for.");
+            return;
+        }
 
-        String genresQuery = "SELECT ID_Content, ID_Genre FROM Content_Genre WHERE ID_Content IN (" + idsString + ")";
-        Map<Integer, List<Integer>> contentGenresMap = new HashMap<>();
+        String genresQuery =  "SELECT ID_Content, ID_Genre FROM Content_Genre WHERE ID_Content IN (" + idsString + ")";
+        Map<Integer,  List<Integer>> contentGenresMap =  new HashMap<>();
 
-        try {
-            if (connection == null || connection.isClosed()) {
-                System.err.println("ContentDao: fetchAndSetGenresForContentList - Database connection is not available.");
+        try (Connection  conn = DataBaseManager.getConnection() ) {
+            if (conn == null) {
+                System.err.println( "ContentDao: fetchAndSetGenresForContentList - Database connection is not available.");
                 return;
             }
-            try (Statement stmt = connection.createStatement()) {
-                ResultSet rs = stmt.executeQuery(genresQuery);
-                while (rs.next()) {
+            try (Statement stmt = conn.createStatement();
+                 ResultSet rs = stmt.executeQuery(genresQuery)) {
+                while ( rs.next()) {
                     int contentId = rs.getInt("ID_Content");
-                    int genreId = rs.getInt("ID_Genre");
-                    contentGenresMap.computeIfAbsent(contentId, k -> new ArrayList<>()).add(genreId);
+                    int genreId = rs.getInt("ID_Genre" );
+                    contentGenresMap.computeIfAbsent( contentId,  k -> new ArrayList<>()).add(genreId);
                 }
             }
         } catch (SQLException e) {
             System.err.println("ContentDao: Error fetching genres for multiple contents. IDs (first 100 chars): " +
-                    (idsString.length() > 100 ? idsString.substring(0, 100) : idsString) +
-                    "... Error: " + e.getMessage());
+                    (idsString.length() > 100 ? idsString.substring(0, 100) + "..." : idsString ) +
+                    " Error: " + e.getMessage());
         }
 
-        for (Content content : validContents) {
-            List<Integer> genres = contentGenresMap.getOrDefault(content.getId(), Collections.emptyList());
-            content.setCategories(genres.stream().distinct().collect(Collectors.toList()));
+        for (Content content : validContents ) {
+            List<Integer> genres = contentGenresMap.getOrDefault(content.getId(), Collections.emptyList( ));
+            content.setCategories(genres.stream().distinct().collect(Collectors.toList( ))) ;
         }
+        System.out.println( "ContentDao: Successfully fetched and set genres for content list.");
     }
 
-    public List<Content> getFavourites(int idUser, int limit) {
-        return getListWithLimit(idUser, limit, "SELECT C.* FROM Content C JOIN Favourite Pr ON C.ID_Content = Pr.ID_Content WHERE Pr.ID_User = ?");
+    public List<Content> getFavourites(int idUser, int limit ) {
+        System.out.println("ContentDao: Getting favourites for user " + idUser + " with limit " + limit);
+        return  getListWithLimit(idUser , limit, "SELECT C.* FROM Content C JOIN Favourite Pr ON C.ID_Content = Pr.ID_Content WHERE Pr.ID_User = ?");
     }
 
-    public List<Content> getWatched(int idUser, int limit) {
-        return getListWithLimit(idUser, limit, "SELECT C.* FROM Content C JOIN History Cr ON C.ID_Content = Cr.ID_Content WHERE Cr.ID_User = ?");
+    public List<Content> getWatched(int  idUser, int limit ) {
+        System.out.println("ContentDao: Getting  watched for user " + idUser + " with limit " + limit);
+        return getListWithLimit(idUser, limit, "SELECT C.* FROM Content C JOIN History Cr ON C.ID_Content  = Cr.ID_Content WHERE Cr.ID_User = ?");
     }
 
-    private List<Content> getListWithLimit(int idUser, int limit, String queryWithoutLimitAndPlaceholder) {
+    private List<Content> getListWithLimit(int idUser, int limit, String queryWithoutLimitAndPlaceholder ) {
+        System.out.println("ContentDao: Attempting to get list with limit for user " + idUser + ", limit " + limit +
+                ". Query (first 50 chars): " + queryWithoutLimitAndPlaceholder.substring(0,  Math.min(50, queryWithoutLimitAndPlaceholder.length())));
         List<Content> resultContents = new ArrayList<>();
         String fullQuery = queryWithoutLimitAndPlaceholder.trim();
         if (fullQuery.endsWith(";")) {
-            fullQuery = fullQuery.substring(0, fullQuery.length() -1);
+            fullQuery = fullQuery.substring(0, fullQuery.length()  - 1);
         }
-        fullQuery += " LIMIT ?;";
+        fullQuery += " ORDER BY C.Popularity DESC LIMIT ?; " ;
 
-        try {
-            if (connection == null || connection.isClosed()) {
+        try (Connection conn = DataBaseManager.getConnection()) {
+
+            if (conn == null) {
                 System.err.println("ContentDao: getListWithLimit - Database connection is not available.");
                 return resultContents;
             }
-            try (PreparedStatement stmt = connection.prepareStatement(fullQuery)) {
+
+            try (PreparedStatement stmt = conn.prepareStatement(fullQuery)) {
                 stmt.setInt(1, idUser);
-                stmt.setInt(2, limit);
-                ResultSet rs = stmt.executeQuery();
+                stmt.setInt( 2, limit);
+
+                try (ResultSet rs = stmt.executeQuery()) {
+                    while (rs.next()) {
+                        Content content = createContentFromResultSet(rs);
+                        if (content != null) {
+                            resultContents.add(content);
+                        }
+                    }
+                }
+            }
+        } catch (SQLException e)  {
+            System.err.println("ContentDao: Error executing getListWithLimit query: " + e.getMessage());
+        }
+        fetchAndSetGenresForContentList(resultContents);
+        System.out.println("ContentDao: Successfully fetched " + resultContents.size() + " items for getListWithLimit.");
+        return resultContents;
+    }
+
+    public List<Content> historyContent(int userId )  {
+        System.out.println("ContentDao: Attempting to fetch history content for user " + userId);
+        List<Content> contentList = new ArrayList<> ();
+        String query = "SELECT C.* FROM History H JOIN Content C ON H.ID_Content=C.ID_Content WHERE H.ID_User=? ORDER BY H.Date DESC";
+
+        try (Connection conn = DataBaseManager.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(query)) {
+            stmt.setInt(1, userId );
+            try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
                     Content content = createContentFromResultSet(rs);
                     if (content != null) {
-                        resultContents.add(content);
+                        contentList.add(content);
                     }
                 }
             }
         } catch (SQLException e) {
-            System.err.println("ContentDao: error executing query (first 50 chars): " +
-                    queryWithoutLimitAndPlaceholder.substring(0, Math.min(50, queryWithoutLimitAndPlaceholder.length())) +
-                    "... Error: " + e.getMessage());
+            System.err.println("ContentDao: Error selecting content from history for user " + userId + ": " + e.getMessage());
         }
-        fetchAndSetGenresForContentList(resultContents);
-        return resultContents;
-    }
-
-
-    public List<Content> historyContent(int userId){
-        List<Content> contentList = new ArrayList<>();
-        String query = "SELECT Content.* FROM History JOIN Content ON History.ID_Content=Content.ID_Content WHERE History.ID_User=?;";
-        try(PreparedStatement stmt = connection.prepareStatement(query)){
-            stmt.setInt(1,userId);
-            ResultSet rs = stmt.executeQuery();
-            while(rs.next()){
-                Content content = new Content();
-                content.setId(rs.getInt("ID_Content"));
-                content.setTitle(rs.getString("Title"));
-                content.setPlot(rs.getString("Plot"));
-                content.setImageUrl(rs.getString("Image_Url"));
-                content.setPosterUrl(rs.getString("Poster_Url"));
-                content.setVideoUrl(rs.getString("Film_Url"));
-                content.setYear(rs.getInt("Year"));
-                content.setRating(rs.getDouble("Rating"));
-                content.setPopularity(rs.getInt("Popularity"));
-                content.setReleaseDate(rs.getString("Release_Date"));
-                content.setIsSeries(rs.getInt("Episodes_Count") > 0);
-                contentList.add(content);
-            }
-
-        }catch (SQLException e) {
-            System.err.println("ContentDao : error select content from history of the user "+e.getMessage());
-        }
+        fetchAndSetGenresForContentList(contentList);
+        System.out.println("ContentDao: Successfully fetched " + contentList.size() + " history items for user " + userId);
 
         return contentList;
     }
 
-    public List<Content> watchlistContent(int userId){
+    public List<Content> watchlistContent(int userId) {
+        System.out.println("ContentDao: Attempting to fetch watchlist content for user " + userId);
         List<Content> contentList = new ArrayList<>();
-        String query = "SELECT Content.* FROM Watchlist JOIN Content ON Watchlist.ID_Content=Content.ID_Content WHERE Watchlist.ID_User=?;";
-        try(PreparedStatement stmt = connection.prepareStatement(query)){
-            stmt.setInt(1,userId);
-            ResultSet rs = stmt.executeQuery();
-            while(rs.next()){
-                Content content = new Content();
-                content.setId(rs.getInt("ID_Content"));
-                content.setTitle(rs.getString("Title"));
-                content.setPlot(rs.getString("Plot"));
-                content.setImageUrl(rs.getString("Image_Url"));
-                content.setPosterUrl(rs.getString("Poster_Url"));
-                content.setVideoUrl(rs.getString("Film_Url"));
-                content.setYear(rs.getInt("Year"));
-                content.setRating(rs.getDouble("Rating"));
-                content.setPopularity(rs.getInt("Popularity"));
-                content.setReleaseDate(rs.getString("Release_Date"));
-                content.setIsSeries(rs.getInt("Episodes_Count") > 0);
-                contentList.add(content);
-            }
+        //  Watchlist table has a Date_Added or similar for ordering, if not, order by Title or Popularity
+        String query = "SELECT C.* FROM Watchlist W JOIN Content C ON W.ID_Content=C.ID_Content WHERE W.ID_User=? ORDER BY C.Title ASC";
 
-        }catch (SQLException e) {
-            System.err.println("ContentDao : error select content from watchlist of the user "+e.getMessage());
+        try (Connection conn = DataBaseManager.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(query)) {
+            stmt.setInt(1, userId);
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    Content content = createContentFromResultSet(rs);
+
+                    if (content != null)
+                        contentList.add(content);
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("ContentDao: Error selecting content from watchlist for user " + userId + ": " + e.getMessage());
         }
+        fetchAndSetGenresForContentList(contentList);
+        System.out.println("ContentDao: Successfully fetched " + contentList.size() + " watchlist items for user " + userId);
         return contentList;
     }
 
-
-    public List<Content> favoriteListContent(int userId){
+    public List<Content> favoriteListContent(int userId) {
+        System.out.println("ContentDao: Attempting to fetch favorite list content for user " + userId);
         List<Content> contentList = new ArrayList<>();
-        String query = "SELECT Content.* FROM Favourite JOIN Content ON Favourite.ID_Content=Content.ID_Content WHERE Favourite.ID_User=?;";
-        try(PreparedStatement stmt = connection.prepareStatement(query)){
-            stmt.setInt(1,userId);
-            ResultSet rs = stmt.executeQuery();
-            while(rs.next()){
-                Content content = new Content();
-                content.setId(rs.getInt("ID_Content"));
-                content.setTitle(rs.getString("Title"));
-                content.setPlot(rs.getString("Plot"));
-                content.setImageUrl(rs.getString("Image_Url"));
-                content.setPosterUrl(rs.getString("Poster_Url"));
-                content.setVideoUrl(rs.getString("Film_Url"));
-                content.setYear(rs.getInt("Year"));
-                content.setRating(rs.getDouble("Rating"));
-                content.setPopularity(rs.getInt("Popularity"));
-                content.setReleaseDate(rs.getString("Release_Date"));
-                content.setIsSeries(rs.getInt("Episodes_Count") > 0);
-                contentList.add(content);
-            }
+        String query = "SELECT C.* FROM Favourite F JOIN Content C ON F.ID_Content=C.ID_Content WHERE F.ID_User=? ORDER BY C.Title ASC";
 
-        }catch (SQLException e) {
-            System.err.println("ContentDao : error select content from favourite of the user "+e.getMessage());
+        try (Connection conn = DataBaseManager.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(query)) {
+            stmt.setInt(1, userId);
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    Content content = createContentFromResultSet(rs);
+                    if (content != null)
+                        contentList.add(content);
+
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("ContentDao: Error selecting content from favourite list for user " + userId + ": " + e.getMessage());
         }
+        fetchAndSetGenresForContentList(contentList);
+        System.out.println("ContentDao: Successfully fetched " + contentList.size() + " favorite items for user " + userId);
         return contentList;
     }
-
 }

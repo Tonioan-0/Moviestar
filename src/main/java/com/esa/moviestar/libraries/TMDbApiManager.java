@@ -79,7 +79,7 @@ public class TMDbApiManager {
     }
 
     // Singleton instance
-    private static volatile TMDbApiManager instance;
+    private static volatile TMDbApiManager  instance;
     private final OkHttpClient client;
     private final ExecutorService executor;
     private ContentDao contentDao;
@@ -97,7 +97,7 @@ public class TMDbApiManager {
         if (instance == null) {
             synchronized (TMDbApiManager.class) {
                 if (instance == null) {
-                    instance = new TMDbApiManager();
+                    instance =  new TMDbApiManager();
                 }
             }
         }
@@ -113,7 +113,7 @@ public class TMDbApiManager {
             Request original = chain.request();
             HttpUrl originalHttpUrl = original.url();
             HttpUrl url = originalHttpUrl.newBuilder().build(); // No need to add API key as query param with Bearer token
-            Request.Builder requestBuilder = original.newBuilder()
+            Request.Builder requestBuilder  = original.newBuilder()
                     .url(url)
                     .header("accept", "application/json")
                     // Use the Bearer token method which is preferred by TMDb v3/v4
@@ -127,15 +127,15 @@ public class TMDbApiManager {
 
     //Requests
     private Request buildRequest(String endpointPathAndQuery) {
-        HttpUrl parsedUrl = HttpUrl.parse(BASE_URL + endpointPathAndQuery);
+        HttpUrl parsedUrl  = HttpUrl.parse(BASE_URL + endpointPathAndQuery);
         if (parsedUrl == null) {
             // Log the malformed URL and throw
-            System.err.println("TMDbApiManager: Malformed URL attempted: " + BASE_URL + endpointPathAndQuery);
-            throw new IllegalArgumentException("Malformed URL for endpoint: " + endpointPathAndQuery);
+            System.err.println( "TMDbApiManager: Malformed URL attempted: " + BASE_URL + endpointPathAndQuery);
+            throw new IllegalArgumentException( "Malformed URL for endpoint: " + endpointPathAndQuery);
         }
         HttpUrl.Builder urlBuilder = parsedUrl.newBuilder();
         // Add language parameter unless it's an image URL or already present
-        if (!endpointPathAndQuery.startsWith("/t/p/") && parsedUrl.queryParameter("language") == null) {
+        if (!endpointPathAndQuery.startsWith( "/t/p/") && parsedUrl.queryParameter("language") ==  null) {
             urlBuilder.addQueryParameter("language", LANGUAGE);
         }
         return new Request.Builder().url(urlBuilder.build()).get().build();
@@ -145,7 +145,7 @@ public class TMDbApiManager {
         try (Response response = client.newCall(request).execute()) {
             if (!response.isSuccessful()) {
                 ResponseBody errorBody = response.body();
-                String errorDetails = errorBody != null ? errorBody.string() : "No error body";
+                String errorDetails = errorBody != null ?  errorBody.string() : "No error body";
                 // Log the full request URL for debugging
                 System.err.println("TMDbApiManager: Request URL: " + request.url());
                 System.err.println("TMDbApiManager: Response Code: " + response.code());
