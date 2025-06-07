@@ -42,25 +42,24 @@ public class Access {
     @FXML
     private PasswordField passwordField;
     @FXML
-    private TextField passwordTextField; // From first code
+    private TextField passwordTextField;
     @FXML
-    private Button togglePasswordButton; // From first code
+    private Button togglePasswordButton;
     @FXML
-    private StackPane passwordContainer; // From first code
+    private StackPane passwordContainer;
     @FXML
-    private StackPane mainContainer; // Renamed from ContenitorePadre in second code
+    private StackPane mainContainer;
     @FXML
     private VBox loginBox;
     @FXML
-    private Button resetPassword; // Renamed from recuperoPassword in second code
+    private Button resetPassword;
     @FXML
-    private StackPane imageContainer; // Renamed from ContenitoreImmagine in second code
+    private StackPane imageContainer;
 
     private EmailService emailService;
     private Account account;
-    private boolean isPasswordVisible = false; // From first code
+    private boolean isPasswordVisible = false;
 
-    // Valori di riferimento
     private final double REFERENCE_WIDTH = 1720.0;
     private final double REFERENCE_HEIGHT = 980.0;
     private final double REFERENCE_LOGIN_WIDTH = 400.0;
@@ -107,14 +106,13 @@ public class Access {
             }
         });
 
-        Node[] formElements = {welcomeText, emailField, passwordField, access, register};
+        Node[] formElements = {togglePasswordButton,welcomeText, emailField, passwordField, access, register};
         AnimationUtils.animateSimultaneously(formElements, 1);
 
         setupResponsiveLayout();
         setupKeyboardNavigation();
     }
 
-    // From first code
     private void setupPasswordToggle() {
         passwordField.textProperty().addListener((obs, oldText, newText) -> {
             if (!passwordTextField.isFocused()) {
@@ -136,11 +134,9 @@ public class Access {
     }
 
     private void togglePasswordVisibility() {
-
         isPasswordVisible = !isPasswordVisible;
 
         if (isPasswordVisible) {
-
             passwordTextField.setText(passwordField.getText());
             passwordField.setVisible(false);
             passwordField.setManaged(false);
@@ -148,11 +144,10 @@ public class Access {
             passwordTextField.setManaged(true);
             passwordTextField.requestFocus();
             passwordTextField.positionCaret(passwordTextField.getText().length());
-            togglePasswordButton.setGraphic(new SVGPath(){{setContent(Main.resourceBundle.getString("passwordField.hidePassword"));getStyleClass().add("on-primary");}});;
+            togglePasswordButton.setGraphic(new SVGPath(){{setContent(Main.resourceBundle.getString("passwordField.hidePassword"));getStyleClass().add("on-primary");}});
 
         }
         else {
-
             passwordField.setText(passwordTextField.getText());
             passwordTextField.setVisible(false);
             passwordTextField.setManaged(false);
@@ -164,7 +159,6 @@ public class Access {
         }
     }
 
-    // From first code
     private void setupKeyboardNavigation() {
         mainContainer.setOnKeyPressed(event -> {
             if (event.getCode() == KeyCode.ENTER) {
@@ -211,7 +205,6 @@ public class Access {
         double rawScale = Math.min(width / REFERENCE_WIDTH, height / REFERENCE_HEIGHT);
         double scale = 1 - (1 - rawScale) * 0.5;
 
-        // Gestione dell'immagine
         if (imageContainer != null) {
             boolean showImage = width > IMAGE_VISIBILITY_THRESHOLD;
             imageContainer.setVisible(showImage);
@@ -226,7 +219,6 @@ public class Access {
             }
         }
 
-        // Gestione del login box
         if (loginBox != null) {
             boolean showLoginBox = width > MIN_VBOX_VISIBILITY_THRESHOLD;
             loginBox.setVisible(showLoginBox);
@@ -251,7 +243,6 @@ public class Access {
                 StackPane.setMargin(loginBox, compactMode ? new Insets(0) :
                         new Insets(0, Math.max(50, (140 * scale)), 0, 0));
 
-                // Dimensioni font dinamiche
                 double baseFontSize = 15 * scale;
                 double welcomeTextScale = Math.max(scale, 0.7);
                 double accessButtonScale = Math.max(scale, 0.7);
@@ -262,7 +253,7 @@ public class Access {
                 access.setStyle("-fx-font-size: " + (15 * accessButtonScale * 2) + "px;");
                 warningText.setStyle("-fx-font-size: " + (warningTextScale) + "px;");
                 register.setStyle("-fx-font-size: " + (registerScale) + "px;");
-                resetPassword.setStyle("-fx-font-size: " + (registerScale) + "px;"); // Changed from recuperoPassword
+                resetPassword.setStyle("-fx-font-size: " + (registerScale) + "px;");
 
                 double fieldWidth = Math.min(loginWidth - padding * 2, loginWidth * 0.9);
 
@@ -291,26 +282,24 @@ public class Access {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/esa/moviestar/login/register.fxml"), Main.resourceBundle);
             Parent registerContent = loader.load();
-            Scene currentScene = mainContainer.getScene(); // Changed from ContenitorePadre
+            Scene currentScene = mainContainer.getScene();
             Scene newScene = new Scene(registerContent, currentScene.getWidth(), currentScene.getHeight());
-            Stage stage = (Stage) mainContainer.getScene().getWindow(); // Changed from ContenitorePadre
+            Stage stage = (Stage) mainContainer.getScene().getWindow();
             stage.setScene(newScene);
         } catch (IOException e) {
-            e.printStackTrace();
-            warningText.setText("Loading error: " + e.getMessage()); // Changed from Errore di caricamento
+            warningText.setText("Loading error: " + e.getMessage());
         }
     }
 
     private boolean check_access(String _email, String _password) {
         if (_email.isEmpty() || _password.isEmpty()) {
-            warningText.setText("Add email and password"); // Changed from Inserisci email e password
+            warningText.setText("Add email and password");
             AnimationUtils.shake(warningText);
             return false;
         }
         return true;
     }
 
-    // From first code
     private String getCurrentPassword() {
         return isPasswordVisible ? passwordTextField.getText() : passwordField.getText();
     }
@@ -347,25 +336,24 @@ public class Access {
                 The MovieStar Team
                 """, verificationCode);
 
-            /* Send email with the verification code
             try {
                 emailService.sendEmail(email, subject, body);
-                warningText.setText("Verification code sent to your email"); // Added message for success
+                warningText.setText("Verification code sent to your email");
                 AnimationUtils.pulse(warningText);
             } catch (MessagingException e) {
-                warningText.setText("Failed to send email. Please try again."); // Added message for email sending failure
+                warningText.setText("Failed to send email. Please try again.");
                 AnimationUtils.shake(warningText);
                 return;
-            }*/
+            }
 
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/esa/moviestar/login/reset-password-view.fxml"), Main.resourceBundle);
             Parent resetContent = loader.load();
-            Node currentContent = mainContainer.getChildren().getFirst(); // Changed from ContenitorePadre
+            Node currentContent = mainContainer.getChildren().getFirst();
             AnimationUtils.fadeOut(currentContent, 100);
 
-            Scene currentScene = mainContainer.getScene(); // Changed from ContenitorePadre
+            Scene currentScene = mainContainer.getScene();
             Scene newScene = new Scene(resetContent, currentScene.getWidth(), currentScene.getHeight());
-            Stage stage = (Stage) mainContainer.getScene().getWindow(); // Changed from ContenitorePadre
+            Stage stage = (Stage) mainContainer.getScene().getWindow();
             stage.setScene(newScene);
 
             ResetController resetController = loader.getController();
@@ -377,7 +365,7 @@ public class Access {
 
     private void loginUser() throws SQLException {
         String email = emailField.getText();
-        String password = getCurrentPassword(); // Uses the method from first code
+        String password = getCurrentPassword();
 
         if (!check_access(email, password)) {
             return;
@@ -391,13 +379,13 @@ public class Access {
             if (temp_acc == null) {
                 emailField.setText("");
                 passwordField.setText("");
-                passwordTextField.setText(""); // Clear passwordTextField as well
-                warningText.setText("Account does not exist"); // Changed from Account inesistente
+                passwordTextField.setText("");
+                warningText.setText("Account does not exist");
                 AnimationUtils.shake(warningText);
                 return;
             }
 
-            // Use BCrypt to verify the password (from first code)
+            // Use BCrypt to verify the password
             if (CredentialCryptManager.verifyPassword(password, temp_acc.getPassword())) {
                 this.account = temp_acc;
                 FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/esa/moviestar/profile/profile-view.fxml"), Main.resourceBundle);
@@ -405,27 +393,24 @@ public class Access {
                 ProfileView profileView = loader.getController();
                 profileView.setAccount(account);
 
-                Scene currentScene = mainContainer.getScene(); // Changed from ContenitorePadre
+                Scene currentScene = mainContainer.getScene();
                 Scene newScene = new Scene(homeContent, currentScene.getWidth(), currentScene.getHeight());
-                Stage stage = (Stage) mainContainer.getScene().getWindow(); // Changed from ContenitorePadre
+                Stage stage = (Stage) mainContainer.getScene().getWindow();
                 stage.setScene(newScene);
             } else {
                 emailField.setText("");
                 passwordField.setText("");
-                passwordTextField.setText(""); // Clear passwordTextField as well
-                warningText.setText("Wrong password"); // Changed from Wrong password
+                passwordTextField.setText("");
+                warningText.setText("Wrong password");
                 AnimationUtils.shake(warningText);
             }
         } catch (IOException e) {
-            e.printStackTrace();
-            warningText.setText("Loading error: " + e.getMessage()); // Changed from Errore di caricamento
-        } catch (Exception e) { // Catching generic exception for broader error handling
-            e.printStackTrace();
-            warningText.setText("An error occurred: " + e.getMessage()); // Generic error message
+            warningText.setText("Loading error: " + e.getMessage());
+        } catch (Exception e) {
+            warningText.setText("An error occurred: " + e.getMessage());
         }
     }
 
-    // Added from second code (renamed setAccount and adjusted for consistency)
     public void setAccount(Account account){
         this.account = account;
         System.out.println("Access : email " + account.getEmail());

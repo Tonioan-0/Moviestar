@@ -133,6 +133,8 @@
                                         <String fx:value="surface-dim"/>
                                         <String fx:value="medium-text"/>
                                         <String fx:value="rating-badge"/>
+                                        <String fx:value="text-gold"/>
+
                                     </styleClass>
                                 </Label>
                             </HBox>

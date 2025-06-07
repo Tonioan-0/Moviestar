@@ -45,6 +45,15 @@
     );
 }
 
+.text-gold{
+    -fx-text-fill: linear-gradient(
+        to bottom right,
+        #f6e27a 33%,
+        #cb9b51 66%,
+        #462523 100%
+    );
+}
+
 /* ========== SURFACES AND BACKGROUNDS ========== */
 
 .surface-gradient{
@@ -275,10 +284,8 @@
 
 
 .rating-badge {
-    -fx-text-fill: black;
     -fx-font-weight: bold;
     -fx-padding: 1px 4px;
-    -fx-background-radius: 2px;
 }
 
 .content-warning {

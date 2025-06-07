@@ -155,7 +155,6 @@ public class FilmSceneController {
                             displayMovieContent();
                         } catch (Exception e) {
                             System.err.println("Error parsing movie data: " + e.getMessage());
-                            e.printStackTrace();
                             showErrorState();
                         }
                     });
@@ -163,7 +162,6 @@ public class FilmSceneController {
                 .exceptionally(ex -> {
                     Platform.runLater(() -> {
                         System.err.println("Error loading movie data: " + ex.getMessage());
-                        ex.printStackTrace();
                         showErrorState();
                     });
                     return null;
@@ -183,7 +181,6 @@ public class FilmSceneController {
                             displaySeriesContent();
                         } catch (Exception e) {
                             System.err.println("Error parsing series data: " + e.getMessage());
-                            e.printStackTrace();
                             showErrorState();
                         }
                     });
@@ -191,7 +188,6 @@ public class FilmSceneController {
                 .exceptionally(ex -> {
                     Platform.runLater(() -> {
                         System.err.println("Error loading series data: " + ex.getMessage());
-                        ex.printStackTrace();
                         showErrorState();
                     });
                     return null;
@@ -412,6 +408,21 @@ public class FilmSceneController {
         }
     }
 
+    private void updateSeasonDropdownButtonText() {
+        if (seasonsDropdownButton == null || currentContent == null || !currentContent.isSeries()) {
+            return;
+        }
+        String buttonText = "Season " + (currentSeasonIndex + 1);
+        List<FilmSeriesDetails.SeasonDetails> seasons = currentContent.getSeasons();
+        if (seasons != null && currentSeasonIndex >= 0 && currentSeasonIndex < seasons.size()) {
+            FilmSeriesDetails.SeasonDetails season = seasons.get(currentSeasonIndex);
+            if (season != null && season.getName() != null && !season.getName().isEmpty()) {
+                buttonText = season.getName();
+            }
+        }
+        seasonsDropdownButton.setText(buttonText);
+    }
+
     private void createSeasonsSelector() {
         if (episodesList == null || !(episodesList.getParent() instanceof VBox)) {
             System.err.println("Cannot create seasons selector: episodesList is null or its parent is not a VBox.");
@@ -433,14 +444,6 @@ public class FilmSceneController {
             seasonsDropdownButton.getStyleClass().addAll("seasons-dropdown-button","small-item","on-primary","primary-border");
             seasonsDropdownButton.setPrefHeight(35);
             seasonsDropdownButton.setOnAction(e -> popUpSeasonContainer());
-            if (currentContent.getSeasons() != null && !currentContent.getSeasons().isEmpty() && currentContent.getSeasons().get(0) != null) {
-                FilmSeriesDetails.SeasonDetails season = currentContent.getSeasons().get(0);
-                if (season.getName() != null && !season.getName().isEmpty()) {
-                    seasonsDropdownButton.setText(season.getName());
-                }
-            } else {
-                seasonsDropdownButton.setText("Season " + (1));
-            }
 
             seasonsDropdownMenu = new VBox();
             seasonsDropdownMenu.getStyleClass().addAll("seasons-dropdown-menu","small-item","on-primary");
@@ -464,6 +467,7 @@ public class FilmSceneController {
 
         seasonsContainer.setVisible(true);
         seasonsContainer.setManaged(true);
+        updateSeasonDropdownButtonText();
     }
 
     private void popUpSeasonContainer(){
@@ -519,14 +523,18 @@ public class FilmSceneController {
             return;
         }
         currentSeasonIndex = seasonIndex;
+        updateSeasonDropdownButtonText();
         updateEpisodesDisplay();
+
     }
 
     private void updateEpisodesDisplay() {
+
         if (episodesList == null) {
-            System.err.println("episodesList VBox is null, cannot update display.");
+            System.err.println("episodesList is null, cannot update display.");
             return;
         }
+
         episodesList.getChildren().clear();
 
         if (currentContent == null || !currentContent.isSeries()) {
@@ -718,8 +726,6 @@ public class FilmSceneController {
             } catch (Exception e) {
                 // Catch any other unexpected errors during image instantiation or setting
                 System.err.println("Failed to load backdrop image: " + backdropUrl + " - " + e.getMessage());
-                e.printStackTrace(); // Good for debugging
-                // heroImageView.setImage(null); // or some default error image
             }
         } else {
             System.err.println("Backdrop URL is null, empty, or invalid: " + backdropUrl);
@@ -821,7 +827,6 @@ public class FilmSceneController {
 
             } catch (IOException e) {
                 System.err.println("\"FilmSceneController: Error to load player, message: " + e.getMessage());
-                e.printStackTrace();
             }
         });
     }
@@ -939,20 +944,22 @@ public class FilmSceneController {
                                 currentContent.setSeasonAtIndex(seasonNumber - 1, seasonDetails);
                                 System.out.println("Season " + seasonNumber + " ('" + seasonDetails.getName() + "') loaded.");
 
-                                if (currentSeasonIndex == seasonNumber - 1 || isDropdownOpen) {
+                                if (currentSeasonIndex == seasonNumber - 1) {
+                                    updateSeasonDropdownButtonText();
                                     updateEpisodesDisplay();
                                 }
                             } catch (Exception e) {
                                 System.err.println("Error parsing season " + seasonNumber + " data: " + e.getMessage());
-                                e.printStackTrace();
                             }
                         });
                     })
                     .exceptionally(ex -> {
                         System.err.println("Error loading season " + seasonNumber + ": " + ex.getMessage());
-                        ex.printStackTrace();
                         if (currentSeasonIndex == seasonNumber - 1) {
-                            Platform.runLater(this::updateEpisodesDisplay);
+                            Platform.runLater(() -> {
+                                updateSeasonDropdownButtonText();
+                                updateEpisodesDisplay();
+                            });
                         }
                         return null;
                     });

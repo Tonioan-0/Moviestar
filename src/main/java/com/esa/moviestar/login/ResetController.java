@@ -1,5 +1,6 @@
 package com.esa.moviestar.login;
 
+import com.esa.moviestar.Main;
 import com.esa.moviestar.database.AccountDao;
 import com.esa.moviestar.libraries.CredentialCryptManager;
 import javafx.animation.PauseTransition;
@@ -16,6 +17,7 @@ import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
+import javafx.scene.shape.SVGPath;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 
@@ -38,13 +40,13 @@ public class ResetController {
     private PasswordField newPasswordField;
 
     @FXML
-    private TextField newPasswordTextField; // For password visibility toggle
+    private TextField newPasswordTextField;
 
     @FXML
     private PasswordField confirmPasswordField;
 
     @FXML
-    private TextField confirmPasswordTextField; // For password visibility toggle
+    private TextField confirmPasswordTextField;
 
     @FXML
     private Button resetButton;
@@ -62,22 +64,20 @@ public class ResetController {
     private StackPane parentContainer;
 
     @FXML
-    private StackPane newPasswordContainer; // Container for new password field with toggle
+    private StackPane newPasswordContainer;
 
     @FXML
-    private StackPane confirmPasswordContainer; // Container for confirm password field with toggle
+    private StackPane confirmPasswordContainer;
 
     @FXML
-    private Button toggleNewPasswordButton; // Toggle button for new password
+    private Button toggleNewPasswordButton;
 
     @FXML
-    private Button toggleConfirmPasswordButton; // Toggle button for confirm password
+    private Button toggleConfirmPasswordButton;
 
-    // Password Reset Attributes
     private String userEmail;
     private String verificationCode;
 
-    // Password visibility states
     private boolean isNewPasswordVisible = false;
     private boolean isConfirmPasswordVisible = false;
 
@@ -96,7 +96,6 @@ public class ResetController {
             statusMessage.setText("");
         }
 
-        // Configure UI components
         if (codeField != null) {
             codeField.setPromptText("Verification code");
         }
@@ -124,13 +123,14 @@ public class ResetController {
         if (backToLoginButton != null) {
             backToLoginButton.setOnMouseClicked(event -> navigateToLogin());
         }
+        toggleNewPasswordButton.setGraphic(new SVGPath(){{setContent(Main.resourceBundle.getString("passwordField.showPassword"));getStyleClass().add("on-primary");}});
+        toggleConfirmPasswordButton.setGraphic(new SVGPath(){{setContent(Main.resourceBundle.getString("passwordField.showPassword"));getStyleClass().add("on-primary");}});
 
-        // Setup password toggle functionality
         setupPasswordToggle();
 
         if (resetButton != null && newPasswordField != null &&
                 confirmPasswordField != null && codeField != null && backToLoginButton != null) {
-            Node[] formElements = {backToLoginButton, codeField, newPasswordContainer, confirmPasswordContainer, resetButton};
+            Node[] formElements = {toggleConfirmPasswordButton, toggleNewPasswordButton, newPasswordField, confirmPasswordField, backToLoginButton, codeField, newPasswordContainer, confirmPasswordContainer, resetButton};
             AnimationUtils.animateSimultaneously(formElements, 1, 0.3);
         }
 
@@ -191,8 +191,7 @@ public class ResetController {
             newPasswordTextField.setManaged(true);
             newPasswordTextField.requestFocus();
             newPasswordTextField.positionCaret(newPasswordTextField.getText().length());
-            toggleNewPasswordButton.setText("🙈");////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-            ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+            toggleNewPasswordButton.setGraphic(new SVGPath(){{setContent(Main.resourceBundle.getString("passwordField.hidePassword"));getStyleClass().add("on-primary");}});
 
         } else {
             newPasswordField.setText(newPasswordTextField.getText());
@@ -202,7 +201,7 @@ public class ResetController {
             newPasswordField.setManaged(true);
             newPasswordField.requestFocus();
             newPasswordField.positionCaret(newPasswordField.getText().length());
-            toggleNewPasswordButton.setText("👁");
+            toggleNewPasswordButton.setGraphic(new SVGPath(){{setContent(Main.resourceBundle.getString("passwordField.showPassword"));getStyleClass().add("on-primary");}});
         }
     }
 
@@ -217,7 +216,7 @@ public class ResetController {
             confirmPasswordTextField.setManaged(true);
             confirmPasswordTextField.requestFocus();
             confirmPasswordTextField.positionCaret(confirmPasswordTextField.getText().length());
-            toggleConfirmPasswordButton.setText("🙈");
+            toggleConfirmPasswordButton.setGraphic(new SVGPath(){{setContent(Main.resourceBundle.getString("passwordField.hidePassword"));getStyleClass().add("on-primary");}});
         } else {
             confirmPasswordField.setText(confirmPasswordTextField.getText());
             confirmPasswordTextField.setVisible(false);
@@ -226,7 +225,7 @@ public class ResetController {
             confirmPasswordField.setManaged(true);
             confirmPasswordField.requestFocus();
             confirmPasswordField.positionCaret(confirmPasswordField.getText().length());
-            toggleConfirmPasswordButton.setText("👁");
+            toggleConfirmPasswordButton.setGraphic(new SVGPath(){{setContent(Main.resourceBundle.getString("passwordField.showPassword"));getStyleClass().add("on-primary");}});
         }
     }
 
@@ -410,7 +409,7 @@ public class ResetController {
         try {
             String hashedPassword = CredentialCryptManager.hashPassword(newPassword);
 
-            cambiaPassword(userEmail, hashedPassword);
+            swapPassword(userEmail, hashedPassword);
             updateStatus("Password changed successfully");
             AnimationUtils.pulse(resetButton);
 
@@ -420,12 +419,11 @@ public class ResetController {
             pause.play();
 
         } catch (SQLException e) {
-            e.printStackTrace();
             updateStatus("Error during password reset: " + e.getMessage());
         }
     }
 
-    private void cambiaPassword(String email, String hashedPassword) throws SQLException {
+    private void swapPassword(String email, String hashedPassword) throws SQLException {
         AccountDao dao = new AccountDao();
         dao.updatePassword(email, hashedPassword);
     }
@@ -453,7 +451,6 @@ public class ResetController {
 
         }
         catch (IOException e) {
-            e.printStackTrace();
             updateStatus("An error occurred while navigating to login: " + e.getMessage());
         }
     }

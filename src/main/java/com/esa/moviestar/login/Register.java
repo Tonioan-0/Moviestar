@@ -102,12 +102,12 @@ public class Register {
         warning1.setText("Password must contain at least:");
         warning2.setText("   · 8 characters");
         warningSpecial.setText("   · 1 number");
-        warningSpecial2.setText("   · 1 special character");
+        warningSpecial2.setText("   · 1 special character (!@#$%^&*()_+{}[]:;<>,.?~-)");
         welcomeText.setText("SIGN UP");
         backToLogin.setText("Already have an account? Sign in");
         register.setText("Register");
 
-        Node[] formElements = {welcomeText, emailField, passwordField, warning1, warningSpecial, warningSpecial2, warning2, register, backToLogin};
+        Node[] formElements = {togglePasswordButton, welcomeText, emailField, passwordField, warning1, warningSpecial, warningSpecial2, warning2, register, backToLogin};
         AnimationUtils.animateSimultaneously(formElements, 1);
 
         setupResponsiveLayout();
@@ -214,9 +214,8 @@ public class Register {
                 double baseMinHeightPercentage = 0.75; // Prova con 75%
                 double baseMinRegisterHeight = REFERENCE_REGISTER_HEIGHT * baseMinHeightPercentage;
 
-                // BLOCCO Altezza per larghezza stretta
-                double narrowWidthThreshold = 700.0; // Soglia di larghezza per attivare il blocco
-                double lockedMinRegisterHeight = 500.0; // Altezza minima fissa quando la larghezza è stretta
+                double narrowWidthThreshold = 700.0;
+                double lockedMinRegisterHeight = 500.0;
 
                 double calculatedRegisterHeight = (REFERENCE_REGISTER_HEIGHT * scale)+25;
 
@@ -244,30 +243,24 @@ public class Register {
                 double warningTextScale = Math.max(scale, 0.7);
                 double backToLoginScale = Math.max(scale, 0.7);
 
-                // Imposta stile per welcomeText PRIMA di calcolarne la larghezza
                 String welcomeTextStyle = "-fx-font-size: " + (15 * welcomeTextScale * 2) + "px;";
                 welcomeText.setStyle(welcomeTextStyle);
 
-                // Imposta stile per bottone register
                 String registerButtonStyle = "-fx-font-size: " + (15 * registerButtonScale * 2) + "px;";
                 register.setStyle(registerButtonStyle);
 
-                // Imposta stili per altri elementi
                 warning1.setStyle("-fx-font-size: " + (warningTextScale * 12 + 2) + "px;");
                 warning2.setStyle("-fx-font-size: " + (warningTextScale * 12 + 2) + "px;");
                 warningSpecial.setStyle("-fx-font-size: " + (warningTextScale * 12 + 2) + "px;");
                 warningSpecial2.setStyle("-fx-font-size: " + (warningTextScale * 12 + 2) + "px;");
                 backToLogin.setStyle("-fx-font-size: " + (backToLoginScale * 12 + 2) + "px;");
 
-                //Calculate the available width for the elements
                 double availableWidth = registerWidth - paddingValue * 2;
                 double fieldWidth = Math.min(availableWidth, registerWidth * 0.9);
 
-                // Set email field width first
                 emailField.setPrefWidth(fieldWidth);
                 emailField.setMaxWidth(fieldWidth);
 
-                // Then sync password fields to match email field
                 passwordField.setPrefWidth(fieldWidth);
                 passwordTextField.setPrefWidth(fieldWidth);
                 passwordContainer.setPrefWidth(fieldWidth);
@@ -300,9 +293,6 @@ public class Register {
         }
     }
 
-    /**
-     * Update the current page with login content
-     */
     private void switchToLoginPage() {
 
         try {
