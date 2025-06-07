@@ -11,11 +11,10 @@ public class AnimationUtils {
     public static void fadeIn(Node node, double durationMs) {
 
         FadeTransition fadeTransition = new FadeTransition(Duration.millis(durationMs), node);
-
         fadeTransition.setFromValue(0.0);
         fadeTransition.setToValue(1.0);
-
         fadeTransition.play();
+
     }
 
     public static void fadeIn(Node node) {
@@ -25,11 +24,10 @@ public class AnimationUtils {
     public static void fadeOut(Node node, double durationMs) {
 
         FadeTransition fadeTransition = new FadeTransition(Duration.millis(durationMs), node);
-
         fadeTransition.setFromValue(1.0);
         fadeTransition.setToValue(0.0);
-
         fadeTransition.play();
+
     }
 
     public static void fadeOut(Node node) {
@@ -41,7 +39,6 @@ public class AnimationUtils {
         TranslateTransition translateTransition = new TranslateTransition(Duration.millis(durationMs), node);
 
         translateTransition.setFromX(distance);
-
         translateTransition.setToX(0);
         node.setOpacity(0);
 
@@ -49,7 +46,6 @@ public class AnimationUtils {
 
         fadeTransition.setFromValue(0.0);
         fadeTransition.setToValue(1.0);
-
         translateTransition.play();
         fadeTransition.play();
     }
@@ -66,16 +62,14 @@ public class AnimationUtils {
         TranslateTransition translateTransition = new TranslateTransition(Duration.millis(durationMs), node);
 
         translateTransition.setFromX(-distance);
-
         translateTransition.setToX(0);
         node.setOpacity(0);
 
         FadeTransition fadeTransition = new FadeTransition(Duration.millis(durationMs), node);
+
         fadeTransition.setFromValue(0.0);
         fadeTransition.setToValue(1.0);
-
         translateTransition.play();
-
         fadeTransition.play();
     }
 
@@ -91,22 +85,19 @@ public class AnimationUtils {
         TranslateTransition translateTransition = new TranslateTransition(Duration.millis(durationMs), node);
 
         translateTransition.setCycleCount(cycles);
-
         translateTransition.setFromX(0);
         translateTransition.setByX(distance);
-
         translateTransition.setAutoReverse(true);
-
         translateTransition.play();
+
     }
 
     public static void shake(Node node) {
-
         shake(node, 50, 10, 4);
     }
 
-
     public static void pulse(Node node) {
+
         double originalScaleX = node.getScaleX();
         double originalScaleY = node.getScaleY();
 
@@ -116,11 +107,10 @@ public class AnimationUtils {
         PauseTransition pause = new PauseTransition(Duration.millis(70));
 
         pause.setOnFinished(e -> {
-
             node.setScaleX(originalScaleX);
             node.setScaleY(originalScaleY);
-
         });
+
         pause.play();
     }
 
@@ -133,71 +123,46 @@ public class AnimationUtils {
                     case 0:
                         fadeIn(nodes[index]);
                         break;
-
                     case 1:
                         slideInFromRight(nodes[index]);
                         break;
-
                     case 2:
                         slideInFromLeft(nodes[index]);
                         break;
-
                     case 3:
                         quickSlideInFromRight(nodes[index]);
                         break;
-
                     case 4:
                         quickSlideInFromLeft(nodes[index]);
                         break;
-
                 }
             });
-
             delay.play();
         }
     }
 
     public static void animateSequentiallyFast(Node[] nodes, int animationType) {
-        // Use a much shorter delay between elements (30ms)
-
         animateSequentially(nodes, animationType, 30);
-
-    }
-
-    public static void showAllInstantly(Node[] nodes) {
-
-        for (Node node : nodes) {
-
-            node.setOpacity(1.0);
-
-        }
     }
 
     public static void animateSimultaneously(Node[] nodes, int animationType, double durationMs) {
-
         for (Node node : nodes) {
             switch (animationType) {
-
                 case 0:
                     fadeIn(node, durationMs);
                     break;
-
                 case 1:
                     slideInFromRight(node, durationMs, 50);
                     break;
-
                 case 2:
                     slideInFromLeft(node, durationMs, 50);
                     break;
-
                 case 3:
                     slideInFromRight(node, durationMs / 2, 30);
                     break;
-
                 case 4:
                     slideInFromLeft(node, durationMs / 2, 30);
                     break;
-
             }
         }
     }
@@ -207,7 +172,6 @@ public class AnimationUtils {
     }
 
     public static void animateContainerWithChildren(javafx.scene.Parent container, int animationType, double durationMs) {
-        // First animate the container itself
         switch (animationType) {
             case 0:
                 fadeIn(container, durationMs);
@@ -225,8 +189,6 @@ public class AnimationUtils {
                 slideInFromLeft(container, durationMs / 2, 30);
                 break;
         }
-
-        // Make sure all children are fully visible
         for (Node child : container.getChildrenUnmodifiable()) {
             child.setOpacity(1.0);
         }
