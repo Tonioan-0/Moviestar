@@ -48,6 +48,8 @@ public class FilmSceneController {
     private FilmSeriesDetails currentContent;
     private User user;
     private Account account;
+    // The api doesn't provide the entire film, to make owr app work we take this sample video
+    private String VIDEO_PLACEHOLDER= "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerFun.mp4";
 
     // Main containers
     @FXML
@@ -208,7 +210,7 @@ public class FilmSceneController {
         movie.setBackdropUrl(apiManager.getImageUrl(getStringOrNull(movieJson, "backdrop_path"), "w1280"));
         movie.setReleaseDate(getStringOrNull(movieJson, "release_date"));
         movie.setMovieRuntime(getIntegerOrNull(movieJson, "runtime", 0));
-        movie.setVideoUrl("http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerFun.mp4");
+        movie.setVideoUrl(VIDEO_PLACEHOLDER);
 
         if (movie.getReleaseDate() != null && movie.getReleaseDate().length() >= 4) {
             try {
@@ -255,7 +257,7 @@ public class FilmSceneController {
         series.setPosterUrl(apiManager.getImageUrl(getStringOrNull(seriesJson, "poster_path"), "w500"));
         series.setBackdropUrl(apiManager.getImageUrl(getStringOrNull(seriesJson, "backdrop_path"), "w1280"));
         series.setReleaseDate(getStringOrNull(seriesJson, "first_air_date"));
-
+        series.setVideoUrl(VIDEO_PLACEHOLDER);
         if (series.getReleaseDate() != null && series.getReleaseDate().length() >= 4) {
             try {
                 series.setYear(Integer.parseInt(series.getReleaseDate().substring(0, 4)));
@@ -301,7 +303,6 @@ public class FilmSceneController {
         season.setOverview(getStringOrNull(seasonJson, "overview"));
         season.setPosterUrl(apiManager.getImageUrl(getStringOrNull(seasonJson, "poster_path"), "w300"));
         season.setAirDate(getStringOrNull(seasonJson, "air_date"));
-
         if (seasonJson.has("episodes") && seasonJson.get("episodes").isJsonArray()) {
             for (JsonElement epEl : seasonJson.getAsJsonArray("episodes")) {
                 JsonObject epJson = epEl.getAsJsonObject();
@@ -312,7 +313,7 @@ public class FilmSceneController {
                 episode.setOverview(getStringOrNull(epJson, "overview"));
                 episode.setStillUrl(apiManager.getImageUrl(getStringOrNull(epJson, "still_path"), "w300"));
                 episode.setRuntimeMinutes(getIntegerOrNull(epJson, "runtime", 0));
-
+                episode.setVideoUrl(VIDEO_PLACEHOLDER);
                 season.addEpisode(episode);
             }
         }

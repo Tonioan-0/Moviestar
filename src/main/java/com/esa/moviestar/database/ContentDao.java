@@ -268,8 +268,6 @@ public class ContentDao {
     }
 
     private List<List<Content>> getContentFromDB(String query, int numberOfLists) {
-        System.out.println("ContentDao: Attempting to get content from DB with " + numberOfLists + " lists. Query (first 150 chars): " +
-                (query.length() > 150 ? query.substring(0, 150) + "..." : query));
         List<List<Content>> resultList = new Vector<>();
         for (int i = 0; i < numberOfLists; i++) {
             resultList.add(new Vector<>());
@@ -336,12 +334,12 @@ public class ContentDao {
                         // User favorites (Assuming 'Favourite' table)
                         "SELECT DISTINCT *, 7 AS List FROM (SELECT C.* FROM Favourite P JOIN Content C ON P.ID_Content = C.ID_Content " +
                         "WHERE P.ID_User = " + userId + " ORDER BY RANDOM() LIMIT 7) UNION ALL " +
-                        // Other categories (bottom genres - if Taste empty, same as top_genres_str)
+                        // Other categories (bottom genres -  if Taste empty, same as top_genres_str)
                         "SELECT DISTINCT * , 8 AS List FROM (SELECT C.* FROM Content C JOIN Content_Genre CG ON C.ID_Content = CG.ID_Content " +
                         bottomGenresString + " ORDER BY RANDOM() LIMIT 7);";
 
         List<List<Content>> results = getContentFromDB(query, 9);
-        results.forEach(this::fetchAndSetGenresForContentList ); // fetchAndSetGenresForContentList will use its own connection
+        results.forEach(this::fetchAndSetGenresForContentList );  // fetchAndSetGenresForContentList will use its own connection
         System.out.println( "ContentDao: Successfully completed getHomePageContents for user ID: " + user.getID());
         return results;
     }

@@ -169,6 +169,7 @@ public class FilmSeriesDetails {
         private String overview;
         private String stillUrl; // Episode thumbnail
         private int runtimeMinutes;
+        private String videoUrl;
         // Add other fields if needed, like airDate, voteAverage for episodes
 
         public EpisodeDetails() {}
@@ -188,5 +189,13 @@ public class FilmSeriesDetails {
 
         public int getRuntimeMinutes() { return runtimeMinutes; }
         public void setRuntimeMinutes(int runtimeMinutes) { this.runtimeMinutes = runtimeMinutes; }
+
+        public String getVideoUrl() {
+            return videoUrl;
+        }
+
+        public void setVideoUrl(String videoUrl) {
+            this.videoUrl = videoUrl;
+        }
     }
 }

@@ -1,7 +1,6 @@
 package com.esa.moviestar.home;
 
 import com.esa.moviestar.Main;
-import com.esa.moviestar.database.UserDao;
 import com.esa.moviestar.model.User;
 import com.esa.moviestar.movie_view.FilmPlayer;
 import com.esa.moviestar.profile.CreateProfileController;
@@ -13,6 +12,7 @@ import com.esa.moviestar.movie_view.FilmCardController;
 import com.esa.moviestar.movie_view.FilmSceneController;
 
 import javafx.animation.FadeTransition;
+import javafx.animation.PauseTransition;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -234,49 +234,87 @@ public class MainPagesController {
     }
 
     private void setupSearchListener(HeaderController headerController) {
-        if (headerController.getTbxSearch() != null) {
-            headerController.getTbxSearch().textProperty().addListener((observableValue, oldV, newV) -> {
-                String query = newV.trim();
-                if (query.isEmpty()) {
-                    if (currentScene != null && currentScene.controller() instanceof SearchController) {
-                        PageData pageToReturnTo = (this.pageBeforeSearch != null && !(this.pageBeforeSearch.controller() instanceof SearchController))
-                                ? this.pageBeforeSearch : this.home;
-                        if (pageToReturnTo != null) {
-                            String pageName = getPageName(pageToReturnTo);
-                            loadPageAsync(pageName, () -> pageToReturnTo);
-                            if (this.pageBeforeSearch == pageToReturnTo) this.pageBeforeSearch = null;
-                        } else {
-                            SearchController sc = (SearchController) currentScene.controller();
-                            sc.performSearch(""); // Tell search controller to clear/show default
+        if (headerController.getTbxSearch() == null) {
+            System.err.println("MainPagesController: Search text field (tbxSearch) is null in HeaderController.");
+            return;
+        }
+
+        PauseTransition throttleTimer = new PauseTransition(Duration.millis(100)); // Or your preferred throttle duration
+
+        headerController.getTbxSearch().textProperty().addListener((observableValue, oldV, newV) -> {
+            throttleTimer.stop(); // Stop any previously scheduled task
+
+            throttleTimer.setOnFinished(event -> {
+                String currentQueryOnExecution = headerController.getTbxSearch().getText().trim();
+
+                if (currentQueryOnExecution.isEmpty()) {
+                    revertFromSearchPage();
+                } else {
+                    // Query is not empty, proceed with search.
+                    // 1. Store the current non-search page if we are about to navigate to search.
+                    if (currentScene != null && !(currentScene.controller() instanceof SearchController)) {
+                        // Only update pageBeforeSearch if it's not already set to this currentScene,
+                        // or if pageBeforeSearch is null. This captures the last non-search page.
+                        if (this.pageBeforeSearch == null || this.pageBeforeSearch.node() != currentScene.node()) {
+                            this.pageBeforeSearch = currentScene;
                         }
                     }
-                    return;
-                }
 
-                if (currentScene != null && !(currentScene.controller() instanceof SearchController)) {
-                    if (this.pageBeforeSearch == null || (this.pageBeforeSearch.node() != currentScene.node())) {
-                        this.pageBeforeSearch = currentScene;
-                    }
+                    // 2. Load the search page.
+                    loadPageAsync("search", () -> {
+                        PageData searchResultPage = loadDynamicBody("search.fxml");
+                        if (searchResultPage != null && searchResultPage.controller() instanceof SearchController sc) {
+                            sc.setParamController(headerController, user, this);
+                            sc.performSearch(currentQueryOnExecution);
+                        } else if (searchResultPage == null) {
+                            System.err.println("MainPagesController: Search page (search.fxml) failed to load.");
+                        } else {
+                            System.err.println("MainPagesController: Search page loaded, but controller is not SearchController.");
+                        }
+                        return searchResultPage;
+                    });
                 }
-
-                loadPageAsync("search", () -> {
-                    PageData searchResultPage = loadDynamicBody("search.fxml");
-                    if (searchResultPage != null && searchResultPage.controller() instanceof SearchController sc) {
-                        sc.setParamController(headerController, user, this);
-                        sc.performSearch(query);
-                    } else if (searchResultPage == null) {
-                        System.err.println("MainPagesController: Search page (search.fxml) failed to load.");
-                    } else {
-                        System.err.println("MainPagesController: Search page loaded, but controller is not SearchController.");
-                    }
-                    return searchResultPage;
-                });
             });
+
+            // (Re)start the timer. It will execute the onFinished logic after the duration
+            // if not stopped by another text change.
+            throttleTimer.playFromStart();
+        });
+    }
+    private void revertFromSearchPage() {
+        // Only act if we are currently on a search page
+        if (!(currentScene != null && currentScene.controller() instanceof SearchController)) {
+            return;
+        }
+
+        PageData pageToReturnTo = this.home; // Default to home
+        boolean returningToStoredPageBeforeSearch = false;
+
+        // Check if we have a valid pageBeforeSearch that isn't a search page itself
+        if (this.pageBeforeSearch != null && !(this.pageBeforeSearch.controller() instanceof SearchController)) {
+            pageToReturnTo = this.pageBeforeSearch;
+            returningToStoredPageBeforeSearch = true;
+        }
+
+        if (pageToReturnTo != null) {
+            String pageName = getPageName(pageToReturnTo);
+            final PageData finalPageToReturnTo = pageToReturnTo; // Capture for lambda
+
+            loadPageAsync(pageName, () -> finalPageToReturnTo);
+
+            // If we initiated a return to the specifically stored pageBeforeSearch, clear it
+            if (returningToStoredPageBeforeSearch) {
+                this.pageBeforeSearch = null;
+            }
         } else {
-            System.err.println("MainPagesController: Search text field (tbxSearch) is null in HeaderController.");
+            // Fallback: If no valid page to return to (e.g., home is null),
+            // just clear the search results on the current search page.
+            if (currentScene.controller() instanceof SearchController sc) {
+                sc.performSearch("");
+            }
+            System.err.println("MainPagesController: revertFromSearchPage - pageToReturnTo is null. Attempting to clear search results on current page.");
         }
     }
-
     private String getPageName(PageData pageData) {
         if (pageData == home) return "home";
         if (pageData == filter_film) return "film filter";
@@ -354,7 +392,6 @@ public class MainPagesController {
                 }, Platform::runLater)
                 .exceptionally(ex -> {
                     System.err.println("MainPagesController: Exception during async page loading for " + pageName + ": " + ex.getMessage());
-                    ex.printStackTrace();
                     Platform.runLater(this::hideLoadingSpinner);
                     return null;
                 });
@@ -600,7 +637,7 @@ public class MainPagesController {
 
             } catch (IOException e) {
                 System.err.println("MainPagesController: Error loading settings page: " + e.getMessage());
-                e.printStackTrace();
+
             }
         });
     }
@@ -715,11 +752,7 @@ public class MainPagesController {
         first_load(user, account);
 
         this.filmClickedInitialLoadFuture
-                .thenRunAsync(() -> {
-
-                    openFilmScene(contentId, series);
-
-                }, Platform::runLater)
+                .thenRunAsync(() -> openFilmScene(contentId, series), Platform::runLater)
                 .exceptionally(ex -> {
                     Platform.runLater(() -> {
                         System.err.println("MainPagesController.filmClicked: Failed to initialize or open film scene: " + ex.getMessage());

@@ -61,29 +61,6 @@ public class ProfileView {
     public void initialize() {
         text.setText("Who wants to watch Moviestar?");
         grid.setSpacing(GRID_SPACING);
-
-        Task<Void> updateDbTask = new Task<>() {
-            @Override
-            protected Void call() {updateMessage("Starting database content update...");
-                System.out.println("ProfileView Task: Attempting to update all content in database.");
-
-                TMDbApiManager tmdbApiManager = TMDbApiManager.getInstance();
-                TMDbApiManager.getInstance().setContentDao(new ContentDao());
-                try {
-                    tmdbApiManager.updateAllContentInDatabase().join();
-                } catch (Exception e) {
-                    System.err.println("ProfileView Task: Exception during TMDb content update: " + e.getMessage());
-                }
-                return null;
-            }
-        };
-        updateDbTask.setOnSucceeded(event -> System.out.println("ProfileView: Database update task succeeded."));
-        updateDbTask.setOnFailed(event -> System.err.println("ProfileView: Database update task failed."));
-
-        Thread taskThread = new Thread(updateDbTask);
-        taskThread.setDaemon(true);
-        taskThread.start();
-
     }
 
     public void setAccount(Account account) {

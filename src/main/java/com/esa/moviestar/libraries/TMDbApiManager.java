@@ -185,7 +185,7 @@ public class TMDbApiManager {
             return CompletableFuture.failedFuture(new   RuntimeException("Failed to encode query.", e));
         }
         String endpointWithQuery = "/search/multi?query=" + encodedQuery + "&page=" + page ;
-        return fetchAsMoviestarContentList(endpointWithQuery, ContentType.UNKNOWN);
+        return fetchAsContentList(endpointWithQuery, ContentType.UNKNOWN);
     }
     @Nullable
     public String getImageUrl(@Nullable  String imagePath, String size) {
@@ -198,7 +198,8 @@ public class TMDbApiManager {
     }
 
     /// Receives
-    public CompletableFuture<List<Content>> fetchAsMoviestarContentList(String endpoint, @Nullable ContentType expectedType) {
+
+    public CompletableFuture<List<Content>> fetchAsContentList(String endpoint, @Nullable ContentType expectedType) {
         return makeRequestAsync(endpoint).thenApplyAsync(responseString -> {
             List<Content> contentList =  new ArrayList<>();
             if (responseString == null  || responseString.isEmpty()) {
@@ -339,12 +340,12 @@ public class TMDbApiManager {
         }
         contentDao.deleteExpiredContent();
         List<CompletableFuture<List<Content>>> futures = List.of(
-                getDiscoverFilmsAsMoviestarContent(1),
-                getDiscoverTvShowsAsMoviestarContent(1),
-                getDiscoverFilmsAsMoviestarContent(2),
-                getDiscoverTvShowsAsMoviestarContent(2),
-                getDiscoverFilmsAsMoviestarContent(3),
-                getDiscoverTvShowsAsMoviestarContent(3)
+                getDiscoverFilmsAsContent(1),
+                getDiscoverTvShowsAsContent(1),
+                getDiscoverFilmsAsContent(2),
+                getDiscoverTvShowsAsContent(2),
+                getDiscoverFilmsAsContent(3),
+                getDiscoverTvShowsAsContent(3)
         );
 
         // Use handle to collect results or exceptions from all futures
@@ -377,13 +378,13 @@ public class TMDbApiManager {
                 }, executor);
     }
 
-    private CompletableFuture<List<Content>> getDiscoverTvShowsAsMoviestarContent(int page ) {
-        return fetchAsMoviestarContentList("/discover/tv?include_adult=false&sort_by=popularity.desc&page=" + page ,  ContentType.TV );
+    private CompletableFuture<List<Content>> getDiscoverTvShowsAsContent(int page ) {
+        return fetchAsContentList("/discover/tv?include_adult=false&sort_by=popularity.desc&page=" + page ,  ContentType.TV );
 
     }
 
-    private CompletableFuture<List<Content>> getDiscoverFilmsAsMoviestarContent(int page) {
-        return  fetchAsMoviestarContentList("/discover/movie?include_adult=false&sort_by=popularity.desc&page=" + page, ContentType.MOVIE);
+    private CompletableFuture<List<Content>> getDiscoverFilmsAsContent(int page) {
+        return  fetchAsContentList("/discover/movie?include_adult=false&sort_by=popularity.desc&page=" + page, ContentType.MOVIE);
     }
 
     /// Helper to filter distinct elements in a stream

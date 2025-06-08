@@ -2,11 +2,14 @@ package com.esa.moviestar.login;
 
 import com.esa.moviestar.database.AccountDao;
 import com.esa.moviestar.Main;
+import com.esa.moviestar.database.ContentDao;
 import com.esa.moviestar.libraries.EmailService;
+import com.esa.moviestar.libraries.TMDbApiManager;
 import com.esa.moviestar.profile.ProfileView;
 import com.esa.moviestar.model.Account;
 import  com.esa.moviestar.libraries.CredentialCryptManager;
 import jakarta.mail.MessagingException;
+import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
@@ -22,8 +25,13 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.layout.*;
 import javafx.scene.shape.SVGPath;
 import javafx.stage.Stage;
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
+import javafx.util.Duration;
 
 import java.io.IOException;
+import java.net.InetSocketAddress;
+import java.net.Socket;
 import java.sql.SQLException;
 import java.util.Random;
 
@@ -71,6 +79,9 @@ public class Access {
     private final double COMPACT_MODE_THRESHOLD = 500.0;
     private final double IMAGE_VISIBILITY_THRESHOLD = 600.0;
 
+    private static final int INTERNET_CHECK_RETRY_SECONDS = 5; // Retry every 5 seconds
+    private Timeline internetRetryTimeline;
+
     public void initialize() {
         emailService = new EmailService();
         emailField.setPromptText("Email");
@@ -88,6 +99,7 @@ public class Access {
         resetPassword.setText("Password forgotten? get it back");
         togglePasswordButton.setGraphic(new SVGPath(){{setContent(Main.resourceBundle.getString("passwordField.showPassword"));getStyleClass().add("on-primary");}});
 
+        checkAndProceedWithDatabaseUpdate();
 
         setupPasswordToggle();
 
@@ -112,6 +124,143 @@ public class Access {
 
         setupResponsiveLayout();
         setupKeyboardNavigation();
+    }
+
+    private void setLoginControlsDisabled(boolean disabled, String message) {
+        access.setDisable(disabled);
+        register.setDisable(disabled);
+        resetPassword.setDisable(disabled);
+        emailField.setDisable(disabled);
+        passwordField.setDisable(disabled);
+        passwordTextField.setDisable(disabled);
+        togglePasswordButton.setDisable(disabled);
+
+        if (message != null) {
+            warningText.setText(message);
+            if (disabled && !message.isEmpty()) {
+                AnimationUtils.shake(warningText);
+            }
+        }
+    }
+
+    private boolean isInternetAvailable() {
+        try {
+
+            try (Socket socket = new Socket()) {
+                socket.connect(new InetSocketAddress("8.8.8.8", 53), 3000); // 3 seconds timeout
+                return true;
+            }
+        } catch (IOException e) {
+            System.err.println("Internet check failed: " + e.getMessage());
+            return false; // Either host is unreachable or network is down
+        }
+    }
+
+    private void scheduleInternetRetry() {
+        if (internetRetryTimeline != null) {
+            internetRetryTimeline.stop();
+        }
+        internetRetryTimeline = new Timeline(new KeyFrame(Duration.seconds(INTERNET_CHECK_RETRY_SECONDS), event -> {
+            Task<Boolean> retryCheckTask = new Task<>() {
+                @Override
+                protected Boolean call() {
+                    return isInternetAvailable();
+                }
+            };
+
+            retryCheckTask.setOnSucceeded(e -> {
+                boolean connected = retryCheckTask.getValue();
+                if (connected) {
+                    if (internetRetryTimeline != null) {
+                        internetRetryTimeline.stop();
+                    }
+                    setLoginControlsDisabled(false, "Internet connection established. Updating database...");
+                    AnimationUtils.pulse(warningText);
+                    updateDatabase(); // Call the original static method
+                } else {
+                    warningText.setText("Connect to internet to continue (retrying...).");
+                    AnimationUtils.shake(warningText);
+                }
+            });
+
+            retryCheckTask.setOnFailed(e -> {
+                warningText.setText("Error during retry. Connect to internet to continue.");
+                AnimationUtils.shake(warningText);
+            });
+            new Thread(retryCheckTask).start();
+        }));
+        internetRetryTimeline.setCycleCount(Timeline.INDEFINITE);
+        internetRetryTimeline.play();
+    }
+
+    private void checkAndProceedWithDatabaseUpdate() {
+        setLoginControlsDisabled(true, "Checking internet connection...");
+
+        Task<Boolean> internetCheckTask = new Task<>() {
+            @Override
+            protected Boolean call() {
+                return isInternetAvailable();
+            }
+        };
+
+        internetCheckTask.setOnSucceeded(event -> {
+            boolean connected = internetCheckTask.getValue();
+            if (connected) {
+                setLoginControlsDisabled(false, "");
+                AnimationUtils.pulse(warningText);
+                updateDatabase(); // Call the original static method
+            } else {
+                setLoginControlsDisabled(true, "Connect to internet to continue");
+                scheduleInternetRetry();
+            }
+        });
+
+        internetCheckTask.setOnFailed(event -> {
+            // This case might occur if the task itself throws an unexpected exception
+            setLoginControlsDisabled(true, "Error checking internet. Connect to internet to continue.");
+            scheduleInternetRetry();
+        });
+
+        new Thread(internetCheckTask).start();
+    }
+
+
+    private static void updateDatabase() {
+        Task<Void> updateDbTask = new Task<>() {
+            @Override
+            protected Void call() {updateMessage("Starting database content update...");
+                System.out.println("Access Task: Attempting to update all content in database."); // Changed log prefix
+
+                TMDbApiManager tmdbApiManager = TMDbApiManager.getInstance();
+                // Consider if ContentDao should be instantiated once or if this is intended
+                tmdbApiManager.setContentDao(new ContentDao());
+                try {
+                    tmdbApiManager.updateAllContentInDatabase().join(); // .join() will block this worker thread, not UI
+                    updateMessage("Database content update completed.");
+                } catch (Exception e) {
+                    updateMessage("Database content update failed.");
+                    System.err.println("Access Task: Exception during TMDb content update: " + e.getMessage());
+                    e.printStackTrace(); // For more detailed error logging
+                }
+                return null;
+            }
+        };
+        updateDbTask.setOnSucceeded(event -> {
+            System.out.println("Access: Database update task succeeded. Message: " + updateDbTask.getMessage());
+
+        });
+        updateDbTask.setOnFailed(event -> {
+            System.err.println("Access: Database update task failed. Message: " + updateDbTask.getMessage());
+            Throwable ex = updateDbTask.getException();
+            if (ex != null) {
+                ex.printStackTrace();
+            }
+
+        });
+
+        Thread taskThread = new Thread(updateDbTask);
+        taskThread.setDaemon(true);
+        taskThread.start();
     }
 
     // From first code
@@ -167,7 +316,7 @@ public class Access {
     // From first code
     private void setupKeyboardNavigation() {
         mainContainer.setOnKeyPressed(event -> {
-            if (event.getCode() == KeyCode.ENTER) {
+            if (event.getCode() == KeyCode.ENTER && !access.isDisabled()) {
                 access.fire();
             }
         });
@@ -183,13 +332,13 @@ public class Access {
         });
 
         passwordField.setOnKeyPressed(event -> {
-            if (event.getCode() == KeyCode.ENTER) {
+            if (event.getCode() == KeyCode.ENTER && !access.isDisabled()) {
                 access.fire();
             }
         });
 
         passwordTextField.setOnKeyPressed(event -> {
-            if (event.getCode() == KeyCode.ENTER) {
+            if (event.getCode() == KeyCode.ENTER && !access.isDisabled()) {
                 access.fire();
             }
         });
@@ -211,7 +360,7 @@ public class Access {
         double rawScale = Math.min(width / REFERENCE_WIDTH, height / REFERENCE_HEIGHT);
         double scale = 1 - (1 - rawScale) * 0.5;
 
-        // Gestione dell'immagine
+        // Manage image visibility
         if (imageContainer != null) {
             boolean showImage = width > IMAGE_VISIBILITY_THRESHOLD;
             imageContainer.setVisible(showImage);
@@ -255,22 +404,23 @@ public class Access {
                 double baseFontSize = 15 * scale;
                 double welcomeTextScale = Math.max(scale, 0.7);
                 double accessButtonScale = Math.max(scale, 0.7);
-                double warningTextScale = Math.max(baseFontSize, 0.7);
-                double registerScale = Math.max(baseFontSize, 0.7);
+                double warningTextScale = Math.max(baseFontSize, 0.7); // Corrected: was Math.max(baseFontSize, 0.7) which is fine, but baseFontSize already includes scale.
+                // Let's ensure it's at least a minimum readable size.
+                warningTextScale = Math.max(10, 12 * scale); // e.g. min 10px, scaled 12px
+                double registerScale = Math.max(scale, 0.7);
+
 
                 welcomeText.setStyle("-fx-font-size: " + ((15 * welcomeTextScale * 2) + 2) + "px;");
                 access.setStyle("-fx-font-size: " + (15 * accessButtonScale * 2) + "px;");
-                warningText.setStyle("-fx-font-size: " + (warningTextScale) + "px;");
-                register.setStyle("-fx-font-size: " + (registerScale) + "px;");
-                resetPassword.setStyle("-fx-font-size: " + (registerScale) + "px;"); // Changed from recuperoPassword
+                warningText.setStyle("-fx-font-size: " + warningTextScale + "px;");
+                register.setStyle("-fx-font-size: " + (12 * registerScale) + "px;"); // Adjusted for consistency
+                resetPassword.setStyle("-fx-font-size: " + (12 * registerScale) + "px;");
 
                 double fieldWidth = Math.min(loginWidth - padding * 2, loginWidth * 0.9);
 
-                // Set email field width first
                 emailField.setPrefWidth(fieldWidth);
                 emailField.setMaxWidth(fieldWidth);
 
-                // Then sync password fields to match email field (from first code)
                 passwordField.setPrefWidth(fieldWidth);
                 passwordTextField.setPrefWidth(fieldWidth);
                 passwordContainer.setPrefWidth(fieldWidth);
@@ -282,7 +432,7 @@ public class Access {
                 double verticalMargin = 10 * scale;
                 VBox.setMargin(welcomeText, new Insets(0, 0, verticalMargin * 3, 0));
                 VBox.setMargin(emailField, new Insets(0, 0, (verticalMargin * 2) + 10, 0));
-                VBox.setMargin(passwordContainer, new Insets(0, 0, (verticalMargin * 2) + 10, 0)); // Changed from passwordField margin
+                VBox.setMargin(passwordContainer, new Insets(0, 0, (verticalMargin * 2) + 10, 0));
             }
         }
     }
@@ -291,26 +441,24 @@ public class Access {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/esa/moviestar/login/register.fxml"), Main.resourceBundle);
             Parent registerContent = loader.load();
-            Scene currentScene = mainContainer.getScene(); // Changed from ContenitorePadre
+            Scene currentScene = mainContainer.getScene();
             Scene newScene = new Scene(registerContent, currentScene.getWidth(), currentScene.getHeight());
-            Stage stage = (Stage) mainContainer.getScene().getWindow(); // Changed from ContenitorePadre
+            Stage stage = (Stage) mainContainer.getScene().getWindow();
             stage.setScene(newScene);
         } catch (IOException e) {
             e.printStackTrace();
-            warningText.setText("Loading error: " + e.getMessage()); // Changed from Errore di caricamento
         }
     }
 
     private boolean check_access(String _email, String _password) {
         if (_email.isEmpty() || _password.isEmpty()) {
-            warningText.setText("Add email and password"); // Changed from Inserisci email e password
+            warningText.setText("Add email and password");
             AnimationUtils.shake(warningText);
             return false;
         }
         return true;
     }
 
-    // From first code
     private String getCurrentPassword() {
         return isPasswordVisible ? passwordTextField.getText() : passwordField.getText();
     }
@@ -353,19 +501,19 @@ public class Access {
                 warningText.setText("Verification code sent to your email"); // Added message for success
                 AnimationUtils.pulse(warningText);
             } catch (MessagingException e) {
-                warningText.setText("Failed to send email. Please try again."); // Added message for email sending failure
+                warningText.setText("Failed to send email. Please try again.");
                 AnimationUtils.shake(warningText);
                 return;
             }*/
 
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/esa/moviestar/login/reset-password-view.fxml"), Main.resourceBundle);
             Parent resetContent = loader.load();
-            Node currentContent = mainContainer.getChildren().getFirst(); // Changed from ContenitorePadre
+            Node currentContent = mainContainer.getChildren().getFirst();
             AnimationUtils.fadeOut(currentContent, 100);
 
-            Scene currentScene = mainContainer.getScene(); // Changed from ContenitorePadre
+            Scene currentScene = mainContainer.getScene();
             Scene newScene = new Scene(resetContent, currentScene.getWidth(), currentScene.getHeight());
-            Stage stage = (Stage) mainContainer.getScene().getWindow(); // Changed from ContenitorePadre
+            Stage stage = (Stage) mainContainer.getScene().getWindow();
             stage.setScene(newScene);
 
             ResetController resetController = loader.getController();
@@ -377,7 +525,7 @@ public class Access {
 
     private void loginUser() throws SQLException {
         String email = emailField.getText();
-        String password = getCurrentPassword(); // Uses the method from first code
+        String password = getCurrentPassword();
 
         if (!check_access(email, password)) {
             return;
@@ -391,13 +539,12 @@ public class Access {
             if (temp_acc == null) {
                 emailField.setText("");
                 passwordField.setText("");
-                passwordTextField.setText(""); // Clear passwordTextField as well
-                warningText.setText("Account does not exist"); // Changed from Account inesistente
+                passwordTextField.setText("");
+                warningText.setText("Account does not exist");
                 AnimationUtils.shake(warningText);
                 return;
             }
 
-            // Use BCrypt to verify the password (from first code)
             if (CredentialCryptManager.verifyPassword(password, temp_acc.getPassword())) {
                 this.account = temp_acc;
                 FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/esa/moviestar/profile/profile-view.fxml"), Main.resourceBundle);
@@ -405,27 +552,26 @@ public class Access {
                 ProfileView profileView = loader.getController();
                 profileView.setAccount(account);
 
-                Scene currentScene = mainContainer.getScene(); // Changed from ContenitorePadre
+                Scene currentScene = mainContainer.getScene();
                 Scene newScene = new Scene(homeContent, currentScene.getWidth(), currentScene.getHeight());
-                Stage stage = (Stage) mainContainer.getScene().getWindow(); // Changed from ContenitorePadre
+                Stage stage = (Stage) mainContainer.getScene().getWindow();
                 stage.setScene(newScene);
             } else {
                 emailField.setText("");
                 passwordField.setText("");
-                passwordTextField.setText(""); // Clear passwordTextField as well
-                warningText.setText("Wrong password"); // Changed from Wrong password
+                passwordTextField.setText("");
+                warningText.setText("Wrong password");
                 AnimationUtils.shake(warningText);
             }
         } catch (IOException e) {
             e.printStackTrace();
-            warningText.setText("Loading error: " + e.getMessage()); // Changed from Errore di caricamento
-        } catch (Exception e) { // Catching generic exception for broader error handling
+            warningText.setText("Loading error: " + e.getMessage());
+        } catch (Exception e) {
             e.printStackTrace();
-            warningText.setText("An error occurred: " + e.getMessage()); // Generic error message
+            warningText.setText("An error occurred: " + e.getMessage());
         }
     }
 
-    // Added from second code (renamed setAccount and adjusted for consistency)
     public void setAccount(Account account){
         this.account = account;
         System.out.println("Access : email " + account.getEmail());
