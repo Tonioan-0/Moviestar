@@ -1,11 +1,13 @@
 package com.esa.moviestar.home;
 
+import com.esa.moviestar.database.ContentDao;
 import com.esa.moviestar.libraries.TMDbApiManager;
 import com.esa.moviestar.model.Content;
 import com.esa.moviestar.model.User;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 // import javafx.scene.control.Label; // Label import is not used directly in this snippet
@@ -18,11 +20,7 @@ import javafx.scene.paint.Stop;
 import javafx.scene.shape.Line;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Set;
-import java.util.HashSet;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -43,27 +41,21 @@ public class SearchController {
     private User user;
     private TMDbApiManager tmdbApiManager;
 
-    private static final int MAX_PAGES_TO_FETCH_SEARCH = 3;
+    //Since the api gives content with different id but with same info we need to check from the title
+    private Map<String, Boolean> seen;
+
+    private static final int MAX_PAGES_TO_FETCH_SEARCH = 10;
     private static final int TOP_N_COUNT_FOR_RICH_DISPLAY = 20;
     private static final int MAX_LABEL_LIKE_COUNT = 15;
+    private static final int MIN_LABEL_LIKE_DISPLAY_COUNT = 5;
 
-    private static <T> Predicate<T> distinctByKey(Function<? super T, ?> keyExtractor) {
-        Set<Object> seen = new HashSet<>();
-        return t -> {
-            Object key = keyExtractor.apply(t);
-            if (key == null) {
-                return false;
-            }
-            return seen.add(key);
-        };
-    }
 
     public void initialize() {
         if (this.setupController == null) {
             this.setupController = new MainPagesController();
         }
         tmdbApiManager = TMDbApiManager.getInstance();
-
+        this.seen = new HashMap<>();
         if (separatorLine != null) {
             separatorLine.setStroke(
                     new LinearGradient(
@@ -83,9 +75,9 @@ public class SearchController {
         this.setupController = mainPagesController;
 
         if (headerController != null && headerController.getTbxSearch() != null) {
-            String query = headerController.getTbxSearch().getText();
-            if (query != null && !query.trim().isEmpty()) {
-                performSearch(query);
+            String queryText = headerController.getTbxSearch().getText();
+            if (queryText != null && !queryText.trim().isEmpty()) {
+                performSearch(queryText);
             } else {
                 clearSearchResults();
             }
@@ -100,17 +92,16 @@ public class SearchController {
         });
     }
 
-    public void performSearch(String query) {
+    public void performSearch(String searchText) {
         Platform.runLater(() -> {
             recommendations.getChildren().clear();
             filmSeriesRecommendations.getChildren().clear();
             if (findOutButton != null) findOutButton.setVisible(false); // Hide initially
-            // Optionally, show a loading indicator here
         });
 
         List<CompletableFuture<List<Content>>> pageFutures = new ArrayList<>();
         for (int i = 1; i <= MAX_PAGES_TO_FETCH_SEARCH; i++) {
-            pageFutures.add(tmdbApiManager.searchMultiContent(query, i));
+            pageFutures.add(tmdbApiManager.searchMultiContent(searchText, i));
         }
 
         CompletableFuture<Void> allPagesFuture = CompletableFuture.allOf(pageFutures.toArray(new CompletableFuture[0]));
@@ -119,7 +110,7 @@ public class SearchController {
                     List<Content> allRawResultsFromApi = new ArrayList<>();
                     for (CompletableFuture<List<Content>> pageFuture : pageFutures) {
                         try {
-                            List<Content> pageResult = pageFuture.join(); // .join() is safe here
+                            List<Content> pageResult = pageFuture.join();
                             if (pageResult != null) {
                                 allRawResultsFromApi.addAll(pageResult);
                             }
@@ -128,35 +119,65 @@ public class SearchController {
                         }
                     }
 
-                    // Process the combined list on the JavaFX Application Thread
                     Platform.runLater(() -> {
                         if (allRawResultsFromApi.isEmpty() && pageFutures.stream().allMatch(CompletableFuture::isCompletedExceptionally)) {
-                            System.err.println("SearchController: All page fetches failed for query '" + query + "'.");
+                            System.err.println("SearchController: All page fetches failed for query '" + searchText + "'.");
                             return;
                         }
 
-                        String lowerCaseQuery = query.toLowerCase();
+                        String lowerCaseSearchText = searchText.toLowerCase();
+                        seen.clear();
 
-                        List<Content> uniquePopularContent = allRawResultsFromApi.stream()
+                        List<Content> uniquePopularContentFromApi = allRawResultsFromApi.stream()
                                 .filter(content -> content != null && content.getTitle() != null &&
                                         !content.getTitle().trim().isEmpty() &&
-                                        content.getTitle().toLowerCase().contains(lowerCaseQuery))
+                                        content.getTitle().toLowerCase().contains(lowerCaseSearchText))
                                 .sorted(Comparator.comparingDouble(Content::getPopularity).reversed())
-                                .filter(distinctByKey(content -> content.getTitle().toLowerCase()))
+                                .filter(content -> {
+                                    String titleKey = content.getTitle().toLowerCase();
+                                    if (seen.containsKey(titleKey)) {
+                                        return false;
+                                    } else {
+                                        seen.put(titleKey, true);
+                                        return true;
+                                    }
+                                })
                                 .toList();
 
-                        List<Content> forRichDisplay = uniquePopularContent.stream()
+                        List<Content> forRichDisplay = uniquePopularContentFromApi.stream()
                                 .limit(TOP_N_COUNT_FOR_RICH_DISPLAY)
-                                .collect(Collectors.toList());
+                                .collect(Collectors.toCollection(ArrayList::new));
+
+                        // Supplement forRichDisplay from DB if it's not full yet
+                        if (forRichDisplay.size() < TOP_N_COUNT_FOR_RICH_DISPLAY) {
+                            ContentDao contentdao = new ContentDao();
+                            String sanitizedSearchTermForDb = searchText.replace("'", "''"); // Basic sanitization for LIKE
+                            String queryDb = "SELECT DISTINCT * , 0 AS List FROM Content C WHERE C.title LIKE '%" + sanitizedSearchTermForDb + "%'";
+                            List<Content> dbContentList = contentdao.getContentFromQuery(queryDb);
+
+                            for (Content dbContent : dbContentList) {
+                                if (forRichDisplay.size() >= TOP_N_COUNT_FOR_RICH_DISPLAY) {
+                                    break;
+                                }
+                                if (dbContent.getTitle() != null && !dbContent.getTitle().trim().isEmpty()) {
+                                    String titleKey = dbContent.getTitle().toLowerCase();
+                                    if (!seen.containsKey(titleKey)) {
+                                        forRichDisplay.add(dbContent);
+                                        seen.put(titleKey, true);
+                                    }
+                                }
+                            }
+                        }
 
                         if (!forRichDisplay.isEmpty()) {
                             try {
                                 if (setupController == null) {
                                     System.err.println("SearchController: setupController is null. Cannot create film nodes.");
-                                    return;
+                                } else {
+                                    filmSeriesRecommendations.getChildren().clear();
+                                    List<Node> filmNodes = setupController.createFilmNodes(forRichDisplay, false);
+                                    filmSeriesRecommendations.getChildren().addAll(filmNodes);
                                 }
-                                List<Node> filmNodes = setupController.createFilmNodes(forRichDisplay, false);
-                                filmSeriesRecommendations.getChildren().addAll(filmNodes);
                             } catch (IOException e) {
                                 System.err.println("SearchController: Error creating film nodes for filmSeriesRecommendations: " + e.getMessage());
                             } catch (NullPointerException e) {
@@ -164,10 +185,36 @@ public class SearchController {
                             }
                         }
 
-                        List<Content> forLabelLikeDisplay = uniquePopularContent.stream()
-                                .skip(forRichDisplay.size())
+                        List<Content> forLabelLikeDisplay = uniquePopularContentFromApi.stream()
+                                .filter(content -> !seen.containsKey(content.getTitle().toLowerCase()))
                                 .limit(MAX_LABEL_LIKE_COUNT)
-                                .collect(Collectors.toList());
+                                .collect(Collectors.toCollection(ArrayList::new)); // Ensure mutable list
+
+                        // Supplement forLabelLikeDisplay from DB if it's less than MIN_LABEL_LIKE_DISPLAY_COUNT
+                        if (forLabelLikeDisplay.size() < MIN_LABEL_LIKE_DISPLAY_COUNT) {
+                            ContentDao contentdao = new ContentDao();
+                            String sanitizedSearchTermForDb = searchText.replace("'", "''");
+                            String queryDb = "SELECT DISTINCT * , 0 AS List FROM Content C WHERE C.title LIKE '%" + sanitizedSearchTermForDb + "%' ORDER BY popularity DESC"; // Assuming a popularity column
+                            List<Content> dbContentList = contentdao.getContentFromQuery(queryDb);
+
+                            for (Content dbContent : dbContentList) {
+                                if (forLabelLikeDisplay.size() >= MIN_LABEL_LIKE_DISPLAY_COUNT) {
+                                    break;
+                                }
+                                if (dbContent.getTitle() != null && !dbContent.getTitle().trim().isEmpty()) {
+                                    String titleKey = dbContent.getTitle().toLowerCase();
+                                    if (!seen.containsKey(titleKey)) {
+                                        forLabelLikeDisplay.add(dbContent);
+                                        seen.put(titleKey, true);
+                                    }
+                                }
+                            }
+                        }
+                        // Ensure forLabelLikeDisplay does not exceed MAX_LABEL_LIKE_COUNT after DB supplement
+                        if (forLabelLikeDisplay.size() > MAX_LABEL_LIKE_COUNT) {
+                            forLabelLikeDisplay = forLabelLikeDisplay.subList(0, MAX_LABEL_LIKE_COUNT);
+                        }
+
 
                         recommendations.getChildren().clear();
                         if (!forLabelLikeDisplay.isEmpty()) {
@@ -179,12 +226,12 @@ public class SearchController {
                         }
 
                         if (forRichDisplay.isEmpty() && forLabelLikeDisplay.isEmpty()) {
-                            System.out.println("SearchController: No results found for query '" + query + "' after processing all pages.");
+                            System.out.println("SearchController: No results found for query '" + searchText + "' after processing all pages.");
                         }
                     });
                 }, tmdbApiManager.getExecutor())
                 .exceptionally(ex -> {
-                    System.err.println("SearchController: Error during multi-page search operation for query '" + query + "': " + ex.getMessage());
+                    System.err.println("SearchController: Error during multi-page search operation for query '" + searchText + "': " + ex.getMessage());
                     Platform.runLater(() -> {
                         recommendations.getChildren().clear();
                         filmSeriesRecommendations.getChildren().clear();
@@ -203,7 +250,7 @@ public class SearchController {
             if (content.getTitle() == null || content.getTitle().trim().isEmpty()) continue;
 
             HBox itemContainer = new HBox();
-            itemContainer.setAlignment(javafx.geometry.Pos.CENTER);
+            itemContainer.setAlignment(Pos.CENTER);
             itemContainer.setSpacing(2);
 
             Button button = new Button(content.getTitle());

@@ -226,7 +226,6 @@ public class ContentDao {
         return String.join(",", genreIds);
     }
 
-
     private List<List<Content>> getContentFromDB( String query,int numberOfLists) {
         List<List<Content>> list = new Vector<>();
         for(int i=0;i<numberOfLists;i++)
@@ -292,6 +291,9 @@ public class ContentDao {
         List<List<Content>> results = getContentFromDB(query,9);
         results.forEach(this::fetchAndSetGenresForContentList);
         return results;
+    }
+    public List<Content> getContentFromQuery(String query){
+        return getContentFromDB(query,1).get(0);
     }
     public String buildGenreFilter(String genreIdsString) {
         if (genreIdsString != null && !genreIdsString.equals("-1")) {

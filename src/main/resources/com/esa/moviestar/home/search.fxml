@@ -6,7 +6,8 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.shape.*?>
 
-<AnchorPane maxHeight="1920" maxWidth="1080" minHeight="-Infinity" minWidth="-Infinity" prefHeight="851.0" prefWidth="1077.0" styleClass="bg-color" stylesheets="@../styles/general.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.esa.moviestar.home.SearchController">
+<?import java.net.URL?>
+<AnchorPane maxHeight="1920" maxWidth="1080" minHeight="-Infinity" minWidth="-Infinity" prefHeight="851.0" prefWidth="1077.0" styleClass="bg-color" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.esa.moviestar.home.SearchController">
     <ScrollPane fitToWidth="true" hbarPolicy="NEVER" hmax="0.0" prefHeight="1080.0" prefWidth="1920.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" BorderPane.alignment="TOP_CENTER">
         <VBox alignment="TOP_CENTER" spacing="16.0" style="-fx-background-color: transparent;" VBox.vgrow="ALWAYS">
             <!-- Used like a dynamic margin for the scroll pane to give the header (main.fxml) space in initial position-->
@@ -44,4 +45,8 @@
             <Insets bottom="16.0" left="16.0" top="16.0" />
         </padding>
     </ScrollPane>
+    <stylesheets>
+        <URL value="@../styles/access.css" />
+        <URL value="@../styles/general.css" />
+    </stylesheets>
 </AnchorPane>

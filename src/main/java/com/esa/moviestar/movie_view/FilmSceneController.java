@@ -29,6 +29,7 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
+import javafx.scene.shape.Rectangle;
 import javafx.stage.Popup;
 import javafx.stage.Stage;
 
@@ -652,7 +653,7 @@ public class FilmSceneController {
         HBox episodeItem = new HBox();
         episodeItem.setAlignment(Pos.CENTER_LEFT);
         episodeItem.setSpacing(15);
-        episodeItem.getStyleClass().add("episode-item");
+        episodeItem.getStyleClass().addAll("episode-item","small-item");
 
         Label episodeNumber = new Label(String.valueOf(episode.getEpisodeNumber()));
         episodeNumber.getStyleClass().addAll("episode-number","on-primary");
@@ -665,6 +666,12 @@ public class FilmSceneController {
         episodeThumbnail.setPreserveRatio(true);
         episodeThumbnail.getStyleClass().add("episode-thumbnail-image");
         // Use the updated loadEpisodeThumbnail which includes fallback logic
+        Rectangle clip = new Rectangle();
+        clip.widthProperty().bind(episodeItem.widthProperty());
+        clip.heightProperty().bind(episodeItem.heightProperty());
+        clip.setArcWidth(32);
+        clip.setArcHeight(32);
+        episodeItem.setClip(clip);
         loadEpisodeThumbnail(episode.getStillUrl(), episodeThumbnail);
 
         VBox episodeDetails = new VBox(5);

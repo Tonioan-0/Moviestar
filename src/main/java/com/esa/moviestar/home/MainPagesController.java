@@ -11,6 +11,9 @@ import com.esa.moviestar.model.Content;
 import com.esa.moviestar.movie_view.FilmCardController;
 import com.esa.moviestar.movie_view.FilmSceneController;
 
+import javafx.animation.Timeline;
+import javafx.animation.KeyFrame;
+import javafx.util.Duration;
 import javafx.animation.FadeTransition;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
@@ -63,6 +66,9 @@ public class MainPagesController {
     private PageData currentScene;
     private PageData pageBeforeSearch;
     private PageData savedPageData;    // For restoring state after film scene
+
+    //Timer setting
+    private Timeline searchTimer;
 
     private boolean transitionInProgress = false;
     private BufferAnimation loadingSpinner;
@@ -221,14 +227,20 @@ public class MainPagesController {
     }
 
     private void setupSearchListener(HeaderController headerController) {
-        if (headerController.getTbxSearch() != null) {
+        if (headerController.getTbxSearch() != null ) {
+
             headerController.getTbxSearch().textProperty().addListener((observableValue, oldV, newV) -> {
+
+                if(searchTimer != null ){
+                    searchTimer.stop();
+                    searchTimer = null;
+                }
                 String query = newV.trim();
                 if (query.isEmpty()) {
-                    if (currentScene != null && currentScene.controller() instanceof SearchController) {
+                    if (currentScene != null && currentScene.controller() instanceof SearchController ) {
                         PageData pageToReturnTo = (this.pageBeforeSearch != null && !(this.pageBeforeSearch.controller() instanceof SearchController))
                                 ? this.pageBeforeSearch : this.home;
-                        if (pageToReturnTo != null) {
+                        if (pageToReturnTo != null ) {
                             String pageName = getPageName(pageToReturnTo);
                             loadPageAsync(pageName, () -> pageToReturnTo);
                             if (this.pageBeforeSearch == pageToReturnTo) this.pageBeforeSearch = null;
@@ -250,8 +262,13 @@ public class MainPagesController {
                     PageData searchResultPage = loadDynamicBody("search.fxml");
                     if (searchResultPage != null && searchResultPage.controller() instanceof SearchController sc) {
                         sc.setParamController(headerController, user, this);
+                        searchTimer = new Timeline(new KeyFrame(Duration.millis(500), e -> {
+                            sc.performSearch(query);
+                        }));
+                        searchTimer.play();
                         sc.performSearch(query);
-                    } else if (searchResultPage == null) {
+                    }
+                    else if (searchResultPage == null) {
                         System.err.println("MainPagesController: Search page (search.fxml) failed to load.");
                     } else {
                         System.err.println("MainPagesController: Search page loaded, but controller is not SearchController.");
@@ -265,14 +282,17 @@ public class MainPagesController {
     }
 
     private String getPageName(PageData pageData) {
+
         if (pageData == home) return "home";
         if (pageData == filter_film) return "film filter";
         if (pageData == filter_series) return "series filter";
         return "unknown";
+
     }
 
 
     private void showLoadingSpinner() {
+
         Platform.runLater(() -> {
             if (loadingSpinner == null || loadingOverlay == null) {
                 if (root != null) createLoadingOverlay(); else return;
@@ -295,9 +315,11 @@ public class MainPagesController {
             fadeIn.setToValue(1.0);
             fadeIn.play();
         });
+
     }
 
     private void hideLoadingSpinner() {
+
         Platform.runLater(() -> {
             if (loadingOverlay == null) return;
             FadeTransition fadeOut = new FadeTransition(Duration.millis(200), loadingOverlay);
@@ -309,6 +331,7 @@ public class MainPagesController {
             });
             fadeOut.play();
         });
+
     }
 
     private void loadPageAsync(String pageName, Supplier<PageData> pageSupplier) {
