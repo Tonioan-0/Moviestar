@@ -1,174 +1,162 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import java.lang.*?>
-<?import javafx.geometry.*?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
-<?import javafx.scene.shape.*?>
+<?import java.lang.String?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.shape.SVGPath?>
 
-<AnchorPane fx:id="container" stylesheets="@../styles/general.css" xmlns="http://javafx.com/javafx/17.0.12"
-            xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.esa.moviestar.settings.SettingsViewController">
-    <BorderPane AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0"
-                AnchorPane.topAnchor="0.0">
+<AnchorPane fx:id="container" stylesheets="@../styles/general.css" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.esa.moviestar.settings.SettingsViewController">
+    <BorderPane AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
         <left>
-            <VBox prefHeight="380.0" prefWidth="300.0" spacing="45.0" styleClass="surface-opaque"
-                  BorderPane.alignment="TOP_LEFT" VBox.vgrow="ALWAYS">
+            <VBox prefHeight="380.0" prefWidth="300.0" spacing="45.0" styleClass="surface-opaque" BorderPane.alignment="TOP_LEFT" VBox.vgrow="ALWAYS">
                 <StackPane alignment="TOP_LEFT" prefHeight="129.0" prefWidth="383.0">
                     <padding>
-                        <Insets top="40.0"/>
+                        <Insets top="40.0" />
                     </padding>
-                    <SVGPath content="%icon-moviestar-bg" styleClass="surface-solid"
-                             StackPane.alignment="BOTTOM_CENTER"/>
-                    <SVGPath content="%icon-moviestar-fg" fill="WHITE" styleClass="on-primary"
-                             StackPane.alignment="BOTTOM_CENTER"/>
+                    <SVGPath content="%icon-moviestar-bg" styleClass="surface-solid" StackPane.alignment="BOTTOM_CENTER" />
+                    <SVGPath content="%icon-moviestar-fg" fill="WHITE" styleClass="on-primary" StackPane.alignment="BOTTOM_CENTER" />
                 </StackPane>
                 <VBox spacing="25.0" VBox.vgrow="ALWAYS">
                     <VBox.margin>
-                        <Insets top="20.0"/>
+                        <Insets top="20.0" />
                     </VBox.margin>
-                    <HBox fx:id="userContent" alignment="CENTER_LEFT" minHeight="50.0"
-                          style="-fx-background-radius: 0 20 20 0;">
+                    <HBox fx:id="userContent" alignment="CENTER_LEFT" minHeight="50.0" style="-fx-background-radius: 0 20 20 0;">
                         <styleClass>
-                            <String fx:value="chips"/>
-                            <String fx:value="surface-transparent"/>
-                            <String fx:value="hboxMenu"/>
+                            <String fx:value="chips" />
+                            <String fx:value="surface-transparent" />
+                            <String fx:value="hboxMenu" />
                         </styleClass>
                         <VBox.margin>
-                            <Insets right="10.0"/>
+                            <Insets right="10.0" />
                         </VBox.margin>
-                        <SVGPath fx:id="userSVG" content="%user" fill="white"/>
-                        <Label fx:id="userText" alignment="CENTER" prefHeight="26.0" prefWidth="73.0"
-                               text="Account">
+                        <SVGPath fx:id="userSVG" content="%user" fill="white" />
+                        <Label fx:id="userText" alignment="CENTER" prefHeight="26.0" prefWidth="73.0" text="Account">
                             <styleClass>
-                                <String fx:value="bold-text"/>
-                                <String fx:value="medium-text"/>
-                                <String fx:value="on-primary"/>
+                                <String fx:value="bold-text" />
+                                <String fx:value="medium-text" />
+                                <String fx:value="on-primary" />
                             </styleClass>
                             <HBox.margin>
-                                <Insets/>
+                                <Insets />
                             </HBox.margin>
                             <padding>
-                                <Insets right="9.0"/>
+                                <Insets right="9.0" />
                             </padding>
                         </Label>
                     </HBox>
-                    <HBox fx:id="historyContent" alignment="CENTER_LEFT" minHeight="50.0"
-                          style="-fx-background-radius: 0 20 20 0;">
+                    <HBox fx:id="historyContent" alignment="CENTER_LEFT" minHeight="50.0" style="-fx-background-radius: 0 20 20 0;">
                         <styleClass>
-                            <String fx:value="chips"/>
-                            <String fx:value="surface-transparent"/>
-                            <String fx:value="hboxMenu"/>
+                            <String fx:value="chips" />
+                            <String fx:value="surface-transparent" />
+                            <String fx:value="hboxMenu" />
                         </styleClass>
                         <VBox.margin>
-                            <Insets right="10.0"/>
+                            <Insets right="10.0" />
                         </VBox.margin>
-                        <SVGPath fx:id="historySVG" content="%history" fill="white"/>
+                        <SVGPath fx:id="historySVG" content="%history" fill="white" />
                         <Label fx:id="historyText" prefHeight="26.0" prefWidth="94.0" text="History">
                             <styleClass>
-                                <String fx:value="bold-text"/>
-                                <String fx:value="medium-text"/>
-                                <String fx:value="on-primary"/>
+                                <String fx:value="bold-text" />
+                                <String fx:value="medium-text" />
+                                <String fx:value="on-primary" />
                             </styleClass>
                         </Label>
                     </HBox>
-                    <HBox fx:id="watchListContent" alignment="CENTER_LEFT" minHeight="50.0"
-                          style="-fx-background-radius: 0 20 20 0;">
+                    <HBox fx:id="watchListContent" alignment="CENTER_LEFT" minHeight="50.0" style="-fx-background-radius: 0 20 20 0;">
                         <styleClass>
-                            <String fx:value="chips"/>
-                            <String fx:value="surface-transparent"/>
-                            <String fx:value="hboxMenu"/>
+                            <String fx:value="chips" />
+                            <String fx:value="surface-transparent" />
+                            <String fx:value="hboxMenu" />
                         </styleClass>
                         <VBox.margin>
-                            <Insets right="10.0"/>
+                            <Insets right="10.0" />
                         </VBox.margin>
-                        <SVGPath fx:id="watchlistIcon" content="%watchlist" fill="white"/>
+                        <SVGPath fx:id="watchlistIcon" content="%watchlist" fill="white" />
                         <Label fx:id="watchListText" prefHeight="26.0" prefWidth="94.0" text="Watchlist">
                             <styleClass>
-                                <String fx:value="bold-text"/>
-                                <String fx:value="medium-text"/>
-                                <String fx:value="on-primary"/>
+                                <String fx:value="bold-text" />
+                                <String fx:value="medium-text" />
+                                <String fx:value="on-primary" />
                             </styleClass>
                         </Label>
                     </HBox>
-                    <HBox fx:id="favouritesContent" alignment="CENTER_LEFT" layoutX="10.0" layoutY="160.0"
-                          minHeight="50.0" style="-fx-background-radius: 0 20 20 0;">
+                    <HBox fx:id="favouritesContent" alignment="CENTER_LEFT" layoutX="10.0" layoutY="160.0" minHeight="50.0" style="-fx-background-radius: 0 20 20 0;">
                         <styleClass>
-                            <String fx:value="chips"/>
-                            <String fx:value="surface-transparent"/>
-                            <String fx:value="hboxMenu"/>
+                            <String fx:value="chips" />
+                            <String fx:value="surface-transparent" />
+                            <String fx:value="hboxMenu" />
                         </styleClass>
-                        <SVGPath fx:id="favoritesIcon" content="%favorite" fill="white" scaleX="1.7"
-                                 scaleY="1.7"/>
+                        <SVGPath fx:id="favoritesIcon" content="%favorite" fill="white" scaleX="1.7" scaleY="1.7" />
                         <Label fx:id="favoritesText" prefHeight="26.0" prefWidth="94.0" text="Favourites">
                             <styleClass>
-                                <String fx:value="bold-text"/>
-                                <String fx:value="medium-text"/>
-                                <String fx:value="on-primary"/>
+                                <String fx:value="bold-text" />
+                                <String fx:value="medium-text" />
+                                <String fx:value="on-primary" />
                             </styleClass>
                         </Label>
                     </HBox>
-                    <HBox fx:id="privacyContent" alignment="CENTER_LEFT" minHeight="50.0"
-                          style="-fx-background-radius: 0 20 20 0;">
+                    <HBox fx:id="privacyContent" alignment="CENTER_LEFT" minHeight="50.0" style="-fx-background-radius: 0 20 20 0;">
                         <styleClass>
-                            <String fx:value="chips"/>
-                            <String fx:value="surface-transparent"/>
-                            <String fx:value="hboxMenu"/>
+                            <String fx:value="chips" />
+                            <String fx:value="surface-transparent" />
+                            <String fx:value="hboxMenu" />
                         </styleClass>
                         <VBox.margin>
-                            <Insets right="10.0"/>
+                            <Insets right="10.0" />
                         </VBox.margin>
-                        <SVGPath content="%privacy" fill="white"/>
+                        <SVGPath content="%privacy" fill="white" />
                         <Label prefHeight="26.0" prefWidth="166.0" text="Privacy &amp; Terms">
                             <styleClass>
-                                <String fx:value="bold-text"/>
-                                <String fx:value="medium-text"/>
-                                <String fx:value="on-primary"/>
+                                <String fx:value="bold-text" />
+                                <String fx:value="medium-text" />
+                                <String fx:value="on-primary" />
                             </styleClass>
                         </Label>
                     </HBox>
-                    <HBox fx:id="aboutContent" alignment="CENTER_LEFT" minHeight="50.0"
-                          style="-fx-background-radius: 0 20 20 0;">
+                    <HBox fx:id="aboutContent" alignment="CENTER_LEFT" minHeight="50.0" style="-fx-background-radius: 0 20 20 0;">
                         <styleClass>
-                            <String fx:value="chips"/>
-                            <String fx:value="surface-transparent"/>
-                            <String fx:value="hboxMenu"/>
+                            <String fx:value="chips" />
+                            <String fx:value="surface-transparent" />
+                            <String fx:value="hboxMenu" />
                         </styleClass>
                         <VBox.margin>
-                            <Insets right="10.0"/>
+                            <Insets right="10.0" />
                         </VBox.margin>
-                        <SVGPath content="%about" fill="white"/>
+                        <SVGPath content="%about" fill="white" />
                         <Label text="About &amp; Support ">
                             <styleClass>
-                                <String fx:value="medium-text"/>
-                                <String fx:value="bold-text"/>
-                                <String fx:value="on-primary"/>
+                                <String fx:value="medium-text" />
+                                <String fx:value="bold-text" />
+                                <String fx:value="on-primary" />
                             </styleClass>
                         </Label>
                     </HBox>
                 </VBox>
                 <VBox alignment="CENTER_LEFT" styleClass="chips">
                     <VBox.margin>
-                        <Insets bottom="10.0"/>
+                        <Insets bottom="10.0" />
                     </VBox.margin>
-                    <Separator opacity="0.2"/>
                     <HBox fx:id="githubIcon" alignment="CENTER_LEFT">
-                        <SVGPath content="%github" fill="white"/>
+                        <SVGPath content="%github" fill="white" />
                     </HBox>
                 </VBox>
             </VBox>
         </left>
         <center>
-            <StackPane fx:id="contentArea" prefHeight="378.0" prefWidth="370.0" styleClass="surface-solid"
-                       BorderPane.alignment="CENTER"/>
+            <StackPane fx:id="contentArea" prefHeight="378.0" prefWidth="370.0" styleClass="surface-solid" BorderPane.alignment="CENTER" />
         </center>
     </BorderPane>
-    <StackPane fx:id="backToHome" maxHeight="48.0" maxWidth="48.0" minHeight="48.0" minWidth="48.0"
-               prefHeight="48.0" prefWidth="48.0" AnchorPane.rightAnchor="16.0" AnchorPane.topAnchor="16.0">
+    <StackPane fx:id="backToHome" maxHeight="48.0" maxWidth="48.0" minHeight="48.0" minWidth="48.0" prefHeight="48.0" prefWidth="48.0" AnchorPane.rightAnchor="16.0" AnchorPane.topAnchor="16.0">
         <styleClass>
-            <String fx:value="small-item"/>
-            <String fx:value="surface-transparent"/>
-            <String fx:value="on-primary-border"/>
+            <String fx:value="small-item" />
+            <String fx:value="surface-transparent" />
+            <String fx:value="on-primary-border" />
         </styleClass>
-        <SVGPath content="%close" fill="#f5f5f5" scaleX="0.6" scaleY="0.6" styleClass="on-primary"/>
+        <SVGPath content="%close" fill="#f5f5f5" scaleX="0.6" scaleY="0.6" styleClass="on-primary" />
     </StackPane>
 </AnchorPane>

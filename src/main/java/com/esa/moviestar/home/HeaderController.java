@@ -124,7 +124,7 @@ public class HeaderController {
         }};
         settingsItem.getChildren().addAll(profileIcon, text);
         settingsItem.setOnMouseClicked(e -> {
-                    mainPagesController.settingsClick(user,account);
+                    mainPagesController.goToSettings( user,account);
                     popupMenu.dispose();
                 }
         );
@@ -150,7 +150,7 @@ public class HeaderController {
         Text logoutText = new Text("Logout") {{
             getStyleClass().addAll("medium-text", "on-primary");
         }};
-        emailButton.setOnMouseClicked(e -> {mainPagesController.emailClick();popupMenu.dispose();});
+        emailButton.setOnMouseClicked(e -> {mainPagesController.goToAccess();popupMenu.dispose();});
         emailButton.getChildren().addAll(logoutIcon, logoutText);
         popupMenu.addItem(emailButton);
 
@@ -168,7 +168,7 @@ public class HeaderController {
             getStyleClass().addAll("medium-text", "on-primary");
         }};
         item.getChildren().addAll(profileIcon, text);
-        item.setOnMouseClicked(e -> {mainPagesController.profileClick(user);popupMenu.dispose();});
+        item.setOnMouseClicked(e -> {mainPagesController.switchProfile(user);popupMenu.dispose();});
         popupMenu.addItem(item);
 
     }
@@ -196,7 +196,7 @@ public class HeaderController {
             getStyleClass().addAll("medium-text", "on-primary");
         }};
         item.getChildren().addAll(cross, text);
-        item.setOnMouseClicked(e -> {mainPagesController.createProfileUser(account);popupMenu.dispose();});
+        item.setOnMouseClicked(e -> {mainPagesController.goToProfileCreation(account);popupMenu.dispose();});
         popupMenu.addItem(item);
 
     }

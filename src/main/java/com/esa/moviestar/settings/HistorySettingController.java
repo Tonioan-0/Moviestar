@@ -2,14 +2,11 @@ package com.esa.moviestar.settings;
 
 
 import com.esa.moviestar.database.ContentDao;
-import com.esa.moviestar.model.Account;
 import com.esa.moviestar.model.User;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
 
 
-import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 
@@ -24,22 +21,13 @@ public class HistorySettingController {
    @FXML
    private VBox vboxContainer;
 
-    private User user;
-    private Account account;
     private SettingsViewController settingViewController;
 
 
-    public void setAccount(Account account){
-        this.account=account;
-        System.out.println("HistorySettingController : email "+account.getEmail());
-    }
-
     public void setScene(SettingsViewController container){this.settingViewController = container;}
 
-    public void setUser(User user){
+    public void updateHistory(User user){
         vboxContainer.getChildren().clear();
-        this.user = user;
-        System.out.println("HistorySettingController : user : "+ user.getName()+" email user : "+ user.getEmail()+" id user : "+ user.getID());
         ContentDao dao = new ContentDao();
         List<Node> contentList;
         try {

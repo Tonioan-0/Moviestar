@@ -15,7 +15,7 @@ public class AccountDao {
         try{
             connection = DataBaseManager.getConnection();
         }
-        catch (SQLException e) {
+        catch (SQLException e  ) {
             System.err.println("AccountDao : Database connection error "+e.getMessage());
         }
     }
@@ -31,12 +31,8 @@ public class AccountDao {
             System.out.println("AccountDao : Account added : "+account.getEmail());
             return true;
         }catch (SQLException e) {
-            if (e.getMessage().contains("UNIQUE constraint failed")) {
-                return false;
-            } else {
-                System.err.println("accountDao :Account insertion error"+e.getMessage());
-                return false;
-            }
+            System.err.println("accountDao :Account insertion error"+e.getMessage());
+            return false;
         }
     }
 
@@ -45,10 +41,9 @@ public class AccountDao {
         try (PreparedStatement stmt = connection.prepareStatement(query)) {
             stmt.setString(1, email);
             int rowsAffected = stmt.executeUpdate();
-            if (rowsAffected == 0) {
+            if (rowsAffected == 0)
                 System.err.println("No account found with email =" + email);
 
-            }
             System.out.println("AccountDao : account deleted : "+email);
         } catch (SQLException e) {
             System.err.println("accountDao: Error removing account – " + e.getMessage());
@@ -62,28 +57,27 @@ public class AccountDao {
 
         try (PreparedStatement stmt = connection.prepareStatement(query)) {
             stmt.setString(1, email);
-            ResultSet rs = stmt.executeQuery();
+            ResultSet rs =  stmt.executeQuery();
             if (rs.next()) {
                 return new Account(
                         rs.getString("Email"),
                         rs.getString("Password")
                 );
             }
-            else {
+            else
                 return null;
-            }
 
-        } catch (SQLException e) {
+        } catch (SQLException e ) {
             System.err.println("accountDao : Account search error"+e.getMessage());
         }
         return null;
     }
 
-    public void updatePassword(String email, String password) {
-        String query = "UPDATE Account SET Password = ? WHERE Email = ?;";
+    public void updatePassword(String email, String password ) {
+        String query = "UPDATE Account SET Password = ? WHERE Email = ?;" ;
 
-        try (PreparedStatement stmt = connection.prepareStatement(query)) {
-            stmt.setString(1, password);
+        try (PreparedStatement stmt = connection.prepareStatement(query)){
+            stmt.setString(1,  password);
             stmt.setString(2, email);
             System.out.println("AccountDao :account with updated password : "+email);
         } catch (SQLException e) {
@@ -93,19 +87,19 @@ public class AccountDao {
     }
 
     public boolean checkPassword(String email , String password){
-        String query = "SELECT Password FROM Account WHERE Email = ?;";
+        String query = "SELECT Password FROM Account WHERE Email = ?;" ;
 
         try(PreparedStatement stmt = connection.prepareStatement(query)){
             stmt.setString(1,email);
             try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
-                    String storedPassword = rs.getString("Password");
+                    String storedPassword = rs.getString("Password" );
                     return storedPassword.equals(password);
                 }
             }
-            System.out.println("AccountDao : account with verified password: "+email);
-        }catch (SQLException e){
-            System.err.println("accountDao : Account password verification error"+e.getMessage());
+            System.out.println("AccountDao : account with verified password: " + email );
+        }catch (SQLException e ){
+            System.err.println("accountDao : Account password verification error"+e.getMessage() );
         }
         return false;
     }

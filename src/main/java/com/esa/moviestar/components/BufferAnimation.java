@@ -13,28 +13,28 @@ import javafx.util.Duration;
     Buffer animation is the main animation of the program, it used in mainPagesController to switch by the children
     Sources: Same to CarouselSkin
 */
-public class BufferAnimation extends  StackPane {
+public class BufferAnimation extends  StackPane{
 
     private final Rectangle largeSquare;
     private final Rectangle smallSquare;
     private final Timeline animation;
 
 
-    public BufferAnimation() {
+    public BufferAnimation(){
         this(64 );
     }
 
-    public BufferAnimation(double size) {
+    public BufferAnimation(double size){
         setPrefSize(size, size);
         setMaxSize(size, size);
         setMinSize(size, size);
 
-        Pane container = new Pane() {{
+        Pane container = new Pane(){{
             setPrefSize(size, size);
         }};
 
         // Create large cube
-        largeSquare = new Rectangle(size, size ) {{
+        largeSquare = new Rectangle(size, size ){{
             setFill(Color.rgb(115, 65, 190));
             setArcWidth(32);
             setArcHeight(32);
@@ -60,7 +60,7 @@ public class BufferAnimation extends  StackPane {
         animation.play();
     }
 
-    private Timeline createAnimation() {
+    private Timeline createAnimation(){
         Duration duration = Duration.seconds(2);
         Timeline timeline = new Timeline();
         KeyValue kv1Start =new KeyValue( largeSquare.rotateProperty(),  0, Interpolator.EASE_BOTH);
@@ -82,10 +82,10 @@ public class BufferAnimation extends  StackPane {
     }
 
 
-    public void startAnimation() {
+    public void startAnimation(){
         animation.play();
     }
-    public void stopAnimation() {
+    public void stopAnimation(){
         animation.pause();
     }
 }

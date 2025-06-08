@@ -1,13 +1,10 @@
 package com.esa.moviestar.profile;
 
 import com.esa.moviestar.Main;
-import com.esa.moviestar.database.ContentDao;
 import com.esa.moviestar.database.UserDao;
 import com.esa.moviestar.home.MainPagesController;
-import com.esa.moviestar.libraries.TMDbApiManager;
 import com.esa.moviestar.model.Account;
 import com.esa.moviestar.model.User;
-import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
@@ -65,23 +62,23 @@ public class ProfileView {
 
     public void setAccount(Account account) {
         this.account = account;
-        System.out.println("ProfileView : email "+account.getEmail());
+        System.out.println( "ProfileView: email "+account.getEmail() );
         loadUser();
     }
 
 
     private void loadUser() {
         grid.getChildren().clear();
-        UserDao dao = new UserDao();
+        UserDao dao = new  UserDao();
         List<User> users = dao.findAllUsers(account.getEmail());
 
-        for (User u : users) {
+        for (User u :  users){
             VBox userBox = createUserBox(u);
             grid.getChildren().add(userBox);
         }
 
 
-        if (users.size() < 4) {
+        if (users.size() < 4){
             VBox addUserBox = createAddUserBox();
             grid.getChildren().add(addUserBox);
         }
@@ -214,7 +211,7 @@ public class ProfileView {
             Parent homeContent = loader.load();
 
             MainPagesController mainPagesController = loader.getController();
-            mainPagesController.first_load(user,account);
+            mainPagesController.load(user,account);
             Scene currentScene = fatherContainer.getScene();
             Scene newScene = new Scene(homeContent, currentScene.getWidth(), currentScene.getHeight());
             Stage stage = (Stage) fatherContainer.getScene().getWindow();

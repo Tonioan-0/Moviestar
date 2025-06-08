@@ -55,15 +55,14 @@ public class AccountSettingController {
 
     public void setAccount(Account account) {
         this.account = account;
-        System.out.println("AccountViewController: email " + account.getEmail());
     }
 
-    public void setUtente(User user) {
+    public void setUser(User user) {
         this.user = user;
         if (user != null) {
-            int codImmagineCorrente = user.getIDIcon();
+            int imageID = user.getIDIcon();
             profileImage.getChildren().clear();
-            Group g = new Group(IconSVG.takeElement(codImmagineCorrente));
+            Group g = new Group(IconSVG.takeElement(imageID));
             profileImage.getChildren().add(g);
             userName.setText(user.getName());
             if (user.getRegistrationDate() != null) {
@@ -72,7 +71,6 @@ public class AccountSettingController {
                 registrationDate.setText("Not available");
             }
             Email.setText("Email : " + user.getEmail());
-            System.out.println("AccountViewController : user : " + user.getName() + " email user : " + user.getEmail() + " id user : " + user.getID());
         }
     }
 
@@ -227,7 +225,7 @@ public class AccountSettingController {
                 Parent updateContent = loader.load();
 
                 UpdatePasswordController updatePasswordController = loader.getController();
-                updatePasswordController.setUtente(user);
+                updatePasswordController.setUser(user);
                 updatePasswordController.setAccount(account);
 
                 Scene currentScene = accountContentSetting.getScene();

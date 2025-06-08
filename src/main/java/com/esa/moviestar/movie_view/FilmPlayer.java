@@ -32,7 +32,7 @@ import java.net.URL;
 // Sources:
 // https://docs.oracle.com/javase/8/javafx/api/javafx/scene/media/MediaView.html
 // https://docs.oracle.com/javase/8/javafx/api/javafx/scene/media/MediaPlayer.html
-public class FilmPlayer {
+public class FilmPlayer{
     //Buttons (They are stackPane to handle the icon better, with button I would use .setGraphics()
     public StackPane playerContainer;
     public StackPane btnPlay;
@@ -72,7 +72,7 @@ public class FilmPlayer {
     protected String videoUrl;
 
     //Variables
-    private final double[] playbackSpeeds = {0.5, 0.7, 1.0, 1.2, 1.5, 2.0};
+    private final double[] playbackSpeeds ={0.5 , 0.7, 1.0, 1.2, 1.5, 2.0};
     private int currentSpeedIndex = 2;
     private boolean isMuted = false;
     private double previousVolume = 1.0;
@@ -93,7 +93,7 @@ public class FilmPlayer {
     private User user;
     private Account account;
 
-    public void initialize() {
+    public void initialize(){
         setupControlActions();
         setupAutoHideControls();
         sliderVolume.setValue(100);
@@ -103,7 +103,7 @@ public class FilmPlayer {
         closeButton.setOnMouseClicked(e-> returnToMainPages());
     }
 
-    private void setupAutoHideControls() {
+    private void setupAutoHideControls(){
         // Transitions for bottomBar (manages controlsVisible state)
         fadeOutTransition = new FadeTransition(Duration.millis(FADE_DURATION_MILLIS), bottomBar);
         fadeOutTransition.setFromValue(1.0);
@@ -116,7 +116,7 @@ public class FilmPlayer {
         fadeInTransition.setOnFinished(e ->  controlsVisible = true);
 
         // Transitions for the closeButton
-        if (closeButton != null) {
+        if (closeButton != null){
             fadeOutTransitionCloseButton = new FadeTransition(Duration.millis(FADE_DURATION_MILLIS), closeButton);
             fadeOutTransitionCloseButton.setFromValue(1.0);
             fadeOutTransitionCloseButton.setToValue( 0.0);
@@ -135,43 +135,43 @@ public class FilmPlayer {
         resetHideTimer();
     }
 
-    private void setupMouseActivityListeners() {
+    private void setupMouseActivityListeners(){
         root.setOnMouseMoved( this::onUserActivity);
         root.setOnMouseClicked(this::onUserActivity );
         playerContainer.setOnMouseMoved( this::onUserActivity);
         playerContainer.setOnMouseClicked(this::onUserActivity);
 
-        btnPlay.setOnMouseEntered(e -> showControls());
-        btnReturn.setOnMouseEntered(e -> showControls());
-        btnForward.setOnMouseEntered(e -> showControls());
+        btnPlay.setOnMouseEntered(e ->  showControls());
+        btnReturn.setOnMouseEntered( e -> showControls());
+        btnForward.setOnMouseEntered(e ->  showControls());
         btnSpeed.setOnMouseEntered(e -> showControls());
-        btnMaximize.setOnMouseEntered(e -> showControls());
-        volumeIconContainer.setOnMouseEntered(e -> showControls());
-        volumeSliderContainer.setOnMouseEntered(e -> showControls());
-        sliderVideo.setOnMouseEntered(e -> showControls());
+        btnMaximize.setOnMouseEntered(e ->  showControls());
+        volumeIconContainer.setOnMouseEntered(e ->  showControls());
+        volumeSliderContainer.setOnMouseEntered( e ->  showControls());
+        sliderVideo.setOnMouseEntered( e -> showControls());
         sliderVolume.setOnMouseEntered(e -> showControls());
 
         if (closeButton != null)
-            closeButton.setOnMouseEntered(e -> showControls() );
+            closeButton.setOnMouseEntered(e ->  showControls() );
 
     }
 
-    private void onUserActivity(MouseEvent event) {
+    private void onUserActivity(MouseEvent event){
         showControls();
-        resetHideTimer();
+         resetHideTimer();
     }
 
-    private void showControls() {
-        if (!controlsVisible) {
+    private void  showControls(){
+        if (!controlsVisible){
             // bottomBar
-            if (fadeOutTransition.getStatus() == javafx.animation.Animation.Status.RUNNING)
+            if (fadeOutTransition.getStatus() == javafx.animation.Animation.Status.RUNNING )
                 fadeOutTransition.stop();
 
             fadeInTransition.play();
 
             // closeButton
-            if (closeButton != null && fadeInTransitionCloseButton != null && fadeOutTransitionCloseButton != null) {
-                if (fadeOutTransitionCloseButton.getStatus() == javafx.animation.Animation.Status.RUNNING)
+            if (closeButton != null && fadeInTransitionCloseButton != null  && fadeOutTransitionCloseButton != null ){
+                if (fadeOutTransitionCloseButton.getStatus() ==  javafx.animation.Animation.Status.RUNNING )
                     fadeOutTransitionCloseButton.stop();
 
                 fadeInTransitionCloseButton.play();
@@ -180,18 +180,18 @@ public class FilmPlayer {
         resetHideTimer();
     }
 
-    private void hideControls() {
-        if ( controlsVisible && mediaPlayer != null && mediaPlayer.getStatus() == MediaPlayer.Status.PLAYING) {
+    private void hideControls(){
+        if ( controlsVisible && mediaPlayer != null && mediaPlayer.getStatus() ==  MediaPlayer.Status.PLAYING){
 
             // bottomBar
-            if (fadeInTransition.getStatus() == javafx.animation.Animation.Status.RUNNING)
+            if ( fadeInTransition.getStatus()  == javafx.animation.Animation.Status.RUNNING)
                 fadeInTransition.stop();
 
             fadeOutTransition.play(); // This transition's onFinished will set controlsVisible = false
 
             // closeButton
-            if (closeButton != null && fadeInTransitionCloseButton != null && fadeOutTransitionCloseButton != null) {
-                if (fadeInTransitionCloseButton.getStatus() == javafx.animation.Animation.Status.RUNNING)
+            if (closeButton  != null && fadeInTransitionCloseButton != null && fadeOutTransitionCloseButton != null){
+                if (fadeInTransitionCloseButton.getStatus() ==  javafx.animation.Animation.Status.RUNNING)
                     fadeInTransitionCloseButton.stop();
 
                 fadeOutTransitionCloseButton.play();
@@ -199,54 +199,55 @@ public class FilmPlayer {
         }
     }
 
-    private void resetHideTimer() {
+    private void resetHideTimer(){
         hideControlsTimer.stop();
-        if (mediaPlayer != null && mediaPlayer.getStatus() == MediaPlayer.Status.PLAYING)
-            hideControlsTimer.play();
+        if (mediaPlayer != null && mediaPlayer.getStatus() ==  MediaPlayer.Status.PLAYING)
+             hideControlsTimer.play();
     }
 
-    private void stopHideTimer()  {
-        hideControlsTimer.stop();
+    private void stopHideTimer() {
+        hideControlsTimer.stop() ;
     }
 
-    public void initializePlayer(String videoUrl,  User user, Account account) {
+    public void initializePlayer(String videoUrl,  User user, Account account){
+
+        this.videoUrl = videoUrl;
         this.user = user;
         this.account = account;
-        this.videoUrl = videoUrl;
-        try {
+        try{
             Media media = new Media(new URL(videoUrl).toExternalForm());
             mediaPlayer = new MediaPlayer(media);
-            mediaView = new MediaView(mediaPlayer);
+            mediaView = new MediaView( mediaPlayer);
 
             mediaView.setPreserveRatio(true);
             mediaView.fitWidthProperty().bind(playerContainer.widthProperty());
             mediaView.fitHeightProperty().bind(playerContainer.heightProperty() );
 
-            playerContainer.getChildren( ).addFirst(mediaView);
-            if (closeButton != null) closeButton.setOpacity(1.0);
+            playerContainer.getChildren().addFirst(mediaView );
+            if (closeButton  != null) closeButton.setOpacity(1.0);
             bottomBar.setOpacity(1.0);
 
             setupMediaPlayerListeners();
 
-            mediaPlayer.setOnError(() -> {
-                System.err.println("Video playback error: " + mediaPlayer.getError());
-            });
+            mediaPlayer.setOnError(() ->
+                    System.err.println("FilmPlayer: Video playback error: " + mediaPlayer.getError()));
+
             mediaPlayer.setVolume(sliderVolume.getValue() / 100.0);
 
-        } catch (Exception e) {
-            System.err.println("Error creating video player: " + e.getMessage() );
+        } catch (Exception e){
+            System.err.println("FilmPlayer: Error creating video player: " + e.getMessage() );
         }
     }
 
-    private void setupControlActions() {
-        btnPlay.setOnMouseClicked(e ->  {
-            if (mediaPlayer != null) {
-                if (mediaPlayer.getStatus() == MediaPlayer.Status.PLAYING) {
+    private void setupControlActions(){
+        btnPlay.setOnMouseClicked(e -> {
+            if (mediaPlayer  != null){
+                if (mediaPlayer.getStatus() == MediaPlayer.Status.PLAYING){
                     mediaPlayer.pause();
                     iconPlay.setContent(Main.resourceBundle.getString("buttons.play"));
                     stopHideTimer();
                     showControls();
-                } else {
+                } else{
                     mediaPlayer.play();
                     iconPlay.setContent(Main.resourceBundle.getString("buttons.stop"));
                     resetHideTimer();
@@ -254,8 +255,8 @@ public class FilmPlayer {
             }
         });
 
-        btnReturn.setOnMouseClicked(e -> {
-            if (mediaPlayer  != null && mediaPlayer.getCurrentTime() !=  null ) {
+        btnReturn.setOnMouseClicked(e ->{
+            if (mediaPlayer   != null && mediaPlayer.getCurrentTime() !=  null ){
                 Duration currentTime = mediaPlayer.getCurrentTime();
                 Duration newTime = currentTime.subtract(Duration.seconds(SKIP_DURATION) );
                 if (newTime.lessThan(Duration.ZERO))
@@ -265,13 +266,13 @@ public class FilmPlayer {
             }
         });
 
-        btnForward.setOnMouseClicked(e -> {
-            if (mediaPlayer != null && mediaPlayer.getCurrentTime() != null && mediaPlayer.getTotalDuration()  != null) {
+        btnForward.setOnMouseClicked(e ->{
+            if (mediaPlayer  != null && mediaPlayer.getCurrentTime() != null && mediaPlayer.getTotalDuration()   != null){
                 Duration currentTime = mediaPlayer.getCurrentTime();
                 Duration totalTime = mediaPlayer.getTotalDuration();
                 Duration newTime  = currentTime.add(Duration.seconds(SKIP_DURATION));
 
-                if (newTime.greaterThan(totalTime) ) {
+                if (newTime.greaterThan(totalTime) ){
                     newTime = totalTime;
                 }
 
@@ -280,8 +281,8 @@ public class FilmPlayer {
             }
         });
 
-        sliderVolume.valueProperty().addListener((obs,  oldVal, newVal) -> {
-            if (mediaPlayer !=  null) {
+        sliderVolume.valueProperty().addListener((obs,  oldVal, newVal) ->{
+            if (mediaPlayer  != null){
                 mediaPlayer.setVolume(newVal.doubleValue() /  100.0);
                 updateVolumeIcon(newVal.doubleValue());
                 resetHideTimer();
@@ -292,13 +293,13 @@ public class FilmPlayer {
             }
         });
 
-        volumeIconContainer.setOnMouseClicked(e -> {
-            if (mediaPlayer !=  null) {
-                if (isMuted) {
+        volumeIconContainer.setOnMouseClicked(e ->{
+            if (mediaPlayer  !=  null){
+                if (isMuted){
                     mediaPlayer.setVolume(previousVolume);
                     sliderVolume.setValue(previousVolume * 100);
                     isMuted = false;
-                } else {
+                } else{
                     previousVolume = mediaPlayer.getVolume();
                     mediaPlayer.setVolume(0);
                     sliderVolume.setValue(0);
@@ -309,8 +310,8 @@ public class FilmPlayer {
             }
         });
 
-        sliderVideo.setOnMousePressed(e -> {
-            if (mediaPlayer  != null && mediaPlayer.getTotalDuration() !=  null) {
+        sliderVideo.setOnMousePressed(e ->  {
+            if (mediaPlayer  != null && mediaPlayer.getTotalDuration()  !=  null){
                 stopHideTimer();
                 showControls();
                 Duration seekTime = mediaPlayer.getTotalDuration().multiply(sliderVideo.getValue() / 100.0);
@@ -318,8 +319,8 @@ public class FilmPlayer {
             }
         });
 
-        sliderVideo.setOnMouseDragged(e -> {
-            if (mediaPlayer != null  && mediaPlayer.getTotalDuration() != null) {
+        sliderVideo.setOnMouseDragged(e ->{
+            if (mediaPlayer  != null  && mediaPlayer.getTotalDuration() != null){
                 showControls();
                 Duration seekTime =  mediaPlayer.getTotalDuration().multiply(sliderVideo.getValue() / 100.0);
                 mediaPlayer.seek(seekTime);
@@ -328,8 +329,8 @@ public class FilmPlayer {
 
         sliderVideo.setOnMouseReleased(e -> resetHideTimer());
 
-        btnSpeed.setOnMouseClicked(e -> {
-            if (mediaPlayer != null) {
+        btnSpeed.setOnMouseClicked(e ->{
+            if (mediaPlayer != null){
                 currentSpeedIndex = (currentSpeedIndex + 1) % playbackSpeeds.length;
                 double newSpeed = playbackSpeeds[currentSpeedIndex];
                 mediaPlayer.setRate(newSpeed);
@@ -340,62 +341,61 @@ public class FilmPlayer {
 
 
 
-        btnMaximize.setOnMouseClicked(e -> {
+        btnMaximize.setOnMouseClicked(e ->{
             toggleFullscreen();
             resetHideTimer();
         });
     }
 
 
-    private void setupMediaPlayerListeners() {
-        if (mediaPlayer == null)
+    private void setupMediaPlayerListeners(){
+        if (mediaPlayer==null)
             return;
 
-        mediaPlayer.setOnReady(() ->  {
+        mediaPlayer.setOnReady(() -> {
             Duration totalDuration = mediaPlayer.getTotalDuration();
-            textTotalTime.setText(formatTime(totalDuration));
+            textTotalTime.setText( formatTime(totalDuration));
             sliderVideo.setMax(100); // the percentage of the video
             showControls();
-            if (mediaPlayer.getStatus() != MediaPlayer.Status.PLAYING) {
-                stopHideTimer(); // If not playing, the controls should not disappear
-            } else {
+            if (mediaPlayer.getStatus()  != MediaPlayer.Status.PLAYING )
+                 stopHideTimer(); // If not playing, the controls should not disappear
+            else
                 resetHideTimer();
-            }
         });
 
         mediaPlayer.currentTimeProperty().addListener((obs, oldTime, newTime) ->
-                Platform.runLater(() -> {
+                Platform.runLater(() ->{
             textActualTime.setText(formatTime(newTime));
-            if (mediaPlayer.getTotalDuration() != null && mediaPlayer.getTotalDuration().toMillis() > 0) {
+            if (mediaPlayer.getTotalDuration()  != null && mediaPlayer.getTotalDuration().toMillis() > 0){
                 double progress = newTime.toMillis() / mediaPlayer.getTotalDuration().toMillis() * 100;
                 if (!sliderVideo.isPressed()) // Only update if user is not dragging the slider
                     sliderVideo.setValue(progress);
             } else if (mediaPlayer.getTotalDuration() != null  &&  mediaPlayer.getTotalDuration().isUnknown() )
-                sliderVideo.setDisable(true);// Handle live streams or unknown duration  - slider might not be applicable or behave differently , Example: disable slider for unknown duration
+                sliderVideo.setDisable(true );// Handle live streams or unknown duration  - slider might not be applicable or behave differently , Example: disable slider for unknown duration
              else
                 sliderVideo.setValue(0);
         }));
 
-        mediaPlayer.setOnEndOfMedia(() -> Platform.runLater(() -> {
-            iconPlay.setContent(Main.resourceBundle.getString("buttons.play"));
-            sliderVideo.setValue(mediaPlayer.getTotalDuration() != null && !mediaPlayer.getTotalDuration().isUnknown() ? 100 : 0);
+        mediaPlayer.setOnEndOfMedia(() -> Platform.runLater(() ->{
+            iconPlay.setContent(Main.resourceBundle.getString( "buttons.play"));
+            sliderVideo.setValue ( mediaPlayer.getTotalDuration() != null && !mediaPlayer.getTotalDuration().isUnknown()   ? 100  :  0);
             textActualTime.setText(formatTime(mediaPlayer.getTotalDuration()));
             stopHideTimer();
             showControls();
         }));
 
-        mediaPlayer.setOnPlaying(() -> Platform.runLater(() -> {
-            iconPlay.setContent(Main.resourceBundle.getString("buttons.stop"));
+        mediaPlayer.setOnPlaying(() -> Platform.runLater(() ->{
+            iconPlay.setContent(Main.resourceBundle.getString("buttons.stop" ));
             resetHideTimer();
         }));
 
-        mediaPlayer.setOnPaused(() -> Platform.runLater(() -> {
-            iconPlay.setContent(Main.resourceBundle.getString("buttons.play"));
+        mediaPlayer.setOnPaused(() -> Platform.runLater( () ->{
+            iconPlay.setContent( Main.resourceBundle.getString("buttons.play" ));
             stopHideTimer();
             showControls();
         }));
 
-        mediaPlayer.setOnStopped(() -> Platform.runLater(() -> {
+        mediaPlayer.setOnStopped(() -> Platform.runLater(() ->{
             iconPlay.setContent(Main.resourceBundle.getString("buttons.play"));
             sliderVideo.setValue(0);
             textActualTime.setText("00:00");
@@ -405,7 +405,7 @@ public class FilmPlayer {
     }
 
 
-    private void updateVolumeIcon(double volume) {
+    private void updateVolumeIcon(double volume){
         if (isMuted || volume <= 0)
             iconVolume.setContent(Main.resourceBundle.getString( "buttons.volume_mute"));
         else if (volume < 50)
@@ -415,32 +415,32 @@ public class FilmPlayer {
 
     }
 
-    private void updateSpeedDisplay(double speed) {
+    private void updateSpeedDisplay(double speed){
         if (speed == 0.5)
             iconSpeed.setContent(Main.resourceBundle.getString("buttons.speed_05"));
-        else if (speed == 0.7)
-            iconSpeed.setContent(Main.resourceBundle.getString("buttons.speed_07"));
+        else if  (speed == 0.7)
+            iconSpeed.setContent(Main.resourceBundle.getString( "buttons.speed_07"));
         else if (speed == 1.0)
             iconSpeed.setContent(Main.resourceBundle.getString("buttons.speed_1"));
-        else if (speed == 1.2)
-            iconSpeed.setContent(Main.resourceBundle.getString("buttons.speed_12"));
+        else if ( speed == 1.2)
+            iconSpeed.setContent(Main.resourceBundle.getString( "buttons.speed_12"));
         else if (speed == 1.5)
             iconSpeed.setContent(Main.resourceBundle.getString("buttons.speed_15"));
-        else if (speed == 2.0)
-            iconSpeed.setContent(Main.resourceBundle.getString("buttons.speed_2"));
-        else {
-            iconSpeed.setContent(Main.resourceBundle.getString("buttons.speed_1"));
+        else if ( speed == 2.0)
+            iconSpeed.setContent(Main.resourceBundle.getString( "buttons.speed_2"));
+        else{
+            iconSpeed.setContent(Main.resourceBundle.getString(  "buttons.speed_1"));
         }
     }
 
-    private void toggleFullscreen( ) {
+    private void toggleFullscreen( ){
         isMaximized = !isMaximized;
         Stage stage = (Stage) root.getScene().getWindow();
         stage.setFullScreen( isMaximized);
-        iconMaximize.setContent( Main.resourceBundle.getString( isMaximized ? "buttons.minimize"  : "buttons.maximize"));
+        iconMaximize.setContent( Main.resourceBundle.getString( isMaximized ? "buttons.minimize"   :  "buttons.maximize"));
     }
 
-    private String formatTime(Duration duration) {
+    private String formatTime(Duration duration){
         if (duration == null || duration.isUnknown()) return "00:00";
 
         long totalSeconds = (long) duration.toSeconds();
@@ -449,27 +449,27 @@ public class FilmPlayer {
         return String.format("%02d:%02d", minutes, seconds);
     }
 
-    public void play() {
+    public void play(){
         if (mediaPlayer != null)
             mediaPlayer.play();
 
     }
 
-    public void pause() {
-        if (mediaPlayer != null)
+    public void pause(){
+        if (mediaPlayer  != null)
             mediaPlayer.pause();
     }
 
-    public void stop() {
-        if (mediaPlayer != null)
+    public void stop(){
+        if (mediaPlayer  != null)
             mediaPlayer.stop();
     }
 
-    public void setVolume(double volume) {
-        if (mediaPlayer != null) {
+    public void setVolume(double volume){
+        if (mediaPlayer != null){
             mediaPlayer.setVolume(volume);
             sliderVolume.setValue(volume * 100);
-            if (volume == 0 && !isMuted) {
+            if (volume == 0 && !isMuted){
                 previousVolume = mediaPlayer.getVolume();
                 isMuted = true;
             } else if (volume > 0 && isMuted)
@@ -479,31 +479,31 @@ public class FilmPlayer {
         }
     }
 
-    public void seek(Duration time) {
-        if (mediaPlayer != null) {
+    public void seek(Duration time){
+        if (mediaPlayer  != null){
             mediaPlayer.seek(time);
         }
     }
 
-    public MediaPlayer.Status getStatus() {
-          return mediaPlayer != null ? mediaPlayer.getStatus() : null;
+    public MediaPlayer.Status getStatus(){
+          return mediaPlayer != null ? mediaPlayer.getStatus()  :  null;
     }
 
-    public Duration getCurrentTime() {
-        return mediaPlayer != null ? mediaPlayer.getCurrentTime() :  null;
+    public Duration getCurrentTime(){
+        return mediaPlayer != null ? mediaPlayer.getCurrentTime()  :   null;
     }
 
-    public Duration getTotalDuration() {
-        return mediaPlayer != null ? mediaPlayer.getTotalDuration() :  null;
+    public Duration getTotalDuration(){
+        return mediaPlayer != null ? mediaPlayer.getTotalDuration()  :   null;
     }
 
-    public void returnToMainPages() {
+    public void returnToMainPages(){
         try{
             FXMLLoader loader =  new FXMLLoader(getClass().getResource("/com/esa/moviestar/home/main.fxml"),Main.resourceBundle);
             Parent homeContent = loader.load();
 
             MainPagesController mainPagesController = loader.getController();
-            mainPagesController.first_load(user,account);
+            mainPagesController.load(user,account);
             Scene currentScene =  root.getScene();
             this.dispose();
             Scene newScene = new Scene(homeContent, currentScene.getWidth(), currentScene.getHeight());
@@ -511,11 +511,11 @@ public class FilmPlayer {
             stage.setScene(newScene);
 
         }catch(IOException e){
-            System.err.println("ProfileView: Error to load the home page"+e.getMessage()) ;
+            System.err.println("FilmPlayer: Error to load the home page"+e.getMessage()) ;
         }
     }
 
-    public void dispose() {
+    public void dispose(){
         if (hideControlsTimer != null)
             hideControlsTimer.stop();
 
@@ -532,7 +532,7 @@ public class FilmPlayer {
         if (fadeInTransitionCloseButton != null)
             fadeInTransitionCloseButton.stop();
 
-        if (mediaPlayer != null) {
+        if (mediaPlayer != null){
             mediaPlayer.dispose();
             mediaPlayer = null;
         }

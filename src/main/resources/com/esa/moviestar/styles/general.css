@@ -14,7 +14,6 @@
 /* Application primary colors */
 .primary {
     -fx-background-color: #7341BE;
-    -fx-cursor: hand;
 }
 .primary:hover{
     -fx-background-color: #593294;
@@ -70,34 +69,32 @@
 }
 
 .surface-dim-opaque{
-    -fx-background-color: rgba(37,37,37,0.97);
+    -fx-background-color: rgba(31,31,31,0.97);
 }
 
 .surface-dim-opaque-gradient {
     -fx-background-color: linear-gradient(to bottom,
-        #2A2A2A 0%,
-        #252525 10%,
-        #252525 100%
+        #262626 0%,
+        #1f1f1f 10%,
+        #1f1f1f 100%
     );
 }
 
 .surface-vertical-gradient {
     -fx-background-color: linear-gradient(to bottom,
-        rgba(37, 37, 37, 0) 0%,
-        rgba(37, 37, 37, 0.32) 15%,
-        rgba(37, 37, 37, 0.43) 25%,
-        rgba(37, 37, 37, 0.58) 35%,
-        rgba(37, 37, 37, 0.67) 50%,
-        rgba(37, 37, 37, 0.78) 65%,
-        rgba(37, 37, 37, 0.85) 75%,
-        rgba(37, 37, 37, 0.9) 85%,
-        rgba(37, 37, 37, 0.93) 92%,
-        rgba(37, 37, 37, 0.97) 100%);
+        transparent,
+        rgba(31, 31, 31, 0.05) 20%,
+        rgba(31, 31, 31, 0.20) 30%,
+        rgba(31, 31, 31, 0.45) 35%,
+        rgba(31, 31, 31, 0.60) 50%,
+        rgba(31, 31, 31, 0.65) 65%,
+        rgba(31, 31, 31, 0.80) 75%,
+        rgba(31, 31, 31, 0.9) 90%,
+        rgb(31, 31, 31) 100%);
 }
 
 .surface-danger{
     -fx-background-color: #9E3536;
-    -fx-cursor: hand;
 }
 
 .surface-danger:hover{
@@ -110,7 +107,6 @@
 
 .surface-transparent {
     -fx-background-color: transparent;
-    -fx-cursor: hand;
 }
 
 .surface-transparent:hover {
@@ -175,7 +171,6 @@
     -fx-font-size: 14px;
     -fx-background-color: transparent;
     -fx-border-color: transparent;
-    -fx-cursor: hand;
     -fx-alignment: CENTER_LEFT;
 }
 
@@ -217,7 +212,6 @@
     -fx-border-color: #7341BE;
 }
 
-/* ========== ACCESS SPECIFIC ELEMENTS (EXTENSIONS) ========== */
 
 
 
@@ -242,7 +236,6 @@
 
 .icon-button {
     -fx-background-color: rgba(42, 42, 42, 0.6);
-    -fx-cursor: hand;
     -fx-border-color: rgba(255, 255, 255, 0.7);
     -fx-border-width: 2px;
     -fx-pref-height: 40px;
@@ -259,7 +252,6 @@
 .close-button {
     -fx-background-color: rgba(42, 42, 42, 0.6);
     -fx-font-weight: bold;
-    -fx-cursor: hand;
     -fx-pref-height: 50px;
     -fx-pref-width: 50px;
 }
@@ -278,7 +270,13 @@
     -fx-text-fill: black;
     -fx-font-weight: bold;
     -fx-padding: 1px 4px;
-    -fx-background-radius: 2px;
+    -fx-background-radius: 4px;
+    -fx-background-color: linear-gradient(
+                                 to bottom right,
+                                 #f6e27a 33%,
+                                 #cb9b51 80%,
+                                 #462523 100%
+                             );
 }
 
 .content-warning {
@@ -315,7 +313,6 @@
 .episode-item {
     -fx-background-color: rgba(42, 42, 42, 0.3);
     -fx-padding: 15px;
-    -fx-cursor: hand;
 }
 
 .episode-item:hover {
@@ -352,20 +349,8 @@
     -fx-pref-width: 200px;
     -fx-alignment: center;
     -fx-background-color: rgba(100, 100, 100, 0.7);
-    -fx-cursor: hand;
 }
 
-/* Button hover effect */
-.button-text:hover {
-    -fx-background-color: linear-gradient(to bottom right, #7341BE, #432570);
-    -fx-text-fill: #F0ECFD;
-}
-
-/* Button pressed effect */
-.button-text:pressed {
-    -fx-background-color: linear-gradient(to bottom right, #262626, #101010);
-    -fx-text-fill: #F0ECFD;
-}
 
 .episode-thumbnail {
     -fx-background-color: #333333;
@@ -388,7 +373,7 @@
     -fx-border-width: 1px;
     -fx-font-weight: bold;
     -fx-padding: 8 16 8 16;
-    -fx-cursor: hand;
+
     -fx-min-width: 180px;
 }
 
@@ -411,7 +396,6 @@
 .season-option-button {
     -fx-background-color: transparent;
     -fx-padding: 8 12 8 12;
-    -fx-cursor: hand;
     -fx-alignment: center-left;
 }
 

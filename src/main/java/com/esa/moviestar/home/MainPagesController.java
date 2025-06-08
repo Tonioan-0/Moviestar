@@ -30,12 +30,11 @@ import javafx.util.Duration;
 import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
-// import java.util.concurrent.ExecutorService; // Not explicitly used in this version's relevant parts
-// import java.util.concurrent.Executors;    // Not explicitly used in this version's relevant parts
 import java.util.function.Supplier;
 
+//To facilitate understanding we've organized this class in a manner that allows information to be collapsed
 
-public class MainPagesController {
+public class MainPagesController{
 
 
     // FXML elements
@@ -56,7 +55,7 @@ public class MainPagesController {
     private Account account ;
 
     // Page data containers
-    private record PageData(Node node, Object controller) {}
+    private record PageData(Node node, Object controller){}
     private PageData header;
     private PageData home ;
     private PageData filter_film;
@@ -71,18 +70,19 @@ public class MainPagesController {
     private StackPane  loadingOverlay;
     private static final double  FADE_DURATION_MS = 300;
 
+    /// Main method
 
-    public void first_load(User user, Account account) {
-        if (loadingOverlay == null && root != null ) {
+    public void load(User user, Account account){
+        if (loadingOverlay == null && root != null ){
             createLoadingOverlay();
-            if (!root.getChildren().contains(loadingOverlay) ) {
+            if (!root.getChildren().contains(loadingOverlay) ){
                 root.getChildren().add(loadingOverlay);
                 AnchorPane.setTopAnchor(loadingOverlay, 0.0);
                 AnchorPane.setBottomAnchor(loadingOverlay, 0.0);
                 AnchorPane.setLeftAnchor(loadingOverlay, 0.0);
                 AnchorPane.setRightAnchor(loadingOverlay, 0.0);
             }
-        } else if (loadingOverlay == null && body != null ) {
+        } else if (loadingOverlay == null && body != null ){
             createLoadingOverlay();
             if (!body.getChildren().contains(loadingOverlay))
                  body.getChildren().add(loadingOverlay);
@@ -96,8 +96,8 @@ public class MainPagesController {
             loadHeader();
 
 
-        if (this.header == null ||  this.header.controller() == null) {
-            System.err.println("MainPagesController: Critical error - Header or its controller failed to load. Aborting first_load.");
+        if (this.header == null ||  this.header.controller() == null){
+            System.err.println("MainPagesController: Critical error - Header or its controller failed to load. Aborting load.");
             hideLoadingSpinner();
             if (filmClickedInitialLoadFuture != null && !filmClickedInitialLoadFuture.isDone())
                 filmClickedInitialLoadFuture.completeExceptionally(new IllegalStateException("Header or its controller failed to load."));
@@ -108,7 +108,7 @@ public class MainPagesController {
         if (this.header.controller() instanceof  HeaderController headerCtrl)
             headerCtrl.setProfileIcon(user.getIcon());
         else
-        {
+       {
             System.err.println( "MainPagesController: Header controller is not of type HeaderController. ");
             hideLoadingSpinner();
             if (filmClickedInitialLoadFuture != null && !filmClickedInitialLoadFuture.isDone())
@@ -116,16 +116,18 @@ public class MainPagesController {
             return;
         }
 
-        CompletableFuture.runAsync(() -> {
+        CompletableFuture.runAsync(() ->{
             PageData homeData = loadDynamicBody("home.fxml");
-            if (homeData != null && homeData.controller() instanceof HomeController) {
-                Platform.runLater(() -> {
+            if (homeData != null && homeData.controller() instanceof HomeController){
+                Platform.runLater(() ->{
                     ((HomeController) homeData.controller()).setRecommendations(user, MainPagesController.this);
                     this.home = homeData;
                     transitionToPage(homeData);
                 });
-            } else {
-                Platform.runLater(() -> {
+            }
+            else
+            {
+                Platform.runLater(() ->{
                     String error;
                     if (homeData == null)
                         error = "MainPagesController: Home page (home.fxml) failed to load.";
@@ -139,138 +141,190 @@ public class MainPagesController {
         });
     }
 
-    private void createLoadingOverlay() {
-        loadingSpinner = new BufferAnimation(128);
-        loadingOverlay = new StackPane(loadingSpinner);
-        loadingOverlay.setStyle("-fx-background-color: rgba(0, 0, 0, 0.7);");
-        loadingOverlay.setAlignment(Pos.CENTER);
-        loadingOverlay.setVisible(false);
-        loadingOverlay.setOpacity(0);
-    }
+    public void loadForShowingFilmScene(User user, Account account, int contentId, boolean series){
+        showLoadingSpinner();
 
-    private void loadHeader() {
-        header = loadDynamicBody("header.fxml");
-        if (header == null || header.controller() == null) {
-            System.err.println("MainPagesController: Error loading header or its controller. Navigation and search may not work.");
+        this.filmClickedInitialLoadFuture = new CompletableFuture<>();
+
+        load(user, account);
+
+        this.filmClickedInitialLoadFuture
+                .thenRunAsync(() -> openFilmScene(contentId, series), Platform::runLater)
+                .exceptionally(ex ->{
+                    Platform.runLater( () ->{
+                        System.err.println("MainPagesController.loadForShowingFilmScene: Failed to initialize or open film scene: " + ex.getMessage());
+                        hideLoadingSpinner();
+                    });
+                    return null;
+                });
+    }
+    private String getPageName(PageData pageData){
+        if (pageData == home)
+            return "home";
+        if (pageData == filter_film)
+            return "film filter";
+        if (pageData == filter_series)
+            return  "series filter";
+        return "unknown";
+    }
+    private void loadPageAsync(String pageName, Supplier<PageData> pageSupplier){
+        if (header == null ||  !(header.controller() instanceof HeaderController headerController)){
+            System.err.println("MainPagesController.loadPageAsync: Header or its controller is invalid. Cannot load " + pageName);
+            hideLoadingSpinner();
             return;
         }
 
-        if (headerContainer != null) {
+        showLoadingSpinner();
+
+        Platform.runLater(() ->{
+            switch (pageName){
+                case "home" ->{  if (headerController.homeButton != null) headerController.activeButton(headerController.homeButton); }
+                case "film filter" ->{ if (headerController.filmButton != null) headerController.activeButton(headerController.filmButton); }
+                case "series filter" ->{ if (headerController.seriesButton != null) headerController.activeButton(headerController.seriesButton); }
+                case "search" ->  headerController.activeSearch();
+                default -> System.err.println("MainPagesController.loadPageAsync: Unknown page name for button activation: " + pageName);
+            }
+        });
+
+        CompletableFuture.supplyAsync(pageSupplier)
+                .thenAcceptAsync(page ->{
+                    if (page != null && page.node() != null)
+                        transitionToPage(page);
+                    else
+                    {
+                        hideLoadingSpinner();
+                        System.err.println("MainPagesController: Failed to load " + pageName + " page (supplier returned null or node is null).");
+                    }
+                }, Platform::runLater)
+                .exceptionally(ex ->{
+                    System.err.println("MainPagesController: Exception during async page loading for " + pageName + ": " + ex.getMessage());
+                    Platform.runLater(this::hideLoadingSpinner );
+                    return null;
+                });
+    }
+
+    /// Header logic
+    private void loadHeader(){
+        header = loadDynamicBody("header.fxml" );
+        if (header == null || header.controller() == null){
+            System.err.println("MainPagesController: Error loading header or its controller. Navigation and search may not work." );
+            return;
+        }
+
+        if (headerContainer != null){
             headerContainer.getChildren().clear();
             headerContainer.getChildren().add(header.node());
-        } else {
+        }
+        else{
             System.err.println("MainPagesController: headerContainer is null. Cannot display header.");
             return;
         }
 
-        if (header.controller() instanceof HeaderController headerController) {
-            if (user != null) {
+        if (header.controller() instanceof HeaderController headerController){
+            if (user != null){
                 headerController.setUpPopUpMenu(this, user, account);
             }
             setupNavigationButtons(headerController);
             setupSearchListener(headerController);
-        } else {
+        } else
             System.err.println("MainPagesController: Loaded header controller is not of type HeaderController.");
-        }
-    }
 
-    private void setupNavigationButtons(HeaderController headerController) {
-        if (headerController.homeButton != null) {
-            headerController.homeButton.setOnMouseClicked(e -> { // Changed to setOnAction
+    }
+    private void setupNavigationButtons(HeaderController headerController){
+        if (headerController.homeButton != null){
+            headerController.homeButton.setOnMouseClicked(e ->{ // Changed to setOnAction
                 if (currentScene == home || transitionInProgress) return;
-                loadPageAsync("home", () -> {
-                    if (home == null) {
+                loadPageAsync("home", () ->{
+                    if (home == null){
                         home = loadDynamicBody("home.fxml");
-                        if (home != null && home.controller() instanceof HomeController hc) {
+                        if (home != null && home.controller() instanceof HomeController hc){
                             hc.setRecommendations(user, this);
-                        } else if (home != null) {
+                        } else if (home != null){
                             System.err.println("MainPagesController: Home page loaded but controller type mismatch.");
                         }
                     }
                     return home;
                 });
             });
-        } else {
-            System.err.println("MainPagesController: homeButton in HeaderController is null.");
         }
+        else
+            System.err.println("MainPagesController: homeButton in HeaderController is null.");
+
 
         if (headerController.filmButton != null) {
-            headerController.filmButton.setOnMouseClicked(e -> { // Changed to setOnAction
+            headerController.filmButton.setOnMouseClicked(e ->{ // Changed to setOnAction
                 if (currentScene == filter_film || transitionInProgress) return;
-                loadPageAsync("film filter", () -> {
-                    if (filter_film == null) {
+                loadPageAsync( "film filter", () ->  {
+                    if (filter_film == null){
                         filter_film = loadDynamicBody("filter.fxml");
-                        if (filter_film != null && filter_film.controller() instanceof FilterController fc) {
-                            fc.setContent(this, user, true); // true for film
-                        } else if (filter_film != null) {
+                        if (filter_film != null && filter_film.controller() instanceof FilterController fc){
+                            fc.setContent(  this, user, true); // true for film
+                        } else if (filter_film != null){
                             System.err.println("MainPagesController: Film filter page loaded but controller type mismatch.");
                         }
                     }
                     return filter_film;
                 });
             });
-        } else {
+        } else
             System.err.println("MainPagesController: filmButton in HeaderController is null.");
-        }
+
 
         if (headerController.seriesButton != null) {
-            headerController.seriesButton.setOnMouseClicked(e -> { // Changed to setOnAction
+            headerController.seriesButton.setOnMouseClicked(e ->{ // Changed to setOnAction
                 if (currentScene == filter_series || transitionInProgress) return;
-                loadPageAsync("series filter", () -> {
-                    if (filter_series == null) {
-                        filter_series = loadDynamicBody("filter.fxml"); // Re-use filter.fxml
-                        if (filter_series != null && filter_series.controller() instanceof FilterController fc) {
-                            fc.setContent(this, user, false); // false for series
-                        } else if (filter_series != null) {
-                            System.err.println("MainPagesController: Series filter page loaded but controller type mismatch.");
-                        }
+                loadPageAsync("series filter", ()->{
+                    if (filter_series == null){
+                        filter_series = loadDynamicBody( "filter.fxml"); // Re-use filter.fxml
+                        if (filter_series != null  && filter_series.controller() instanceof  FilterController fc)
+                            fc.setContent( this,  user, false ); // false for series
+                        else if (filter_series !=  null)
+                            System.err.println("MainPagesController: Series filter page loaded but controller type mismatch." );
                     }
-                    return filter_series;
+                    return  filter_series;
                 });
             });
-        } else {
-            System.err.println("MainPagesController: seriesButton in HeaderController is null.");
         }
-    }
+        else
+            System.err.println("MainPagesController: seriesButton in HeaderController is null.");
 
-    private void setupSearchListener(HeaderController headerController) {
-        if (headerController.getTbxSearch() == null) {
+    }
+    private void setupSearchListener(HeaderController headerController){
+        if (headerController.getTbxSearch() == null){
             System.err.println("MainPagesController: Search text field (tbxSearch) is null in HeaderController.");
             return;
         }
 
-        PauseTransition throttleTimer = new PauseTransition(Duration.millis(100)); // Or your preferred throttle duration
+        PauseTransition throttleTimer = new PauseTransition(Duration.millis( 100)); // Or your preferred throttle duration
 
-        headerController.getTbxSearch().textProperty().addListener((observableValue, oldV, newV) -> {
+        headerController.getTbxSearch().textProperty().addListener((observableValue, oldV, newV) ->{
             throttleTimer.stop(); // Stop any previously scheduled task
 
-            throttleTimer.setOnFinished(event -> {
+            throttleTimer.setOnFinished(event ->{
                 String currentQueryOnExecution = headerController.getTbxSearch().getText().trim();
 
-                if (currentQueryOnExecution.isEmpty()) {
+                if (currentQueryOnExecution.isEmpty())
                     revertFromSearchPage();
-                } else {
+                else{
                     // Query is not empty, proceed with search.
                     // 1. Store the current non-search page if we are about to navigate to search.
-                    if (currentScene != null && !(currentScene.controller() instanceof SearchController)) {
+                    if (currentScene != null && !(currentScene.controller() instanceof SearchController)){
                         // Only update pageBeforeSearch if it's not already set to this currentScene,
                         // or if pageBeforeSearch is null. This captures the last non-search page.
-                        if (this.pageBeforeSearch == null || this.pageBeforeSearch.node() != currentScene.node()) {
+                        if (this.pageBeforeSearch == null || this.pageBeforeSearch.node() != currentScene.node())
                             this.pageBeforeSearch = currentScene;
-                        }
                     }
 
                     // 2. Load the search page.
-                    loadPageAsync("search", () -> {
+                    loadPageAsync("search", () ->{
                         PageData searchResultPage = loadDynamicBody("search.fxml");
-                        if (searchResultPage != null && searchResultPage.controller() instanceof SearchController sc) {
+                        if (searchResultPage != null && searchResultPage.controller() instanceof SearchController sc){
                             sc.setParamController(headerController, user, this);
                             sc.performSearch(currentQueryOnExecution);
-                        } else if (searchResultPage == null) {
+                        } else if (searchResultPage == null)
                             System.err.println("MainPagesController: Search page (search.fxml) failed to load.");
-                        } else {
+                         else
                             System.err.println("MainPagesController: Search page loaded, but controller is not SearchController.");
-                        }
                         return searchResultPage;
                     });
                 }
@@ -281,63 +335,67 @@ public class MainPagesController {
             throttleTimer.playFromStart();
         });
     }
-    private void revertFromSearchPage() {
+
+
+    private void revertFromSearchPage(){
         // Only act if we are currently on a search page
-        if (!(currentScene != null && currentScene.controller() instanceof SearchController)) {
+        if (!(currentScene != null && currentScene.controller() instanceof SearchController))
             return;
-        }
+
 
         PageData pageToReturnTo = this.home; // Default to home
         boolean returningToStoredPageBeforeSearch = false;
 
         // Check if we have a valid pageBeforeSearch that isn't a search page itself
-        if (this.pageBeforeSearch != null && !(this.pageBeforeSearch.controller() instanceof SearchController)) {
+        if (this.pageBeforeSearch != null && !(this.pageBeforeSearch.controller() instanceof SearchController)){
             pageToReturnTo = this.pageBeforeSearch;
             returningToStoredPageBeforeSearch = true;
         }
 
-        if (pageToReturnTo != null) {
+        if (pageToReturnTo != null){
             String pageName = getPageName(pageToReturnTo);
             final PageData finalPageToReturnTo = pageToReturnTo; // Capture for lambda
 
-            loadPageAsync(pageName, () -> finalPageToReturnTo);
+            loadPageAsync(pageName, ()-> finalPageToReturnTo);
 
             // If we initiated a return to the specifically stored pageBeforeSearch, clear it
-            if (returningToStoredPageBeforeSearch) {
+            if (returningToStoredPageBeforeSearch)
                 this.pageBeforeSearch = null;
-            }
+
         } else {
-            // Fallback: If no valid page to return to (e.g., home is null),
-            // just clear the search results on the current search page.
-            if (currentScene.controller() instanceof SearchController sc) {
-                sc.performSearch("");
-            }
+            // We created a Fallback if no valid page to return to (like home is null)
+            SearchController sc = (SearchController) currentScene.controller() ;
+            sc.performSearch("");
             System.err.println("MainPagesController: revertFromSearchPage - pageToReturnTo is null. Attempting to clear search results on current page.");
         }
     }
-    private String getPageName(PageData pageData) {
-        if (pageData == home) return "home";
-        if (pageData == filter_film) return "film filter";
-        if (pageData == filter_series) return "series filter";
-        return "unknown";
+
+    /// Buffer logic
+    private void createLoadingOverlay(){
+        loadingSpinner = new BufferAnimation(128);
+        loadingOverlay = new StackPane(loadingSpinner);
+        loadingOverlay.setStyle ("-fx-background-color: rgba(0, 0, 0, 0.7);" );
+        loadingOverlay.setAlignment(Pos.CENTER);
+        loadingOverlay.setVisible(false);
+        loadingOverlay.setOpacity(0);
     }
 
-
-    private void showLoadingSpinner() {
-        Platform.runLater(() -> {
-            if (loadingSpinner == null || loadingOverlay == null) {
+    private void showLoadingSpinner(){
+        Platform.runLater(() ->{
+            if (loadingSpinner == null || loadingOverlay == null){
                 if (root != null) createLoadingOverlay(); else return;
-                if (root != null && !root.getChildren().contains(loadingOverlay)) {
+                if (root != null && !root.getChildren().contains(loadingOverlay)){
                     root.getChildren().add(loadingOverlay);
                     AnchorPane.setTopAnchor(loadingOverlay, 0.0);
                     AnchorPane.setBottomAnchor(loadingOverlay, 0.0);
                     AnchorPane.setLeftAnchor(loadingOverlay, 0.0);
                     AnchorPane.setRightAnchor(loadingOverlay, 0.0);
-                } else if (body != null && !body.getChildren().contains(loadingOverlay)){
-                    body.getChildren().add(loadingOverlay);
-                } else {
-                    return;
                 }
+                else if (body != null && !body.getChildren().contains(loadingOverlay))
+                    body.getChildren().add(loadingOverlay);
+                else
+                    return;
+
             }
             loadingSpinner.startAnimation();
             loadingOverlay.setVisible(true);
@@ -348,13 +406,13 @@ public class MainPagesController {
         });
     }
 
-    private void hideLoadingSpinner() {
-        Platform.runLater(() -> {
+    private void hideLoadingSpinner(){
+        Platform.runLater(() ->{
             if (loadingOverlay == null) return;
             FadeTransition fadeOut = new FadeTransition(Duration.millis(200), loadingOverlay);
-            fadeOut.setFromValue(loadingOverlay.getOpacity());
+            fadeOut.setFromValue(loadingOverlay.getOpacity() );
             fadeOut.setToValue(0.0);
-            fadeOut.setOnFinished(e -> {
+            fadeOut.setOnFinished(e ->{
                 loadingOverlay.setVisible(false);
                 if (loadingSpinner != null) loadingSpinner.stopAnimation();
             });
@@ -362,105 +420,85 @@ public class MainPagesController {
         });
     }
 
-    private void loadPageAsync(String pageName, Supplier<PageData> pageSupplier) {
-        if (header == null || !(header.controller() instanceof HeaderController headerController)) {
-            System.err.println("MainPagesController.loadPageAsync: Header or its controller is invalid. Cannot load " + pageName);
-            hideLoadingSpinner();
+    /// Film Scene Switch
+    public void openFilmScene(int contentId, boolean isSeries){
+        if (transitionInProgress){
+            System.out.println( "MainPagesController: Transition already in progress. Cannot open film scene.");
             return;
         }
-
+        transitionInProgress = true;
         showLoadingSpinner();
 
-        Platform.runLater(() -> {
-            switch (pageName) {
-                case "home" -> { if (headerController.homeButton != null) headerController.activeButton(headerController.homeButton); }
-                case "film filter" -> { if (headerController.filmButton != null) headerController.activeButton(headerController.filmButton); }
-                case "series filter" -> { if (headerController.seriesButton != null) headerController.activeButton(headerController.seriesButton); }
-                case "search" -> headerController.activeSearch();
-                default -> System.err.println("MainPagesController.loadPageAsync: Unknown page name for button activation: " + pageName);
-            }
-        });
+        ImageView screenshotView =  captureScreenshotView();
+        PageData filmDetailPd = loadDynamicBody(FILM_SCENE_PATH);
 
-        CompletableFuture.supplyAsync(pageSupplier)
-                .thenAcceptAsync(page -> {
-                    if (page != null && page.node() != null) {
-                        transitionToPage(page);
-                    } else {
-                        hideLoadingSpinner();
-                        System.err.println("MainPagesController: Failed to load " + pageName + " page (supplier returned null or node is null).");
-                    }
-                }, Platform::runLater)
-                .exceptionally(ex -> {
-                    System.err.println("MainPagesController: Exception during async page loading for " + pageName + ": " + ex.getMessage());
-                    Platform.runLater(this::hideLoadingSpinner);
-                    return null;
-                });
-    }
+        if (filmDetailPd != null && filmDetailPd.controller() instanceof  FilmSceneController filmController){
+            this.savedPageData = this.currentScene;
 
-    private PageData loadDynamicBody(String fxmlFile) {
-        try {
-            String pathToLoad;
-            if (fxmlFile.startsWith("/"))
-                pathToLoad = fxmlFile;
-             else
-                pathToLoad =  "/com/esa/moviestar/home/"+fxmlFile;
-            if (fxmlFile.equals(FILM_SCENE_PATH.substring(1))) {
-                pathToLoad = FILM_SCENE_PATH;
+            if (root != null){
+                root.getChildren().clear();
+                Node filmNode = filmDetailPd.node();
+                root.getChildren().add(filmNode);
+                AnchorPane.setTopAnchor(filmNode, 0.0);
+                AnchorPane.setBottomAnchor(filmNode, 0.0);
+                AnchorPane.setLeftAnchor(filmNode, 0.0);
+                AnchorPane.setRightAnchor(filmNode, 0.0);
             }
-            var resource = getClass().getResource(pathToLoad);
-            if (resource == null) {
-                System.err.println("MainPagesController: Resource not found: " + pathToLoad + " (Original: " + fxmlFile + ")");
-                return null;
+            else {
+                System.err.println( "MainPagesController: Root pane is null. Cannot display film scene.");
+                hideLoadingSpinner();
+                transitionInProgress = false;
+                return;
             }
-            FXMLLoader loader = new FXMLLoader(resource, Main.resourceBundle);
-            Node pageNode = loader.load();
 
-            if (!pathToLoad.equals(FILM_SCENE_PATH)) {
-                AnchorPane.setBottomAnchor(pageNode, 0.0);
-                AnchorPane.setTopAnchor(pageNode, 0.0);
-                AnchorPane.setLeftAnchor(pageNode, 0.0);
-                AnchorPane.setRightAnchor(pageNode, 0.0);
-            }
-            return new PageData(pageNode, loader.getController());
-        } catch (Exception e) {
-            System.err.println("MainPagesController: Unexpected error while loading " + fxmlFile + ". Details: " + e.getMessage());
-            return null;
+            filmController.setMainPagesController(this);
+            filmController.setProperties(screenshotView, this);
+            filmController.loadContent(contentId, !isSeries);
+            filmController.setUserAndAccount(user,account);
+
+            transitionInProgress = false;
+
+        } else{
+            System.err.println("MainPagesController: Failed to load film scene FXML or its controller is not FilmSceneController.");
+            hideLoadingSpinner();
+            transitionInProgress = false;
+            if (savedPageData  != null )
+                restorePreviousScene();
+
         }
     }
-
-    private ImageView captureScreenshotView() {
-        if (root == null || root.getScene() == null || root.getScene().getWindow() == null) {
+    private ImageView captureScreenshotView(){
+        if (root == null || root.getScene() == null || root.getScene().getWindow() == null){
             System.err.println("MainPagesController: Cannot capture screenshot, root, scene or window not available.");
             return new ImageView();
         }
         WritableImage screenshot = root.snapshot(null, null);
-        return new ImageView(screenshot);
+        return new ImageView(screenshot );
     }
-
-    public void restorePreviousScene() {
-        Platform.runLater(() -> {
+    public void restorePreviousScene(){
+        Platform.runLater(() ->{
             if (this.savedPageData != null && this.savedPageData.node() != null) {
-                System.out.println("Restoring previous scene");
+                System.out.println("MainPagesController: Restoring previous scene");
                 if (root == null || body == null || headerContainer == null) {
-                    System.err.println("Cannot restore: root, body, or headerContainer is null.");
+                    System.err.println("MainPagesController: Cannot restore: root, body, or headerContainer is null.");
                     transitionInProgress = false;
                     return;
                 }
 
                 root.getChildren().clear();
-                root.getChildren().addAll(body, headerContainer);
+                root.getChildren().addAll( body, headerContainer);
 
                 body.getChildren().clear();
                 Node pageNodeToRestore = savedPageData.node();
                 pageNodeToRestore.setOpacity(1.0);
-                body.getChildren().add(pageNodeToRestore);
+                body.getChildren().add(pageNodeToRestore );
                 AnchorPane.setTopAnchor(pageNodeToRestore, 0.0);
                 AnchorPane.setBottomAnchor(pageNodeToRestore, 0.0);
                 AnchorPane.setLeftAnchor(pageNodeToRestore, 0.0);
                 AnchorPane.setRightAnchor(pageNodeToRestore, 0.0);
 
-                if (loadingOverlay != null) {
-                    if (!root.getChildren().contains(loadingOverlay)) {
+                if (loadingOverlay != null){
+                    if (!root.getChildren().contains(loadingOverlay)){
                         root.getChildren().add(loadingOverlay);
                         AnchorPane.setTopAnchor(loadingOverlay, 0.0);
                         AnchorPane.setBottomAnchor(loadingOverlay, 0.0);
@@ -474,134 +512,124 @@ public class MainPagesController {
 
                 this.currentScene = this.savedPageData;
                 this.transitionInProgress = false;
-            } else {
+            } else{
                 transitionInProgress = false;
-                first_load(user, account);
+                load(user, account);
             }
         });
     }
 
-    public void openFilmScene(int contentId, boolean isSeries) {
-        if (transitionInProgress) {
-            System.out.println("MainPagesController: Transition already in progress. Cannot open film scene.");
-            return;
-        }
-        transitionInProgress = true;
-        showLoadingSpinner();
+    private PageData loadDynamicBody(String fxmlFile){
+        try{
+            String pathToLoad;
+            if (fxmlFile.startsWith("/" ))
+                pathToLoad = fxmlFile;
+             else
+                pathToLoad =   "/com/esa/moviestar/home/"+fxmlFile;
 
-        ImageView screenshotView = captureScreenshotView();
-        PageData filmDetailPd = loadDynamicBody(FILM_SCENE_PATH);
+            if (fxmlFile.equals(FILM_SCENE_PATH.substring(1)))
+                pathToLoad = FILM_SCENE_PATH;
 
-        if (filmDetailPd != null && filmDetailPd.controller() instanceof FilmSceneController filmController) {
-            this.savedPageData = this.currentScene;
-
-            if (root != null) {
-                root.getChildren().clear();
-                Node filmNode = filmDetailPd.node();
-                root.getChildren().add(filmNode);
-                AnchorPane.setTopAnchor(filmNode, 0.0);
-                AnchorPane.setBottomAnchor(filmNode, 0.0);
-                AnchorPane.setLeftAnchor(filmNode, 0.0);
-                AnchorPane.setRightAnchor(filmNode, 0.0);
-            } else {
-                System.err.println("MainPagesController: Root pane is null. Cannot display film scene.");
-                hideLoadingSpinner();
-                transitionInProgress = false;
-                return;
+            var resource =  getClass().getResource(pathToLoad);
+            if (resource  == null){
+                System.err.println("MainPagesController: Resource not found: " + pathToLoad + " (Original: " + fxmlFile + ")");
+                return null;
             }
+            FXMLLoader loader = new FXMLLoader(resource, Main.resourceBundle);
+            Node pageNode  = loader.load();
 
-            filmController.setMainPagesController(this);
-            filmController.setProperties(screenshotView, this);
-            filmController.loadContent(contentId, !isSeries);
-            filmController.setUserAndAccount(user,account);
-
-            transitionInProgress = false;
-
-        } else {
-            System.err.println("MainPagesController: Failed to load film scene FXML or its controller is not FilmSceneController.");
-            hideLoadingSpinner();
-            transitionInProgress = false;
-            if (savedPageData != null) {
-                restorePreviousScene();
+            if (!pathToLoad.equals(FILM_SCENE_PATH)){
+                AnchorPane.setBottomAnchor(pageNode, 0.0);
+                AnchorPane.setTopAnchor(pageNode, 0.0);
+                AnchorPane.setLeftAnchor(pageNode, 0.0);
+                AnchorPane.setRightAnchor(pageNode, 0.0);
             }
+            return new PageData(pageNode, loader.getController());
+        } catch (Exception e) {
+            System.err.println("MainPagesController: Unexpected error while loading  "   + fxmlFile + ". Details: "  + e.getMessage() );
+            return null;
         }
     }
-
-    private void transitionToPage(PageData newPageData) {
-        Platform.runLater(() -> {
-            if (newPageData == null || newPageData.node() == null) {
-                System.err.println("MainPagesController.transitionToPage: newPageData or its node is null.");
+    
+    private void transitionToPage(PageData newPageData){
+        Platform.runLater(()->{
+            if (newPageData == null || newPageData.node() == null){
+                System.err.println( "MainPagesController.transitionToPage: newPageData or its node is null." );
                 hideLoadingSpinner();
                 transitionInProgress = false;
                 return;
             }
-            if (currentScene == newPageData && body.getChildren().contains(newPageData.node()) && !transitionInProgress) {
+            if (currentScene == newPageData && body.getChildren().contains(newPageData.node()) &&  !transitionInProgress){
                 hideLoadingSpinner();
                 return;
             }
-            if (transitionInProgress) {
-                System.out.println("Transition already in progress. Requested page: " + newPageData.controller().getClass().getSimpleName());
+            if (transitionInProgress){
+                System.out.println( "MainPagesController: Transition already in progress. Requested page: "  + newPageData.controller().getClass().getSimpleName());
                 return;
             }
             transitionInProgress = true;
 
             Node oldNode = body.getChildren().isEmpty() ? null : body.getChildren().getFirst();
 
-            if (oldNode != null && oldNode != newPageData.node()) {
+            if (oldNode != null && oldNode  != newPageData.node()){
                 FadeTransition fadeOut = new FadeTransition(Duration.millis(FADE_DURATION_MS), oldNode);
                 fadeOut.setFromValue(1.0);
                 fadeOut.setToValue(0.0);
-                fadeOut.setOnFinished(e -> {
+                fadeOut.setOnFinished(e ->{
                     body.getChildren().remove(oldNode);
                     addNewPageNode(newPageData);
                 });
                 fadeOut.play();
-            } else {
-                if (oldNode == null && newPageData.node() != null && !body.getChildren().contains(newPageData.node())) {
+            }
+            else {
+                if (oldNode == null && newPageData.node() != null && !body.getChildren().contains(newPageData.node())){
                     body.getChildren().clear();
                     addNewPageNode(newPageData);
-                } else if (body.getChildren().contains(newPageData.node())) {
+                }
+                else if (body.getChildren().contains( newPageData.node())){
                     assert newPageData.node() != null;
-                    newPageData.node().setOpacity(1.0);
+                    newPageData.node().setOpacity(1.0) ;
                     currentScene = newPageData;
-                    transitionInProgress = false;
+                    transitionInProgress  = false;
                     hideLoadingSpinner();
-                } else {
+                }
+                else{
                     body.getChildren().clear();
-                    addNewPageNode(newPageData);
+                    addNewPageNode(newPageData );
                 }
             }
         });
     }
 
-    private void addNewPageNode(PageData newPageData) {
+    private void addNewPageNode(PageData newPageData){
         Node pageNode = newPageData.node();
         pageNode.setOpacity(0.0);
-        if (!body.getChildren().contains(pageNode) && pageNode != loadingOverlay) {
+        if (!body.getChildren().contains(pageNode ) &&  pageNode != loadingOverlay)
             body.getChildren().addFirst(pageNode);
-        }
 
-        FadeTransition fadeIn = new FadeTransition(Duration.millis(FADE_DURATION_MS), pageNode);
+        FadeTransition fadeIn  = new FadeTransition(Duration.millis(FADE_DURATION_MS), pageNode);
         fadeIn.setFromValue(0.0);
         fadeIn.setToValue(1.0);
-        fadeIn.setOnFinished(e -> {
+        fadeIn.setOnFinished(e ->{
             currentScene = newPageData;
-            transitionInProgress = false;
+            transitionInProgress =  false;
             hideLoadingSpinner();
-            if (filmClickedInitialLoadFuture != null && !filmClickedInitialLoadFuture.isDone()) {
-               if (newPageData == this.home)
+            if (filmClickedInitialLoadFuture != null && !filmClickedInitialLoadFuture.isDone()){
+               if (newPageData == this.home )
                     filmClickedInitialLoadFuture.complete(null);
             }
         });
+
         fadeIn.play();
     }
 
-    public List<Node> createFilmNodes(List<Content> contentList, boolean isVertical) throws IOException {
-        List<Node> nodes = new ArrayList<>(contentList.size());
-        String cardPath = isVertical ? PATH_CARD_VERTICAL : PATH_CARD_HORIZONTAL;
+    public List<Node> createFilmNodes(List<Content> contentList, boolean isVertical) throws IOException{
+        List<Node> nodes =  new ArrayList<>(contentList.size());
+        String cardPath = isVertical ?  PATH_CARD_VERTICAL :  PATH_CARD_HORIZONTAL;
 
-        for (Content content : contentList) {
-            if (content == null || content.getId() == 0) continue;
+        for (Content content : contentList){
+            if (content == null || content.getId() == 0)
+                continue;
 
             FXMLLoader fxmlLoader = new FXMLLoader(
                     Objects.requireNonNull(getClass().getResource(cardPath), "FXML resource for card not found: " + cardPath),
@@ -610,115 +638,129 @@ public class MainPagesController {
             Node node = fxmlLoader.load();
             FilmCardController filmCardController = fxmlLoader.getController();
 
-            if (filmCardController != null) {
+            if (filmCardController != null){
                 filmCardController.setContent(content, isVertical);
-                node.setOnMouseClicked(e -> openFilmScene(content.getId(), content.isSeries()));
+                node.setOnMouseClicked(e ->
+                        openFilmScene(content.getId(), content.isSeries()));
                 nodes.add(node);
-            } else {
-                System.err.println("MainPagesController: FilmCardController is null for " + cardPath);
             }
+            else
+                System.err.println("MainPagesController: FilmCardController is null for " + cardPath);
+
         }
         return nodes;
     }
 
-    public void cardClickedPlay(String urlVideo) {
-        Platform.runLater(() -> {
-            try {
+    ///Switch to other scenes
+    public void goToFilmPlayer(String urlVideo){
+        Platform.runLater(() ->{
+            try{
                 FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/esa/moviestar/movie_view/FilmPlayer.fxml"), Main.resourceBundle);
                 Scene currentSceneNode = getCurrentAppScene();
-                if (currentSceneNode == null) return;
+                if (currentSceneNode == null)
+                    return ;
                 Parent scene = loader.load();
                 ((FilmPlayer)loader.getController()).initializePlayer(urlVideo,user,account);
                 ((FilmPlayer)loader.getController()).play();
                 Scene newScene = new Scene(scene, currentSceneNode.getWidth(), currentSceneNode.getHeight());
                 Stage stage = (Stage) currentSceneNode.getWindow();
-                if (stage != null) stage.setScene(newScene);
-                else System.err.println("MainPagesController.settingsClick: Stage is null.");
 
-            } catch (IOException e) {
+                if (stage != null)
+                    stage.setScene(newScene);
+                else
+                    System.err.println("MainPagesController.settingsClick: Stage is null." );
+
+            } catch (IOException e){
                 System.err.println("MainPagesController: Error loading settings page: " + e.getMessage());
-
             }
         });
     }
-
-    public void settingsClick(User user, Account account) {
-        Platform.runLater(() -> {
-            try {
-                FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/esa/moviestar/settings/settings-view.fxml"), Main.resourceBundle);
+    public void goToSettings(User user, Account account){
+        Platform.runLater(() ->{
+            try{
+                FXMLLoader loader = new FXMLLoader(getClass().getResource( "/com/esa/moviestar/settings/settings-view.fxml"), Main.resourceBundle);
                 Parent settingContent = loader.load();
                 SettingsViewController settingsViewController = loader.getController();
-                if (settingsViewController != null) {
+                if (settingsViewController != null){
                     settingsViewController.setUser(user);
                     settingsViewController.setAccount(account);
-                } else {
-                    System.err.println("MainPagesController.settingsClick: SettingsViewController is null.");
                 }
+                else
+                    System.err.println("MainPagesController.settingsClick: SettingsViewController is null." );
 
                 Scene currentSceneNode = getCurrentAppScene();
-                if (currentSceneNode == null) return;
+                if (currentSceneNode == null )
+                    return;
 
-                Scene newScene = new Scene(settingContent, currentSceneNode.getWidth(), currentSceneNode.getHeight());
+                Scene newScene = new Scene( settingContent, currentSceneNode.getWidth(), currentSceneNode.getHeight());
                 Stage stage = (Stage) currentSceneNode.getWindow();
-                if (stage != null) stage.setScene(newScene);
-                else System.err.println("MainPagesController.settingsClick: Stage is null.");
+                if (stage != null)
+                    stage.setScene(newScene);
+                else
+                    System.err.println("MainPagesController.settingsClick: Stage is null.");
 
-            } catch (IOException e) {
-                System.err.println("MainPagesController: Error loading settings page: " + e.getMessage());}
+            } catch (IOException e){
+                System.err.println( "MainPagesController: Error loading settings page: " + e.getMessage()) ;}
         });
     }
-
-    public void emailClick() {
-        Platform.runLater(() -> {
-            try {
-                FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/esa/moviestar/login/access.fxml"), Main.resourceBundle);
+    public void goToAccess(){
+        Platform.runLater(() ->{
+            try{
+                FXMLLoader loader = new FXMLLoader(getClass().getResource( "/com/esa/moviestar/login/access.fxml"), Main.resourceBundle);
                 Parent accessContent = loader.load();
                 Scene currentSceneNode = getCurrentAppScene();
-                if (currentSceneNode == null) return;
+                if (currentSceneNode ==  null)
+                    return;
 
-                Scene newScene = new Scene(accessContent, currentSceneNode.getWidth(), currentSceneNode.getHeight());
+                Scene newScene = new Scene(accessContent,  currentSceneNode.getWidth(), currentSceneNode.getHeight());
                 Stage stage = (Stage) currentSceneNode.getWindow();
-                if (stage != null) stage.setScene(newScene);
-                else System.err.println("MainPagesController.emailClick: Stage is null.");
 
-            } catch (IOException ex) {
-                System.err.println("MainPagesController: Error loading access page: " + ex.getMessage());
+                if (stage !=  null)
+                    stage.setScene( newScene);
+                else
+                    System.err.println("MainPagesController.emailClick: Stage is null." );
+
+            } catch (IOException ex){
+                System.err.println("MainPagesController: Error loading access page: " + ex.getMessage() );
             }
         });
     }
-
-    public void profileClick(User newUser) {
-        if (transitionInProgress) {
-            System.out.println("Transition in progress, cannot switch profile.");
-            return;
+    public void switchProfile(User newUser){
+        if (transitionInProgress){
+            System.out.println("MainPagesController: Transition in progress, cannot switch profile.");
+            return ;
         }
         showLoadingSpinner();
-
-        Platform.runLater(() -> {
-            if (loadingSpinner != null) loadingSpinner.stopAnimation();
-            if (body != null) body.getChildren().clear();
-            if (headerContainer != null) headerContainer.getChildren().clear();
-
-            header = null; home = null; filter_film = null; filter_series = null;
-            currentScene = null; pageBeforeSearch = null; savedPageData = null;
-
+        Platform.runLater(() ->{
+            if (loadingSpinner != null)
+                loadingSpinner.stopAnimation();
+            if (body != null)
+                body.getChildren().clear();
+            if (headerContainer != null)
+                headerContainer.getChildren().clear();
+            header = null;
+            home = null;
+            filter_film = null;
+            filter_series = null;
+            currentScene = null;
+            pageBeforeSearch = null;
+            savedPageData = null;
             this.user = newUser;
-            first_load(this.user, this.account);
+            load(this.user, this.account);
         });
     }
-
-    public void createProfileUser(Account account){
-        Platform.runLater(() -> {
-            try {
+    public void goToProfileCreation(Account account){
+        Platform.runLater(() ->{
+            try{
                 FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/esa/moviestar/profile/create-profile-view.fxml"), Main.resourceBundle);
                 Parent createContent = loader.load();
                 CreateProfileController createProfileController = loader.getController();
-                if (createProfileController != null) {
+                if (createProfileController != null){
                     createProfileController.setSource(CreateProfileController.Source.HOME);
                     createProfileController.setAccount(account);
                     createProfileController.setUser(this.user);
-                } else {
-                    System.err.println("MainPagesController.createProfileUser: CreateProfileController is null.");
+                } else{
+                    System.err.println("MainPagesController.goToProfileCreation: CreateProfileController is null.");
                 }
 
                 Scene currentSceneNode = getCurrentAppScene();
@@ -726,39 +768,22 @@ public class MainPagesController {
 
                 Scene newScene = new Scene(createContent, currentSceneNode.getWidth(), currentSceneNode.getHeight());
                 Stage stage = (Stage) currentSceneNode.getWindow();
-                if (stage != null) stage.setScene(newScene);
-                else System.err.println("MainPagesController.createProfileUser: Stage is null.");
+                if (stage != null)  stage.setScene(newScene);
+                else System.err.println("MainPagesController.goToProfileCreation: Stage is null.");
 
             }catch(IOException e){
                 System.err.println("MainPagesController : Error to switch profile: " + e.getMessage());
             }
         });
     }
-
-    private Scene getCurrentAppScene() {
+    private Scene getCurrentAppScene(){
         Scene scene = (body != null && body.getScene() != null) ? body.getScene() :
-                (root != null && root.getScene() != null) ? root.getScene() : null;
-        if (scene == null) {
+                (root  != null && root.getScene() != null) ? root.getScene() : null;
+        if (scene ==  null){
             System.err.println("MainPagesController.getCurrentAppScene: Cannot get current scene from body or root.");
         }
         return scene;
     }
 
-    public void filmClicked(User user, Account account, int contentId, boolean series) {
-        showLoadingSpinner();
 
-        this.filmClickedInitialLoadFuture = new CompletableFuture<>();
-
-        first_load(user, account);
-
-        this.filmClickedInitialLoadFuture
-                .thenRunAsync(() -> openFilmScene(contentId, series), Platform::runLater)
-                .exceptionally(ex -> {
-                    Platform.runLater(() -> {
-                        System.err.println("MainPagesController.filmClicked: Failed to initialize or open film scene: " + ex.getMessage());
-                        hideLoadingSpinner();
-                    });
-                    return null;
-                });
-    }
 }

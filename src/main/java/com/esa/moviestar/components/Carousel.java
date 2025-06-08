@@ -9,7 +9,7 @@ import javafx.scene.control.Control;
 import javafx.scene.control.Skin;
 import javafx.util.Duration;
 
-public class  Carousel extends Control {
+public class  Carousel extends Control{
 
     private static final String DEFAULT_STYLE_CLASS = "carousel";
 
@@ -17,38 +17,38 @@ public class  Carousel extends Control {
      * The items to display in the carousel.
      */
     private final ObservableList<Node> items = FXCollections.observableArrayList();
-    public ObservableList<Node> getItems() { return items; }
+    public ObservableList<Node> getItems(){ return items; }
 
     /**
      * The currently visible item index.
      */
     private final ObjectProperty<Integer> currentIndex = new SimpleObjectProperty<>(0);
-    public final Integer getCurrentIndex() { return currentIndex.get(); }
-    public final ObjectProperty<Integer> currentIndexProperty() { return currentIndex; }
-    public final void setCurrentIndex(Integer value) { currentIndex.set(value); }
+    public final Integer getCurrentIndex(){ return currentIndex.get(); }
+    public final ObjectProperty<Integer> currentIndexProperty(){ return currentIndex; }
+    public final void setCurrentIndex(Integer value){ currentIndex.set(value); }
 
     /**
      * The duration of the transition animation.
      */
     private final ObjectProperty<Duration> animationDuration = new SimpleObjectProperty<>(Duration.millis(500));
-    public final Duration getAnimationDuration() { return animationDuration.get(); }
-    public final ObjectProperty<Duration> animationDurationProperty() { return animationDuration; }
-    public final void setAnimationDuration(Duration value) { animationDuration.set(value); }
+    public final Duration getAnimationDuration(){ return animationDuration.get(); }
+    public final ObjectProperty<Duration> animationDurationProperty(){ return animationDuration; }
+    public final void setAnimationDuration(Duration value){ animationDuration.set(value); }
 
     /**
      * Indicates if the carousel should loop around.
      */
     private final ObjectProperty<Boolean> wrapAround = new SimpleObjectProperty<>(false);
-    public final Boolean getWrapAround() { return wrapAround.get(); }
-    public final ObjectProperty<Boolean> wrapAroundProperty() { return wrapAround; }
-    public final void setWrapAround(Boolean value) { wrapAround.set(value); }
+    public final Boolean getWrapAround(){ return wrapAround.get(); }
+    public final ObjectProperty<Boolean> wrapAroundProperty(){ return wrapAround; }
+    public final void setWrapAround(Boolean value){ wrapAround.set(value); }
 
-    public Carousel() {
+    public Carousel(){
         getStyleClass().add(DEFAULT_STYLE_CLASS);
     }
 
     @Override
-    protected Skin<?> createDefaultSkin() {
+    protected Skin<?> createDefaultSkin(){
         return new CarouselSkin(this);
     }
 
@@ -56,13 +56,13 @@ public class  Carousel extends Control {
     /**
      * Moves to the next item in the carousel.
      */
-    public void next() {
+    public void next(){
         int nextIndex = getCurrentIndex() + 1;
-        if (nextIndex >= getItems().size()) {
-            if (getWrapAround()) {
+        if (nextIndex >= getItems().size()){
+            if (getWrapAround()){
                 setCurrentIndex(0);
             }
-        } else {
+        } else{
             setCurrentIndex(nextIndex);
         }
     }
@@ -70,13 +70,13 @@ public class  Carousel extends Control {
     /**
      * Moves to the previous item in the carousel.
      */
-    public void previous() {
+    public void previous(){
         int previousIndex = getCurrentIndex() - 1;
-        if (previousIndex < 0) {
-            if (getWrapAround()) {
+        if (previousIndex < 0){
+            if (getWrapAround()){
                 setCurrentIndex(getItems().size() - 1);
             }
-        } else {
+        } else{
             setCurrentIndex(previousIndex);
         }
     }
@@ -93,8 +93,8 @@ public class  Carousel extends Control {
      * Moves to the item at the specified index.
      * @param index The index of the item to display.
      */
-    public void goTo(int index) {
-        if (index >= 0 && index < getItems().size()) {
+    public void goTo(int index){
+        if (index >= 0 && index < getItems().size()){
             setCurrentIndex(index);
         }
     }

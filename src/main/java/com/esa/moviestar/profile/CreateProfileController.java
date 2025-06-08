@@ -30,7 +30,6 @@ public class CreateProfileController extends BaseProfileController {
 
     public void setUser(User user) {
         this.user = user;
-        System.out.println("CreateProfileController = user : " + user.getName());
     }
 
     public void setSource(Source source) {
@@ -38,7 +37,7 @@ public class CreateProfileController extends BaseProfileController {
     }
 
     @Override
-    protected String getTitleText() {
+    protected String getTitleText(){
         return "Create Username:";
     }
 
@@ -53,14 +52,13 @@ public class CreateProfileController extends BaseProfileController {
     }
 
     @Override
-    protected void handleCancel() {
-        if (source == Source.HOME) {
+    protected void handleCancel(){
+        if (source == Source.HOME)
             goToHome();
-        } else if (source == Source.PROFILE) {
+        else if (source == Source.PROFILE)
             backToProfiles();
-        } else if (source == Source.REGISTER || dao.countProfilesByEmail(account.getEmail()) == 0) {
+        else if (source == Source.REGISTER || dao.countProfilesByEmail(account.getEmail()) == 0)
             textName.setText("");
-        }
     }
 
     @Override
@@ -105,7 +103,7 @@ public class CreateProfileController extends BaseProfileController {
             stage.setScene(newScene);
         } catch (IOException ex) {
             System.out.println("CreateProfileController : Couldn't load profile view ." + ex.getMessage());
-            warningText.setText("Error loading the page. " + ex.getMessage());
+            warningText.setText("CreateProfileController : Error loading the page. " + ex.getMessage());
         }
     }
 
@@ -115,7 +113,7 @@ public class CreateProfileController extends BaseProfileController {
             Parent homeContent = loader.load();
 
             MainPagesController mainPagesController = loader.getController();
-            mainPagesController.first_load(user, account);
+            mainPagesController.load(user, account);
 
             Scene currentScene = createPageContainer.getScene();
             Scene newScene = new Scene(homeContent, currentScene.getWidth(), currentScene.getHeight());

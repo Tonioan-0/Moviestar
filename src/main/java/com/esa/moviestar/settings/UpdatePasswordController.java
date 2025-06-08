@@ -59,16 +59,15 @@ public class UpdatePasswordController {
 
     private User user;
 
-    public void setUtente(User user) {
+    public void setUser(User user) {
         this.user = user;
-        System.out.println("UpdatePasswordController : user  : " + user.getName());
     }
 
     private Account account;
 
     public void setAccount(Account account) {
         this.account = account;
-        System.out.println("UpdatePasswordController : email  : " + account.getEmail());
+
     }
 
 
@@ -160,9 +159,9 @@ public class UpdatePasswordController {
 
     private void navigateToAccess() {
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/esa/moviestar/login/access.fxml"), Main.resourceBundle);
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/esa/moviestar/login/access.fxml") ,  Main.resourceBundle);
             Parent accountSettingContent = loader.load();
-            Access access = loader.getController();
+            Access access =  loader.getController();
             access.setAccount(account);
 
             Scene currentScene = parentContainer.getScene();
@@ -178,9 +177,9 @@ public class UpdatePasswordController {
         }
     }
 
-    private void navigateToSetting() {
+    private void navigateToSetting(){
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/esa/moviestar/settings/settings-view.fxml"), Main.resourceBundle);
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/esa/moviestar/settings/settings-view.fxml" ), Main.resourceBundle);
             Parent accountSettingContent = loader.load();
             SettingsViewController settingsViewController = loader.getController();
             settingsViewController.setUser(user);

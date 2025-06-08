@@ -13,6 +13,8 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
+import org.jetbrains.annotations.NotNull;
+
 import java.io.IOException;
 import java.util.*;
 
@@ -30,22 +32,9 @@ public class HomeController {
         try {
             scrollViewContainer.getChildren().clear();
             List<List<Content>> contentList= new ContentDao().getHomePageContents(user);
-            List<Node> carouselList= new Vector<>();
-            for (Content c:contentList.getFirst()) {
-                FXMLLoader loader = new FXMLLoader(getClass().getResource(MainPagesController.PATH_CARD_WINDOW), Main.resourceBundle);
-                Node body = loader.load();
-                WindowCardController windowCardController  = loader.getController();
-                windowCardController.setContent(c);
-                windowCardController.getPlayButton().setOnMouseClicked(e-> {
-                    UserDao userDao = new UserDao();
-                    userDao.insertHistoryContent(user.getID(),c.getId());
-                    mainPagesController.cardClickedPlay(c.getVideoUrl());
-                });
-                windowCardController.getInfoButton().setOnMouseClicked(e->mainPagesController.openFilmScene(windowCardController.getCardId(),c.isSeries()));
-                carouselList.add(body);
-            }
+
             Carousel carousel = new Carousel();
-            carousel.getItems().addAll(carouselList);
+            carousel.getItems().addAll(getCarouselList(user, mainPagesController, contentList));
             carousel.getStylesheets().add(Objects.requireNonNull(getClass().getResource("/com/esa/moviestar/styles/carousel.css")).toExternalForm());
             body.getChildren().add(1, carousel);
 
@@ -56,7 +45,7 @@ public class HomeController {
             ScrollView latest10Scroll = new ScrollView("New Releases:", Color.rgb(228, 193, 42), MainPagesController.BACKGROUND_COLOR, null, 32.0);
             latest10Scroll.setContent(mainPagesController.createFilmNodes( contentList.get(2), true));
 
-            scrollViewContainer.getChildren().addAll(top10Scroll,latest10Scroll);
+            scrollViewContainer.getChildren().addAll( top10Scroll,latest10Scroll);
 
             if(!contentList.get(4).isEmpty()) {
                 ScrollView similarToLastWatchedScroll = new ScrollView("Similar at " + contentList.get(4).getFirst().getTitle() + " :", Color.TRANSPARENT, MainPagesController.FORE_COLOR, MainPagesController.BACKGROUND_COLOR);
@@ -83,14 +72,14 @@ public class HomeController {
             }
 
             if (!contentList.get(7).isEmpty()) {
-                ScrollView favouriteScroll = new ScrollView("Favourites:", Color.rgb(31, 31, 31), MainPagesController.BACKGROUND_COLOR, null, 32.0);
+                ScrollView favouriteScroll = new ScrollView("Favourites:", Color.rgb(31, 31, 31), MainPagesController.FORE_COLOR, null, 32.0);
                 favouriteScroll.setContent(mainPagesController.createFilmNodes( contentList.get(7), true));
                 scrollViewContainer.getChildren().add(favouriteScroll);
             }
 
             ScrollView bottom7Scroll = new ScrollView("New Experiences:", Color.TRANSPARENT, MainPagesController.FORE_COLOR, MainPagesController.BACKGROUND_COLOR);
             bottom7Scroll.setContent(mainPagesController.createFilmNodes( contentList.get(8), false));
-            scrollViewContainer.getChildren().addAll(bottom7Scroll);
+            scrollViewContainer.getChildren().addAll( bottom7Scroll);
 
 
 
@@ -100,5 +89,24 @@ public class HomeController {
         catch (IOException e){
             System.err.println("HomeController: Failed to load recommendations \n Error:"+e.getMessage());
         }
+    }
+
+    @NotNull
+    private List<Node> getCarouselList(User user, MainPagesController mainPagesController, List<List<Content>> contentList) throws IOException {
+        List<Node> carouselList= new Vector<>();
+        for (Content c: contentList.getFirst()) {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource(MainPagesController.PATH_CARD_WINDOW), Main.resourceBundle);
+            Node body = loader.load();
+            WindowCardController windowCardController  = loader.getController();
+            windowCardController.setContent(c);
+            windowCardController.getPlayButton().setOnMouseClicked(e-> {
+                UserDao userDao = new UserDao();
+                userDao.insertHistoryContent(user.getID(),c.getId());
+                mainPagesController.goToFilmPlayer(c.getVideoUrl());
+            });
+            windowCardController.getInfoButton().setOnMouseClicked(e-> mainPagesController.openFilmScene(windowCardController.getCardId(),c.isSeries()));
+            carouselList.add(body);
+        }
+        return carouselList;
     }
 }

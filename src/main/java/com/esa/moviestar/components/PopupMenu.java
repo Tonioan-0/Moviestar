@@ -20,7 +20,7 @@ import java.util.Objects;
  * Sources:
  * <a href="https://docs.oracle.com/javase/8/javafx/api/javafx/stage/Popup.html">...</a>
  */
-public class PopupMenu {
+public class PopupMenu{
 
     private final Popup popup;
     private final HBox columnsContainer;
@@ -29,22 +29,22 @@ public class PopupMenu {
     private int   columnsCount = 1;
     private boolean positionShowLeft = true;
 
-    public PopupMenu() {
+    public PopupMenu(){
 
         this(255,1);
     }
-    public PopupMenu( double columnWidth) {
+    public PopupMenu( double columnWidth){
         this(columnWidth,1);
     }
 
-    public PopupMenu(double columnWidth , int columnsCount) {
+    public PopupMenu(double columnWidth , int columnsCount){
         this.columnWidth = columnWidth;
         this.popup = new Popup();
         this.columnsCount = Math.max(1, columnsCount);
         this.columns = new ArrayList<>( columnsCount);
         this.columnsContainer = new HBox(4);
 
-        for (int i = 0; i <   columnsCount; i++) {
+        for (int i = 0; i <   columnsCount; i++){
             VBox column = createColumn();
             columns.add(column);
             columnsContainer.getChildren().add(column);
@@ -66,9 +66,9 @@ public class PopupMenu {
         popup.setAutoHide(true);
     }
 
-    private VBox createColumn() {
+    private VBox createColumn(){
         return new VBox(4)
-        {{
+       {{
             setPadding(new Insets(0));
             setMaxWidth(columnWidth);
             setMinWidth(columnWidth);
@@ -79,7 +79,7 @@ public class PopupMenu {
      * Adds an item to the first column
      * @param n The node to add
      */
-    public void addItem(Node n) {
+    public void addItem(Node n){
         addItem(0, n);
     }
 
@@ -88,7 +88,7 @@ public class PopupMenu {
      * @param columnIndex The index of the column (0-based)
      * @param n The node to add
      */
-    public void addItem(int columnIndex, Node n) {
+    public void addItem(int columnIndex, Node n){
         if(columnIndex < 0 || columnIndex >=columns.size())
             return;
         columns.get(columnIndex ).getChildren().add(n );
@@ -97,7 +97,7 @@ public class PopupMenu {
     /**
      * Adds a separator to the first column
      */
-    public void addSeparator() {
+    public void addSeparator(){
         addSeparator(0);
     }
 
@@ -105,14 +105,14 @@ public class PopupMenu {
      * Adds a separator to the specified column
      * @param columnIndex The index of the column (0-based)
      */
-    public void addSeparator(int columnIndex) {
+    public void addSeparator(int columnIndex){
         if( columnIndex < 0 || columnIndex >=columns.size())
             return;
-        columns.get(columnIndex ).getChildren().add(new VBox() {{ setHeight(4); }});
+        columns.get(columnIndex ).getChildren().add(new VBox(){{ setHeight(4); }});
     }
 
 
-    public int addColumn() {
+    public int addColumn(){
         VBox newColumn = createColumn();
         columns.add(newColumn );
         columnsContainer.getChildren().add( newColumn);
@@ -121,7 +121,7 @@ public class PopupMenu {
     }
 
 
-    public int getNumberOfColumns() {
+    public int getNumberOfColumns(){
         return   columnsCount;
     }
 
@@ -129,7 +129,7 @@ public class PopupMenu {
      * Shows the popup menu anchored to the specified node
      * @param anchor The node to anchor the popup to
      */
-    public void show(Node anchor) {
+    public void show(Node anchor){
         if (anchor == null || anchor.getScene() == null)
             return;
 
@@ -139,28 +139,28 @@ public class PopupMenu {
         popup.show(anchor.getScene().getWindow(), anchorX, posY);
     }
 
-    public void close() {
+    public void close(){
         this.popup.hide();
     }
 
-    public void dispose() {
+    public void dispose(){
         close();
-        if (columns != null) {
-            for (VBox column : columns) {
-                if (column != null) {
+        if (columns != null){
+            for (VBox column : columns){
+                if (column != null){
                     column.getChildren().clear();
                 }
             }
             columns.clear();
         }
-        if (columnsContainer != null) {
+        if (columnsContainer != null){
             columnsContainer.getChildren().clear();
             columnsContainer.setEffect(null);
-            if (columnsContainer.getStylesheets() != null) {
+            if (columnsContainer.getStylesheets() != null){
                 columnsContainer.getStylesheets().clear();
             }
         }
-        if (popup != null && popup.getContent() != null) {
+        if (popup != null && popup.getContent() != null){
             popup.getContent().clear();
         }
     }

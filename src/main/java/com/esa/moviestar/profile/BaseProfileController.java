@@ -57,7 +57,6 @@ public abstract class BaseProfileController {
 
     public void setAccount(Account account) {
         this.account = account;
-        System.out.println(getClass().getSimpleName() + " = email : " + account.getEmail());
     }
 
     protected boolean validateName(String name) {
@@ -151,11 +150,11 @@ public abstract class BaseProfileController {
             return;
         }
 
-        if (performSave(name, codCurrentImage)) {
+        if (performSave(name, codCurrentImage))
             onSaveSuccess();
-        } else {
+        else
             warningText.setText("Error saving the profile.");
-        }
+
     }
 
     protected void showError(String message) {

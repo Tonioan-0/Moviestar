@@ -151,7 +151,7 @@ public class Access {
                 return true;
             }
         } catch (IOException e) {
-            System.err.println("Internet check failed: " + e.getMessage());
+            System.err.println("Access: Internet check failed: " + e.getMessage());
             return false; // Either host is unreachable or network is down
         }
     }
@@ -229,18 +229,16 @@ public class Access {
         Task<Void> updateDbTask = new Task<>() {
             @Override
             protected Void call() {updateMessage("Starting database content update...");
-                System.out.println("Access Task: Attempting to update all content in database."); // Changed log prefix
+                System.out.println("Access : Attempting to update all content in database."); // Changed log prefix
 
                 TMDbApiManager tmdbApiManager = TMDbApiManager.getInstance();
-                // Consider if ContentDao should be instantiated once or if this is intended
                 tmdbApiManager.setContentDao(new ContentDao());
                 try {
                     tmdbApiManager.updateAllContentInDatabase().join(); // .join() will block this worker thread, not UI
                     updateMessage("Database content update completed.");
                 } catch (Exception e) {
                     updateMessage("Database content update failed.");
-                    System.err.println("Access Task: Exception during TMDb content update: " + e.getMessage());
-                    e.printStackTrace(); // For more detailed error logging
+                    System.err.println("Access: Exception during TMDb content update: " + e.getMessage());
                 }
                 return null;
             }
@@ -251,11 +249,6 @@ public class Access {
         });
         updateDbTask.setOnFailed(event -> {
             System.err.println("Access: Database update task failed. Message: " + updateDbTask.getMessage());
-            Throwable ex = updateDbTask.getException();
-            if (ex != null) {
-                ex.printStackTrace();
-            }
-
         });
 
         Thread taskThread = new Thread(updateDbTask);
@@ -297,7 +290,7 @@ public class Access {
             passwordTextField.setManaged(true);
             passwordTextField.requestFocus();
             passwordTextField.positionCaret(passwordTextField.getText().length());
-            togglePasswordButton.setGraphic(new SVGPath(){{setContent(Main.resourceBundle.getString("passwordField.hidePassword"));getStyleClass().add("on-primary");}});;
+            togglePasswordButton.setGraphic(new SVGPath(){{setContent(Main.resourceBundle.getString("passwordField.hidePassword"));getStyleClass().add("on-primary");}});
 
         }
         else {
@@ -564,16 +557,13 @@ public class Access {
                 AnimationUtils.shake(warningText);
             }
         } catch (IOException e) {
-            e.printStackTrace();
             warningText.setText("Loading error: " + e.getMessage());
         } catch (Exception e) {
-            e.printStackTrace();
             warningText.setText("An error occurred: " + e.getMessage());
         }
     }
 
     public void setAccount(Account account){
         this.account = account;
-        System.out.println("Access : email " + account.getEmail());
     }
 }

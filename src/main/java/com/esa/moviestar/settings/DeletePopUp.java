@@ -57,7 +57,10 @@ public class DeletePopUp extends StackPane {
         titleLabel.getStyleClass().addAll("large-text", "bold-text", "on-primary");
 
         // Text
-        Text descriptionText = new Text(isAccount ? "Are you sure you want to delete your account? By proceeding, you will be logged out and will no longer be able to access it." : "Are you sure you want to delete your user profile? Deleting your profile is an irreversible action and you will lose all data associated with it.");
+        Text descriptionText = new Text(isAccount ?
+                "Are you sure you want to delete your account? By proceeding, you will be logged out and will no longer be able to access it."
+                :
+                "Are you sure you want to delete your user profile? Deleting your profile is an irreversible action and you will lose all data associated with it.");
         descriptionText.setStrokeType(javafx.scene.shape.StrokeType.OUTSIDE);
         descriptionText.setStrokeWidth(0.0);
         descriptionText.setWrappingWidth(400.0);

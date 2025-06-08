@@ -75,7 +75,8 @@ public class UserDao {
                 return rs.getInt(1);
             }
         }catch(SQLException e){
-            System.err.println("UserDao : User count error "+e.getMessage());        }
+            System.err.println("UserDao : User count error "+e.getMessage());
+        }
         return 0;
     }
 
@@ -111,8 +112,6 @@ public class UserDao {
                 );
                 users.add(user);
             }
-
-            System.out.println("UserDao : Number of users found: " + users.size());
         } catch (SQLException e) {
             System.err.println("UserDao : Error fetching user list by user email " + e.getMessage());
         }
@@ -158,24 +157,24 @@ public class UserDao {
     }
     public void deleteHistory(int idUser,int idContent){
         String query = "DELETE FROM History WHERE ID_User = ? AND ID_Content = ?;";
-        try(PreparedStatement stmt = connection.prepareStatement(query)){
+        try(PreparedStatement stmt = connection.prepareStatement(query) ){
             stmt.setInt(1,idUser);
             stmt.setInt(2,idContent);
             int rowsAffected = stmt.executeUpdate();
-            if (rowsAffected == 0) {
+            if (rowsAffected == 0)
                 throw new SQLException("deleteHistory : No content with id : "+idContent+" for the user :  "+idUser);
-            }
-        }catch (SQLException e){
-            System.err.println("userDao : error deleting history of the user "+e.getMessage());
+        }
+        catch (SQLException e){
+            System.err.println("userDao : error deleting history of the user "+e.getMessage() );
         }
     }
 
-    public void deleteWatchlist(int idUser,int idContent){
+    public void deleteWatchlist( int idUser,int idContent ){
         String query = "DELETE FROM WatchList WHERE ID_User = ? AND ID_Content = ?;";
         try(PreparedStatement stmt = connection.prepareStatement(query)){
-            stmt.setInt(1,idUser);
-            stmt.setInt(2,idContent);
-            int rowsAffected = stmt.executeUpdate();
+            stmt.setInt(1,idUser );
+            stmt.setInt(2,idContent );
+            int rowsAffected =  stmt.executeUpdate();
             if (rowsAffected == 0) {
                 throw new SQLException("deleteWatchlist : No content with id : "+idContent+" for the user :  "+idUser);
             }        }catch (SQLException e){
@@ -186,7 +185,7 @@ public class UserDao {
     public void insertFavouriteContent(int userId , int contentId){
         String query = "INSERT INTO Favourite (ID_User,ID_Content) Values (?,?);";
         try(PreparedStatement stmt = connection.prepareStatement(query)){
-            stmt.setInt(1, userId);
+            stmt.setInt( 1, userId);
             stmt.setInt(2, contentId);
             stmt.executeUpdate();
         }catch (SQLException e){

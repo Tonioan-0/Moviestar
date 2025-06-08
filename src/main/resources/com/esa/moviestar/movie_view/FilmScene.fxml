@@ -1,27 +1,28 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import java.lang.*?>
-<?import javafx.geometry.*?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.image.*?>
-<?import javafx.scene.layout.*?>
-<?import javafx.scene.shape.*?>
+<?import java.lang.String?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.shape.SVGPath?>
+<?import javafx.scene.shape.Rectangle?>
 
 <StackPane fx:id="background" prefHeight="800.0" prefWidth="1200.0" stylesheets="@../styles/general.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.esa.moviestar.movie_view.FilmSceneController">
 
-    <ScrollPane fx:id="scrollPane" fitToWidth="true" hbarPolicy="NEVER">
-        <AnchorPane>
-            <VBox fx:id="mainVBox" alignment="TOP_CENTER" spacing="0" AnchorPane.leftAnchor="400.0"
-                  AnchorPane.rightAnchor="400.0" AnchorPane.topAnchor="40.0">
+    <ScrollPane fx:id="scrollPane" fitToWidth="true" hbarPolicy="NEVER" pannable="true" StackPane.alignment="CENTER">
+        <StackPane>
+            <VBox fx:id="mainVBox" alignment="TOP_CENTER" maxWidth="1080.0" minWidth="1080.0">
                 <clip>
-                    <Rectangle arcHeight="96.0" arcWidth="96.0" height="${mainVBox.height}"
-                               width="${mainVBox.width}"/>
+                    <Rectangle arcHeight="96.0" arcWidth="96.0" height="${mainVBox.height}" width="${mainVBox.width}"/>
                 </clip>
                 <StackPane>
                     <ImageView fx:id="heroImageView" fitHeight="493.0" fitWidth="350.0" pickOnBounds="true"
-                               styleClass="primary">
-
-                    </ImageView>
+                               styleClass="primary"/>
                     <Region prefHeight="45.0" prefWidth="405.0" styleClass="surface-vertical-gradient"/>
                     <!-- Hero Section -->
                     <VBox fx:id="backgroundVBox" alignment="BOTTOM_CENTER" prefHeight="650.0"
@@ -30,8 +31,7 @@
                             <VBox.margin>
                                 <Insets left="60.0"/>
                             </VBox.margin>
-                            <Label fx:id="titleLabel" styleClass="hero-title" text="Loading..."
-                                   wrapText="true">
+                            <Label fx:id="titleLabel" styleClass="hero-title" text="Loading..." wrapText="true">
                                 <styleClass>
                                     <String fx:value="big-title"/>
                                     <String fx:value="on-primary"/>
@@ -44,59 +44,54 @@
                             <VBox.margin>
                                 <Insets top="25.0"/>
                             </VBox.margin>
-                            <children>
-                                <HBox fx:id="playButton" alignment="CENTER_LEFT" prefHeight="48.0"
-                                      prefWidth="170.0" spacing="2.0">
-                                    <StackPane maxHeight="48.0" maxWidth="48.0" minHeight="48.0" minWidth="48.0"
-                                               prefHeight="48.0" prefWidth="48.0" styleClass="chips">
+                            <HBox fx:id="playButton" alignment="CENTER_LEFT" prefHeight="48.0" prefWidth="170.0"
+                                  spacing="2.0">
+                                <StackPane maxHeight="48.0" maxWidth="48.0" minHeight="48.0" minWidth="48.0"
+                                           prefHeight="48.0" prefWidth="48.0" styleClass="chips">
 
-                                        <SVGPath content="%play" fill="#f5f5f5" scaleX="0.9" scaleY="0.9"/>
-                                    </StackPane>
-                                    <Label alignment="CENTER" text="Play">
-                                        <styleClass>
-                                            <String fx:value="on-primary"/>
-                                            <String fx:value="medium-text"/>
-                                            <String fx:value="bold-text"/>
-                                        </styleClass>
-                                    </Label>
+                                    <SVGPath content="%play" fill="#f5f5f5" scaleX="0.9" scaleY="0.9"/>
+                                </StackPane>
+                                <Label alignment="CENTER" text="Play">
                                     <styleClass>
-                                        <String fx:value="primary"/>
-                                        <String fx:value="small-item"/>
+                                        <String fx:value="on-primary"/>
+                                        <String fx:value="medium-text"/>
+                                        <String fx:value="bold-text"/>
                                     </styleClass>
-                                    <HBox.margin>
-                                        <Insets left="60.0"/>
-                                    </HBox.margin>
-                                    <padding>
-                                        <Insets left="15.0"/>
-                                    </padding>
-                                </HBox>
-                                <HBox fx:id="addToFavouriteButton" layoutX="10.0" layoutY="10.0"
-                                      prefHeight="48.0">
-                                    <StackPane maxHeight="48.0" maxWidth="48.0" minHeight="48.0" minWidth="48.0"
-                                               prefHeight="48.0" prefWidth="48.0">
-                                        <styleClass>
-                                            <String fx:value="small-item"/>
-                                            <String fx:value="surface-transparent"/>
-                                            <String fx:value="on-primary-border"/>
-                                        </styleClass>
-                                        <SVGPath content="%favorite" fill="#f5f5f5"
-                                                 StackPane.alignment="CENTER"/>
-                                    </StackPane>
-                                </HBox>
-                                <HBox fx:id="addToWatchListButton" layoutX="207.0" layoutY="10.0"
-                                      prefHeight="48.0">
-                                    <StackPane maxHeight="48.0" maxWidth="48.0" minHeight="48.0" minWidth="48.0"
-                                               prefHeight="48.0" prefWidth="48.0">
-                                        <styleClass>
-                                            <String fx:value="small-item"/>
-                                            <String fx:value="surface-transparent"/>
-                                            <String fx:value="on-primary-border"/>
-                                        </styleClass>
-                                        <SVGPath content="%watchlist" fill="#f5f5f5" scaleX="0.6" scaleY="0.6"
-                                                 StackPane.alignment="CENTER"/>
-                                    </StackPane>
-                                </HBox>
-                            </children>
+                                </Label>
+                                <styleClass>
+                                    <String fx:value="primary"/>
+                                    <String fx:value="small-item"/>
+                                </styleClass>
+                                <HBox.margin>
+                                    <Insets left="60.0"/>
+                                </HBox.margin>
+                                <padding>
+                                    <Insets left="15.0"/>
+                                </padding>
+                            </HBox>
+                            <HBox fx:id="addToFavouriteButton" layoutX="10.0" layoutY="10.0" prefHeight="48.0">
+                                <StackPane maxHeight="48.0" maxWidth="48.0" minHeight="48.0" minWidth="48.0"
+                                           prefHeight="48.0" prefWidth="48.0">
+                                    <styleClass>
+                                        <String fx:value="small-item"/>
+                                        <String fx:value="surface-transparent"/>
+                                        <String fx:value="on-primary-border"/>
+                                    </styleClass>
+                                    <SVGPath content="%favorite" fill="#f5f5f5" StackPane.alignment="CENTER"/>
+                                </StackPane>
+                            </HBox>
+                            <HBox fx:id="addToWatchListButton" layoutX="207.0" layoutY="10.0" prefHeight="48.0">
+                                <StackPane maxHeight="48.0" maxWidth="48.0" minHeight="48.0" minWidth="48.0"
+                                           prefHeight="48.0" prefWidth="48.0">
+                                    <styleClass>
+                                        <String fx:value="small-item"/>
+                                        <String fx:value="surface-transparent"/>
+                                        <String fx:value="on-primary-border"/>
+                                    </styleClass>
+                                    <SVGPath content="%watchlist" fill="#f5f5f5" scaleX="0.6" scaleY="0.6"
+                                             StackPane.alignment="CENTER"/>
+                                </StackPane>
+                            </HBox>
                         </HBox>
                         <padding>
                             <Insets bottom="20.0"/>
@@ -212,7 +207,7 @@
                                     <String fx:value="medium-text"/>
                                 </styleClass>
                             </Label>
-                            <Label fx:id="seriesTitleLabel" managed="false" text="" visible="false">
+                            <Label fx:id="seriesTitleLabel" managed="false" visible="false">
                                 <styleClass>
                                     <String fx:value="series-title"/>
                                     <String fx:value="medium-text"/>
@@ -222,8 +217,8 @@
 
                         <!-- Episodes List Container -->
                         <VBox fx:id="episodesList" spacing="15.0" styleClass="episodes-container">
-                            <!-- Episodes will be dynamically added here by the controller -->
-                        </VBox>
+                         <!-- Episodes will be dynamically added here by the controller -->
+                     </VBox>
                     </VBox>
                     <styleClass>
                         <String fx:value="surface-dim-opaque-gradient"/>
@@ -234,8 +229,11 @@
                     <String fx:value="surface-solid"/>
                     <String fx:value="very-large-item"/>
                 </styleClass>
+                <StackPane.margin>
+                    <Insets top="60.0"/>
+                </StackPane.margin>
             </VBox>
-        </AnchorPane>
+        </StackPane>
     </ScrollPane>
     <StackPane fx:id="closeButton" alignment="TOP_RIGHT" maxHeight="48.0" maxWidth="48.0" minHeight="48.0" minWidth="48.0" prefHeight="48.0" prefWidth="48.0" StackPane.alignment="TOP_RIGHT">
         <styleClass>

@@ -22,7 +22,7 @@ import java.util.concurrent.Executors;
  * Film card controller is the controller of two fxml (FilmCard_Vertical.fxml and FilmCard_Horizontal.fxml)
  * The idea beyond that was to make an object very similar to googleTV and Prime but with the intention of give the user the main information of the movie/series
  */
-public class FilmCardController {
+public class FilmCardController{
     @FXML
     ImageView imgView;
     @FXML
@@ -49,16 +49,16 @@ public class FilmCardController {
 
 
     private static final ExecutorService imageProcessingExecutor =
-            Executors.newCachedThreadPool(r -> {
+            Executors.newCachedThreadPool(r ->{
                 Thread t = Executors.defaultThreadFactory().newThread(r);
                 t.setDaemon(true);
                 return t;
             });
 
 
-    public void setContent(Content content, boolean isVertical) {
+    public void setContent(Content content, boolean isVertical){
         _id = content.getId();
-        titleLabel.setText(content.getTitle());
+        titleLabel.setText(content.getTitle() );
 
         String plot = content.getPlot();
         if (plot != null)
@@ -75,7 +75,7 @@ public class FilmCardController {
         }
         else if(content.isSeries()){
             timeLabel.setText(content.getEpisodeCount() +" Episodes");
-            durationIcon.setContent(resources.getString("episodes"));
+            durationIcon.setContent(resources.getString("episodes") );
         }
         else{
             timeLabel.setText(((int)content.getTime()/60)+"h "+((int)content.getTime()%60)+"min" );
@@ -84,11 +84,11 @@ public class FilmCardController {
         if(content.getRating() == 10.0)
             ratingLabel.setText("10");
         else
-            ratingLabel.setText(String.valueOf(content.getRating()).substring(0,3));
-        try {
+            ratingLabel.setText(String.valueOf(content.getRating()).substring(0,3) );
+        try{
             String imageUrl = isVertical ? content.getPosterUrl() : content.getImageUrl();
 
-            if (imageUrl == null || imageUrl.trim().isEmpty()) {
+            if (imageUrl == null || imageUrl.trim().isEmpty()){
                 System.err.println("FilmCardController: Image URL is null or empty for content ID: " + content.getId());
                 // Optionally set a placeholder image here
                 Platform.runLater(() -> setupGradientOverlay(null)); // Setup default gradient
@@ -96,24 +96,24 @@ public class FilmCardController {
             }
 
             Image img = new Image(imageUrl, true); // true for background loading
-            img.errorProperty().addListener((observable, oldValue, newValue) -> {
-                if (newValue ) {
-                    System.err.println( "FilmCardController: Error loading image '" + imageUrl + "' for content ID: " + content.getId() + ". Exception: " + img.getException());
+            img.errorProperty().addListener((observable, oldValue, newValue) ->{
+                if (newValue ){
+                    System.err.println( "FilmCardController: Error loading image '" + imageUrl + "' for content ID: " + content.getId() + ". Exception: " + img.getException() );
                     Platform.runLater( () -> setupGradientOverlay(null) );
                 }
             });
 
-            img.progressProperty().addListener(( observable, oldValue,  newValue) -> {
-                if (newValue.doubleValue() == 1.0 && !img.isError()) { // Image fully loaded and no error
+            img.progressProperty().addListener(( observable, oldValue,  newValue) ->{
+                if (newValue.doubleValue() == 1.0 && !img.isError()){ // Image fully loaded and no error
                     imgView.setImage(img );
                     CompletableFuture.supplyAsync(() -> getMixedColorFromImage(img), imageProcessingExecutor)
-                            .thenAcceptAsync(calculatedColor -> {
+                            .thenAcceptAsync(calculatedColor ->{
                                 this.color = calculatedColor;
                                 setupGradientOverlay(img);
                             }, Platform::runLater)
-                            .exceptionally(ex -> {
+                            .exceptionally(ex ->{
                                 System.err.println( "FilmCardController: Error processing image color: " + ex.getMessage());
-                                Platform.runLater( () ->  {
+                                Platform.runLater( () -> {
                                     this.color = null;
                                     setupGradientOverlay(null);
                                 });
@@ -121,30 +121,30 @@ public class FilmCardController {
                             });
                 }
             });
-        } catch (Exception e) {
+        } catch (Exception e){
             System.err.println("FilmCardController: Exception in setContent during image loading for content ID " + content.getId() + ": " + e.getMessage());
-            Platform.runLater(() -> setupGradientOverlay(null));
-        } finally {
+            Platform.runLater(() -> setupGradientOverlay(null) );
+        } finally{
             Platform.runLater(this::setupHoverTransitions);
         }
     }
 
 
-    private void setupGradientOverlay(Image image) {
+    private void setupGradientOverlay(Image image){
         Color effectiveColor = this.color;
         LinearGradient gradient;
         gradient = new LinearGradient(0, 0, 0, 1, true, CycleMethod.NO_CYCLE,
                 new Stop(0.6, Color.TRANSPARENT),
                 new Stop(1, Objects.requireNonNullElseGet(effectiveColor, () -> Color.rgb(115, 65, 190))));
-        gradientOverlay.setBackground(Background.fill(gradient));
+        gradientOverlay.setBackground(Background.fill(gradient) );
     }
 
-    private void setupHoverTransitions() {
+    private void setupHoverTransitions(){
         contentPane.setOpacity(0);
         contentPane.setTranslateY(50);
 
 
-        if (gradientOverlay.getBackground() == null) {
+        if (gradientOverlay.getBackground() == null){
 
             LinearGradient initialGradient;
             initialGradient = new LinearGradient(0, 0, 0, 1, true, CycleMethod.NO_CYCLE,
@@ -154,7 +154,7 @@ public class FilmCardController {
         }
 
         Rectangle clip = new Rectangle();
-        clip.widthProperty().bind(cardContainer.widthProperty());
+        clip.widthProperty().bind(cardContainer.widthProperty() );
         clip.heightProperty().bind(cardContainer.heightProperty());
         //The cards are medium item so have a radius of 24px, to have the same radius for the clip we need arc at radius*2
         clip.setArcWidth(48);
@@ -181,10 +181,10 @@ public class FilmCardController {
         ParallelTransition onExit = new ParallelTransition( contentExitTransition,  metadataFadeIn , contentFadeOut);
 
 
-        cardContainer.hoverProperty().addListener((observable,  oldValue, isHovering) -> {
+        cardContainer.hoverProperty().addListener((observable,  oldValue, isHovering) ->{
             Color currentDominantColor = this.color; // Use the member variable
 
-            if (isHovering) {
+            if (isHovering){
                 onExit.stop();
                 LinearGradient hoverGradient= new LinearGradient(0, 0, 0, 1, true, CycleMethod.NO_CYCLE,
                         new Stop(0, Color.TRANSPARENT),
@@ -201,11 +201,11 @@ public class FilmCardController {
 
                 gradientOverlay.setBackground(Background.fill(hoverGradient));
                 onHover.play();
-            } else {
+            } else{
                 onHover.stop();
                 LinearGradient normalGradient = new LinearGradient(0, 0, 0, 1, true, CycleMethod.NO_CYCLE,
                         new Stop(0.6, Color.TRANSPARENT),
-                        new Stop(1, Objects.requireNonNullElseGet(currentDominantColor, () -> Color.rgb(115, 65, 190))));
+                        new Stop(1, Objects.requireNonNullElseGet(currentDominantColor, () -> Color.rgb(115, 65, 190))) );
                 gradientOverlay.setBackground(Background.fill(normalGradient));
                 onExit.play();
             }
@@ -213,7 +213,7 @@ public class FilmCardController {
     }
 
     // This method now runs on a background thread
-    public Color getMixedColorFromImage(Image image) {
+    public Color getMixedColorFromImage(Image image){
         if (image == null || image.isError() || image.getWidth() == 0 || image.getHeight() == 0)
             return null;
 
@@ -234,15 +234,15 @@ public class FilmCardController {
         int sampleStride = numPixels > 0 ? Math.max(1, (int) Math.sqrt((double)numPixels / desiredSamples)) : 1;
 
         int samplesCount = 0;
-        for (int y = 0; y < height; y += sampleStride) {
-            for (int x = 0; x < width; x += sampleStride) {
-                try {
+        for (int y = 0; y < height; y += sampleStride){
+            for (int x = 0; x < width; x += sampleStride){
+                try{
                     Color pixelColor = pixelReader.getColor(x, y);
                     totalRed += pixelColor.getRed();
                     totalGreen += pixelColor.getGreen();
                     totalBlue += pixelColor.getBlue();
                     samplesCount++;
-                } catch (Exception e) {
+                } catch (Exception e){
                     System.err.println("FilmCardController: Error processing image color" );
                 }
             }
@@ -257,20 +257,20 @@ public class FilmCardController {
 
         double brightness = 0.299 *  avgRed + 0.587 * avgGreen + 0.114 * avgBlue;
 
-        if (brightness > 0.75) {
+        if (brightness > 0.75){
             double reductionFactor = 0.75 / brightness;
             avgRed *= reductionFactor;
             avgGreen *= reductionFactor;
             avgBlue *= reductionFactor;
         }
-        avgRed = Math.max(0, Math.min(1, avgRed));
+        avgRed = Math.max(0, Math.min(1,  avgRed) );
         avgGreen = Math.max(0, Math.min(1, avgGreen));
         avgBlue = Math.max(0, Math.min(1, avgBlue));
 
         return Color.color(avgRed, avgGreen, avgBlue);
     }
 
-    public int getCardId() {
+    public int getCardId(){
         return _id;
     }
 

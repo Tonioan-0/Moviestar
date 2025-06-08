@@ -597,8 +597,6 @@ public class CarouselSkin extends SkinBase<Carousel> {
         autoRotationTimeline.stop();
     }
 
-
-
     @Override
     public void dispose() {
         if (animationTimeline != null) {

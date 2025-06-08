@@ -23,7 +23,7 @@ import javafx.util.Duration;
 
 //To facilitate understanding, I've organized this class in a manner that allows information to be collapsed, making it more easily understandable ⁓Antonio D'Ambrosio
 
-public class ScrollViewSkin extends SkinBase<ScrollView> {
+public class ScrollViewSkin extends SkinBase<ScrollView>{
 
     // header
     private StackPane titleBox;
@@ -61,7 +61,7 @@ public class ScrollViewSkin extends SkinBase<ScrollView> {
      * @param control   The ScrollView control this skin is for.
      *
      */
-    public ScrollViewSkin(ScrollView control) {
+    public ScrollViewSkin(ScrollView control){
         super(control);
         // I have created the ScrollView divided in top and bottom part in a way is possible to modify to implement a scrollView without the TitleBox
         titleBox = createTitleBox();
@@ -84,8 +84,8 @@ public class ScrollViewSkin extends SkinBase<ScrollView> {
      * Creates the header section containing the title,  separator line, and action button.
      * @return The StackPane containing the header elements.
      */
-    private StackPane createTitleBox() {
-        StackPane box = new StackPane() {{
+    private StackPane createTitleBox(){
+        StackPane box = new StackPane(){{
             setMinHeight(SPACE*3);
             setPrefHeight(SPACE*3);
         }};
@@ -113,7 +113,7 @@ public class ScrollViewSkin extends SkinBase<ScrollView> {
      * navigation buttons, and gradient overlays.
      * @return An AnchorPane containing the slider components.
      */
-    private AnchorPane createSlider() {
+    private AnchorPane createSlider(){
         ScrollView control = getSkinnable();
 
         scrollPane = new ScrollPane();
@@ -178,28 +178,28 @@ public class ScrollViewSkin extends SkinBase<ScrollView> {
     /**
      * Bind the children of the object
      */
-    private void setupBindings() {
+    private void setupBindings(){
         ScrollView control = getSkinnable();
 
         // Listener for layout bounds (clipping)
-        layoutBoundsListener = (observable, oldValue, newValue) -> {
-            if (control.getRadius() > 0) {
+        layoutBoundsListener = (observable, oldValue, newValue) ->{
+            if (control.getRadius() > 0){
                 Rectangle clipRect = new Rectangle(newValue.getWidth(), newValue.getHeight());
                 clipRect.setArcWidth(control.getRadius() * 2);
                 clipRect.setArcHeight(control.getRadius() * 2);
                 control.setClip(clipRect);
-            } else {
+            } else{
                 control.setClip(null);
             }
         };
         control.layoutBoundsProperty().addListener(layoutBoundsListener);
         titleLabel.textProperty().bind(control.titleProperty());
 
-        widthListener = (obs, oldVal, newVal) -> {
-            if (separator != null) { // Check separator as it might be nullified during dispose
-                if (newVal.doubleValue() < 720) {
+        widthListener = (obs, oldVal, newVal) ->{
+            if (separator != null){ // Check separator as it might be nullified during dispose
+                if (newVal.doubleValue() < 720){
                     separator.setVisible(false);
-                } else {
+                } else{
                     separator.setVisible(true);
                     separator.setStartX(newVal.doubleValue() * 0.3);
                     separator.setEndX(newVal.doubleValue() * 0.8);
@@ -216,9 +216,9 @@ public class ScrollViewSkin extends SkinBase<ScrollView> {
 
         // Bind background color
         getSkinnable().setBackground(Background.fill(control.getBackgroundColor()));
-        backgroundColorListener = (obs, oldVal, newVal) -> {
-            if (newVal != null) {
-                if (control.getEdgeColor() == null) {
+        backgroundColorListener = (obs, oldVal, newVal) ->{
+            if (newVal != null){
+                if (control.getEdgeColor() == null){
                     if (leftGradient != null) leftGradient.setBackground(getOverlayGradientBackgroundFill((Color)newVal, true));
                     if (rightGradient != null) rightGradient.setBackground(getOverlayGradientBackgroundFill((Color)newVal, false));
                 }
@@ -235,30 +235,30 @@ public class ScrollViewSkin extends SkinBase<ScrollView> {
         control.getItems().addListener(itemsListener);
 
         // Bind foreground color
-        foreColorListener = (obs, oldVal, newVal) -> {
-            if (newVal != null) {
+        foreColorListener = (obs, oldVal, newVal) ->{
+            if (newVal != null){
                 updateForeColor((Color)newVal);
             }
         };
         control.foreColorProperty().addListener(foreColorListener);
 
         // Bind edge color
-        edgeColorListener = (obs, oldVal, newVal) -> {
-            if (newVal != null) {
+        edgeColorListener = (obs, oldVal, newVal) ->{
+            if (newVal != null){
                 if (leftGradient != null) leftGradient.setBackground(getOverlayGradientBackgroundFill((Color) newVal, true));
                 if (rightGradient != null) rightGradient.setBackground(getOverlayGradientBackgroundFill((Color)newVal, false));
             }
-            if (sliderContainer != null) {
-                if (leftGradient != null && sliderContainer.getChildren().contains(leftGradient)) {
+            if (sliderContainer != null){
+                if (leftGradient != null && sliderContainer.getChildren().contains(leftGradient)){
                     leftGradient.toFront();
                 }
-                if (rightGradient != null && sliderContainer.getChildren().contains(rightGradient)) {
+                if (rightGradient != null && sliderContainer.getChildren().contains(rightGradient)){
                     rightGradient.toFront();
                 }
-                if (leftButton != null && sliderContainer.getChildren().contains(leftButton)) {
+                if (leftButton != null && sliderContainer.getChildren().contains(leftButton)){
                     leftButton.toFront();
                 }
-                if (rightButton != null && sliderContainer.getChildren().contains(rightButton)) {
+                if (rightButton != null && sliderContainer.getChildren().contains(rightButton)){
                     rightButton.toFront();
                 }
             }
@@ -270,15 +270,15 @@ public class ScrollViewSkin extends SkinBase<ScrollView> {
      * Sets up the mouse enter/exit listeners on the slider container
      * to control the visibility of the navigation buttons.
      */
-    private void setupHoverBehavior() {
-        sliderContainer.setOnMouseEntered(e -> {
+    private void setupHoverBehavior(){
+        sliderContainer.setOnMouseEntered(e ->{
             if(!isHovering&& container.getWidth( )>scrollPane.getWidth()){
                 isHovering = true;
                 updateButtonVisibility(scrollPane.getHvalue());
             }
         });
 
-        sliderContainer.setOnMouseExited(e -> {
+        sliderContainer.setOnMouseExited(e ->{
             if(isHovering){
                 isHovering = false;
                 hideButton(leftButton, true);
@@ -291,7 +291,7 @@ public class ScrollViewSkin extends SkinBase<ScrollView> {
 
     /// Button logic in these methods you can see q boolean variable isLeft (True if it's the left button, False if it's the right button).
 
-    private Button createNavButton(boolean isLeft ) {
+    private Button createNavButton(boolean isLeft ){
         Button button = new Button();
         button.setBackground(Background.EMPTY );
         SVGPath svgPath =  new SVGPath();
@@ -303,7 +303,7 @@ public class ScrollViewSkin extends SkinBase<ScrollView> {
 
         button.setGraphic(svgPath);
 
-        button.setOnAction(event -> {
+        button.setOnAction(event ->{
             double currentHValue = scrollPane.getHvalue();
             double visibleItems = calculateVisibleItems();
             int itemCount = getSkinnable().getItems().size();
@@ -329,7 +329,7 @@ public class ScrollViewSkin extends SkinBase<ScrollView> {
         return button;
     }
 
-    private void showButton(Node button, boolean isLeft) {
+    private void showButton(Node button, boolean isLeft){
         Duration duration  = Duration.millis(250);
         Interpolator easing = Interpolator.EASE_OUT;
         button.setOpacity(1);
@@ -348,18 +348,18 @@ public class ScrollViewSkin extends SkinBase<ScrollView> {
         showTransition.play();
     }
 
-    private void hideButton(Node button, boolean isLeft) {
-        if (button.isVisible() && button.isManaged()) {
+    private void hideButton(Node button, boolean isLeft){
+        if (button.isVisible() && button.isManaged()){
             Duration duration = Duration.millis(200);
             ParallelTransition hideTransition = getParallelTransition(button, isLeft, duration);
             hideTransition.setOnFinished(event -> button.setOpacity(0));
             hideTransition.play();
-        } else {
+        } else{
             button.setOpacity(0);
         }
     }
 
-    private static ParallelTransition getParallelTransition(Node button, boolean isLeft, Duration duration) {
+    private static ParallelTransition getParallelTransition(Node button, boolean isLeft, Duration duration){
         Interpolator easing = Interpolator.EASE_IN;
 
         FadeTransition fadeOut = new FadeTransition(duration, button);
@@ -379,9 +379,9 @@ public class ScrollViewSkin extends SkinBase<ScrollView> {
 
     /// Animation logic to scroll the slider
 
-    private void animateScroll(double targetValue) {
+    private void animateScroll(double targetValue){
         // I used a Keyframe to make the animation smooth instead of a transition
-        if (scrollAnimation != null && scrollAnimation.getStatus() == Timeline.Status.RUNNING) {
+        if (scrollAnimation != null && scrollAnimation.getStatus() == Timeline.Status.RUNNING){
             scrollAnimation.stop();
         }
         scrollAnimation = new Timeline();
@@ -398,15 +398,15 @@ public class ScrollViewSkin extends SkinBase<ScrollView> {
         scrollAnimation.play();
     }
 
-    private double estimateItemWidth() {
-        if (!getSkinnable().getItems().isEmpty()) {
+    private double estimateItemWidth(){
+        if (!getSkinnable().getItems().isEmpty()){
             Node firstItem = getSkinnable().getItems().getFirst();
             return firstItem.getLayoutBounds().getWidth();
         }
         return 0;
     }
 
-    private double calculateVisibleItems() {
+    private double calculateVisibleItems(){
         double viewportWidth = scrollPane.getViewportBounds().getWidth();
         if (viewportWidth <= 0) return 0;
 
@@ -416,7 +416,7 @@ public class ScrollViewSkin extends SkinBase<ScrollView> {
         double spacing = getSkinnable().getSpacing();
         double itemWidthWithSpacing = itemWidth + spacing;
 
-        if (itemWidthWithSpacing <= 0) {
+        if (itemWidthWithSpacing <= 0){
             // Avoid division by zero
             return itemWidth > 0 ? 1 : 0;
         }
@@ -424,12 +424,12 @@ public class ScrollViewSkin extends SkinBase<ScrollView> {
         return Math.max(1.0, Math.floor(viewportWidth / itemWidthWithSpacing));
     }
 
-    private double calculateHValueChange(double visibleItems, int itemCount) {
+    private double calculateHValueChange(double visibleItems, int itemCount){
         double viewportWidth = scrollPane.getViewportBounds().getWidth();
         double itemWidth = estimateItemWidth();
         double spacing = getSkinnable().getSpacing();
 
-        if (itemCount <= 0 || itemWidth <= 0 || viewportWidth <= 0 || visibleItems <= 0) {
+        if (itemCount <= 0 || itemWidth <= 0 || viewportWidth <= 0 || visibleItems <= 0){
             return 0.0;
         }
         double totalContentWidth = (itemCount * itemWidth) + (itemCount > 1 ? (itemCount - 1) * spacing : 0);
@@ -453,7 +453,7 @@ public class ScrollViewSkin extends SkinBase<ScrollView> {
 
     ///Updates
 
-    private void onChanged(ListChangeListener.Change<? extends Node> change) {
+    private void onChanged(ListChangeListener.Change<? extends Node> change){
         updateContainerHeight();
     }
 
@@ -461,16 +461,16 @@ public class ScrollViewSkin extends SkinBase<ScrollView> {
      * Update the height of the control
      * it controls the height of the items and add a minimum space
      */
-    private void updateContainerHeight() {
+    private void updateContainerHeight(){
         double maxHeight = 0;
-        for (Node item : getSkinnable().getItems()) {
+        for (Node item : getSkinnable().getItems()){
             double itemHeight = item.getLayoutBounds().getHeight();
             if (itemHeight <= 0)
                 itemHeight = item.prefHeight(-1);
             maxHeight = Math.max(maxHeight, itemHeight);
         }
         maxHeight+= SPACE;
-        if (maxHeight > 0) {
+        if (maxHeight > 0){
             container.setMinHeight(maxHeight);
             container.setPrefHeight(maxHeight);
         }
@@ -481,8 +481,8 @@ public class ScrollViewSkin extends SkinBase<ScrollView> {
      * scroll position (height value) and whether the mouse is hovering over the slider area.
      * @param scrollValue The current height value of the ScrollPane (0.0 to 1.0).
      */
-    private void updateButtonVisibility(double scrollValue) {
-        if (!isHovering) {
+    private void updateButtonVisibility(double scrollValue){
+        if (!isHovering){
             hideButton(leftButton, true);
             hideButton(rightButton, false);
             return;
@@ -499,7 +499,7 @@ public class ScrollViewSkin extends SkinBase<ScrollView> {
             showButton(rightButton, false);
     }
 
-    private void updateSVGContent(Button button, String svgContent) {
+    private void updateSVGContent(Button button, String svgContent){
         if (button == null || button.getGraphic() == null)
             return;
         SVGPath svgPath = (SVGPath) button.getGraphic();
@@ -509,7 +509,7 @@ public class ScrollViewSkin extends SkinBase<ScrollView> {
             svgPath.setScaleX(-1);
     }
 
-    private void updateForeColor (Color color) {
+    private void updateForeColor (Color color){
         if (color == null) return;
         titleLabel.setFill(color);
         separator.setStroke(getLinearGradient(color));
@@ -518,7 +518,7 @@ public class ScrollViewSkin extends SkinBase<ScrollView> {
 
     }
 
-    private LinearGradient getLinearGradient (Color color) {
+    private LinearGradient getLinearGradient (Color color){
         return new LinearGradient(
                 0, 0,
                 1, 0,
@@ -530,7 +530,7 @@ public class ScrollViewSkin extends SkinBase<ScrollView> {
         );
     }
 
-    private Background getOverlayGradientBackgroundFill(Color color, boolean isLeft) {
+    private Background getOverlayGradientBackgroundFill(Color color, boolean isLeft){
         return Background.fill(
                 new LinearGradient(isLeft? 0:1,0,
                         isLeft? 1:0, 0,
@@ -542,11 +542,11 @@ public class ScrollViewSkin extends SkinBase<ScrollView> {
     }
 
     @Override
-    public void dispose() {
+    public void dispose(){
         ScrollView control = getSkinnable();
         if (scrollAnimation != null)
             scrollAnimation.stop();
-        if (control != null) {
+        if (control != null){
             if (layoutBoundsListener != null)
                 control.layoutBoundsProperty().removeListener(layoutBoundsListener);
             if (widthListener != null)
@@ -560,15 +560,15 @@ public class ScrollViewSkin extends SkinBase<ScrollView> {
             if (edgeColorListener != null)
                 control.edgeColorProperty().removeListener(edgeColorListener);
         }
-        if (sliderContainer != null) {
+        if (sliderContainer != null){
             sliderContainer.setOnMouseEntered(null);
             sliderContainer.setOnMouseExited(null);
         }
         if (titleLabel != null)
             titleLabel.textProperty().unbind();
-        if (container != null) {
+        if (container != null){
             container.spacingProperty().unbind();
-            if (control != null && control.getItems() != null) {
+            if (control != null && control.getItems() != null){
                 Bindings.unbindContent(container.getChildren(), control.getItems());
             }
         }

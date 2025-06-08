@@ -56,12 +56,10 @@ public class SettingsViewController {
     public void setAccount(Account account) {
         this.account = account;
         loadView("/com/esa/moviestar/settings/account-setting-view.fxml");
-        System.out.println("SettingsViewController: email " + account.getEmail());
     }
 
     public void setUser(User user) {
         this.user = user;
-        System.out.println("SettingsViewController = user : " + user.getName() + " email user : " + user.getEmail() + " id user : " + user.getID());
     }
 
     public static final String PATH_CARD_VERTICAL = "/com/esa/moviestar/movie_view/FilmCard_Vertical.fxml";
@@ -87,7 +85,7 @@ public class SettingsViewController {
                 Parent backHomeView = loader.load();
 
                 MainPagesController mainPagesController = loader.getController();
-                mainPagesController.first_load(user, account);
+                mainPagesController.load(user, account);
 
                 Scene currentScene = container.getScene();
                 Scene newScene = new Scene(backHomeView, currentScene.getWidth(), currentScene.getHeight());
@@ -156,27 +154,22 @@ public class SettingsViewController {
 
             if (loader.getController() instanceof AccountSettingController controller) {
                 controller.setAccount(account);
-                controller.setUtente(user);
+                controller.setUser(user);
                 controller.setContainer(container);
             }
 
             if (loader.getController() instanceof HistorySettingController controller) {
-                controller.setAccount(account);
                 controller.setScene(this);
-                controller.setUser(user);
+                controller.updateHistory(user);
             }
 
             if (loader.getController() instanceof WatchListController controller) {
-                controller.setAccount(account);
                 controller.setScene(this);
-                controller.setUser(user);
-
-
+                controller.updateWatchList(user);
             }
             if (loader.getController() instanceof FavouriteSettingController controller) {
-                controller.setAccount(account);
                 controller.setScene(this);
-                controller.setUser(user);
+                controller.updateFavourite(user);
 
 
             }
@@ -195,10 +188,10 @@ public class SettingsViewController {
                 if (Desktop.isDesktopSupported() && Desktop.getDesktop().isSupported(Desktop.Action.BROWSE)) {
                     Desktop.getDesktop().browse(uri);
                 } else {
-                    System.err.println("Apertura browser non supportata");
+                    System.err.println("SettingsViewController: Can't open url");
                 }
             } catch (Exception ex) {
-                System.err.println("Error loading github web page"+ex.getMessage());
+                System.err.println("SettingsViewController: Error loading github web page"+ex.getMessage());
             }
         });
     }
@@ -235,18 +228,18 @@ public class SettingsViewController {
                 UserDao dao  = new UserDao();
                 if(obt instanceof HistorySettingController){
                     dao.deleteHistory(user.getID(), content.getId());
-                    ((HistorySettingController)obt).setUser(user);
+                    ((HistorySettingController)obt).updateHistory(user);
                 }
 
                 else if (obt instanceof WatchListController) {
                     dao.deleteWatchlist(user.getID(), content.getId());
-                    ((WatchListController)obt).setUser(user);
+                    ((WatchListController)obt).updateWatchList(user);
 
                 }
 
                 else if (obt instanceof FavouriteSettingController){
                     dao.deleteFavourite(user.getID(), content.getId());
-                    ((FavouriteSettingController)obt).setUser(user);
+                    ((FavouriteSettingController)obt).updateFavourite(user);
 
                 }
 
@@ -257,7 +250,7 @@ public class SettingsViewController {
                 node.setOnMouseClicked(e -> homePage(user , content.getId(), content.isSeries()));
                 nodes.add(nodeContainer);
             } else {
-                System.err.println("FilmCardController is null for " + cardPath);
+                System.err.println("SettingsViewController: FilmCardController is null for " + cardPath);
             }
         }
 
@@ -270,14 +263,14 @@ public class SettingsViewController {
             Parent homeContent = loader.load();
 
             MainPagesController mainPagesController = loader.getController();
-            mainPagesController.filmClicked(user,account,content,series);
+            mainPagesController.loadForShowingFilmScene(user,account,content,series);
             Scene currentScene = container.getScene();
             Scene newScene = new Scene(homeContent, currentScene.getWidth(), currentScene.getHeight());
             Stage stage = (Stage) container.getScene().getWindow();
             stage.setScene(newScene);
 
         }catch(IOException e){
-            System.err.println("ProfileView: Error to load the home page"+e.getMessage());
+            System.err.println("SettingsViewController: Error to load the home page"+e.getMessage());
         }
     }
 

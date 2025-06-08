@@ -154,7 +154,6 @@ Button {
     -fx-font-size: 14px;
     -fx-background-color: transparent;
     -fx-border-color: transparent;
-    -fx-cursor: hand;
     -fx-alignment: CENTER_LEFT;
 }
 
@@ -169,17 +168,16 @@ Button {
     -fx-pref-width: 200px;
     -fx-alignment: center;
     -fx-background-color: rgba(100, 100, 100, 0.7);
-    -fx-cursor: hand;
 }
 
 /* Button hover effect */
 .button-text:hover {
-    -fx-background-color: linear-gradient(to bottom right, #7341BE, #432570);
+    -fx-background-color: linear-gradient(to bottom right, #7341BE, #381e5e);
 }
 
 /* Button pressed effect */
 .button-text:pressed {
-    -fx-background-color: linear-gradient(to bottom right, #262626, #101010);
+    -fx-background-color: linear-gradient(to bottom right, #432570, #381e5e);
 }
 /* ========== PASSWORD TOGGLE BUTTON ========== */
 
@@ -197,7 +195,6 @@ Button {
     -fx-max-height: 30px;
     -fx-border-radius: 16px;
     -fx-background-radius:16px;
-    -fx-cursor: hand;
     -fx-padding: 0;
     -fx-effect: null;
 }

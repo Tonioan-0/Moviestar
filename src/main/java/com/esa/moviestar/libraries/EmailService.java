@@ -38,17 +38,17 @@ public class EmailService {
             message.setSubject(subject, "UTF-8");
 
             // Set proper headers
-            message.setHeader("Content-Type", "text/plain; charset=UTF-8");
-            message.setSentDate(new java.util.Date());
-            message.setReplyTo(InternetAddress.parse(this.senderEmail));
+            message.setHeader("Content-Type",  "text/plain; charset=UTF-8");
+            message.setSentDate( new java.util.Date());
+            message.setReplyTo(InternetAddress.parse( this.senderEmail));
 
             // Set body with UTF-8
             message.setContent(body, "text/plain; charset=UTF-8");
 
             Transport.send(message);
-            System.out.println("Email sent successfully to " + recipientEmail);
+            System.out.println("EmailService: Email sent successfully to " + recipientEmail);
         } catch (MessagingException e) {
-            System.err.println("Failed to send email: " + e.getMessage());
+            System.err.println("EmailService: Failed to send email: " + e.getMessage());
             throw e;
         }
     }

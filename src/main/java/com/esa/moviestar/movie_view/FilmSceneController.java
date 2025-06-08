@@ -122,7 +122,6 @@ public class FilmSceneController {
             addToFavouriteButton.setOnMouseClicked(event -> addToFavourites());
         }
 
-        System.out.println("FilmSceneController initialized.");
     }
 
     /**
@@ -132,8 +131,6 @@ public class FilmSceneController {
      * @param isMovie   true for movie, false for TV series
      */
     public void loadContent(int contentId, boolean isMovie) {
-        System.out.println("Loading " + (isMovie ? "movie" : "TV series") + " with ID: " + contentId);
-
         // Show loading state
         showLoadingState();
 
@@ -157,7 +154,6 @@ public class FilmSceneController {
                             displayMovieContent();
                         } catch (Exception e) {
                             System.err.println("Error parsing movie data: " + e.getMessage());
-                            e.printStackTrace();
                             showErrorState();
                         }
                     });
@@ -165,7 +161,6 @@ public class FilmSceneController {
                 .exceptionally(ex -> {
                     Platform.runLater(() -> {
                         System.err.println("Error loading movie data: " + ex.getMessage());
-                        ex.printStackTrace();
                         showErrorState();
                     });
                     return null;
@@ -185,7 +180,6 @@ public class FilmSceneController {
                             displaySeriesContent();
                         } catch (Exception e) {
                             System.err.println("Error parsing series data: " + e.getMessage());
-                            e.printStackTrace();
                             showErrorState();
                         }
                     });
@@ -193,7 +187,6 @@ public class FilmSceneController {
                 .exceptionally(ex -> {
                     Platform.runLater(() -> {
                         System.err.println("Error loading series data: " + ex.getMessage());
-                        ex.printStackTrace();
                         showErrorState();
                     });
                     return null;
@@ -434,8 +427,8 @@ public class FilmSceneController {
             seasonsDropdownButton.getStyleClass().addAll("seasons-dropdown-button","small-item","on-primary","primary-border");
             seasonsDropdownButton.setPrefHeight(35);
             seasonsDropdownButton.setOnAction(e -> popUpSeasonContainer());
-            if (currentContent.getSeasons() != null && !currentContent.getSeasons().isEmpty() && currentContent.getSeasons().get(0) != null) {
-                FilmSeriesDetails.SeasonDetails season = currentContent.getSeasons().get(0);
+            if (currentContent.getSeasons() != null && !currentContent.getSeasons().isEmpty() && currentContent.getSeasons().getFirst() != null) {
+                FilmSeriesDetails.SeasonDetails season = currentContent.getSeasons().getFirst();
                 if (season.getName() != null && !season.getName().isEmpty()) {
                     seasonsDropdownButton.setText(season.getName());
                 }
@@ -719,7 +712,7 @@ public class FilmSceneController {
             } catch (Exception e) {
                 // Catch any other unexpected errors during image instantiation or setting
                 System.err.println("Failed to load backdrop image: " + backdropUrl + " - " + e.getMessage());
-                e.printStackTrace(); // Good for debugging
+
                 // heroImageView.setImage(null); // or some default error image
             }
         } else {
@@ -822,7 +815,7 @@ public class FilmSceneController {
 
             } catch (IOException e) {
                 System.err.println("\"FilmSceneController: Error to load player, message: " + e.getMessage());
-                e.printStackTrace();
+
             }
         });
     }

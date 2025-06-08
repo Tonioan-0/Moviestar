@@ -28,9 +28,6 @@ public class ModifyProfileController extends BaseProfileController {
 
     public void setUser(User user) {
         this.user = user;
-        System.out.println("ModifyProfileView = user : " + user.getName() +
-                " id user : " + user.getID() +
-                " email user : " + user.getEmail());
 
         textName.setText(user.getName());
         codCurrentImage = user.getIDIcon();
@@ -89,7 +86,7 @@ public class ModifyProfileController extends BaseProfileController {
         boolean success = dao.updateUser(user);
 
         if (!success) {
-            System.out.println("Error saving changes.");
+            System.out.println("ModifyProfileController: Error saving changes.");
         }
         return success;
     }
@@ -101,7 +98,7 @@ public class ModifyProfileController extends BaseProfileController {
             } else if (source == Origine.SETTINGS) {
                 loadSettingsPage();
             } else {
-                System.err.println("Unrecognized source:" + source);
+                System.err.println("ModifyProfileController: Unrecognized source:" + source);
             }
         } catch (IOException e) {
             System.err.println("ModifyController: The page could not be loaded. " + e.getMessage());
