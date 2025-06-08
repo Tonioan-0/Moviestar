@@ -292,7 +292,8 @@ public class ContentDao {
         results.forEach(this::fetchAndSetGenresForContentList);
         return results;
     }
-    public List<Content> getContentFromQuery(String query){
+    public List<Content> getContentFromQuery(String title){
+        String query="SELECT DISTINCT * , 0 AS List FROM Content C WHERE C.title LIKE '%" + title + "%'";
         return getContentFromDB(query,1).get(0);
     }
     public String buildGenreFilter(String genreIdsString) {

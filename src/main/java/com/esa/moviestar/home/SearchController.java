@@ -18,6 +18,7 @@ import javafx.scene.paint.CycleMethod;
 import javafx.scene.paint.LinearGradient;
 import javafx.scene.paint.Stop;
 import javafx.scene.shape.Line;
+import javafx.scene.shape.SVGPath;
 
 import java.io.IOException;
 import java.util.*;
@@ -48,6 +49,7 @@ public class SearchController {
     private static final int TOP_N_COUNT_FOR_RICH_DISPLAY = 20;
     private static final int MAX_LABEL_LIKE_COUNT = 15;
     private static final int MIN_LABEL_LIKE_DISPLAY_COUNT = 5;
+    private static final int MIN_CONTENT_RICH_DISPLAY = 8;
 
 
     public void initialize() {
@@ -149,14 +151,14 @@ public class SearchController {
                                 .collect(Collectors.toCollection(ArrayList::new));
 
                         // Supplement forRichDisplay from DB if it's not full yet
-                        if (forRichDisplay.size() < TOP_N_COUNT_FOR_RICH_DISPLAY) {
+                        if (forRichDisplay.size() < MIN_CONTENT_RICH_DISPLAY) {
                             ContentDao contentdao = new ContentDao();
                             String sanitizedSearchTermForDb = searchText.replace("'", "''"); // Basic sanitization for LIKE
                             String queryDb = "SELECT DISTINCT * , 0 AS List FROM Content C WHERE C.title LIKE '%" + sanitizedSearchTermForDb + "%'";
                             List<Content> dbContentList = contentdao.getContentFromQuery(queryDb);
 
                             for (Content dbContent : dbContentList) {
-                                if (forRichDisplay.size() >= TOP_N_COUNT_FOR_RICH_DISPLAY) {
+                                if (forRichDisplay.size() >= MIN_CONTENT_RICH_DISPLAY) {
                                     break;
                                 }
                                 if (dbContent.getTitle() != null && !dbContent.getTitle().trim().isEmpty()) {
@@ -184,6 +186,11 @@ public class SearchController {
                                 System.err.println("SearchController: NullPointerException during film node creation. Check setupController: " + e.getMessage());
                             }
                         }
+                        else{
+                            SVGPath path = new SVGPath();
+                            path.setContent("M 100 100 L 300 100 L 200 300 Z");
+                            filmSeriesRecommendations.getChildren().add(path);
+                        }
 
                         List<Content> forLabelLikeDisplay = uniquePopularContentFromApi.stream()
                                 .filter(content -> !seen.containsKey(content.getTitle().toLowerCase()))
@@ -194,8 +201,7 @@ public class SearchController {
                         if (forLabelLikeDisplay.size() < MIN_LABEL_LIKE_DISPLAY_COUNT) {
                             ContentDao contentdao = new ContentDao();
                             String sanitizedSearchTermForDb = searchText.replace("'", "''");
-                            String queryDb = "SELECT DISTINCT * , 0 AS List FROM Content C WHERE C.title LIKE '%" + sanitizedSearchTermForDb + "%' ORDER BY popularity DESC"; // Assuming a popularity column
-                            List<Content> dbContentList = contentdao.getContentFromQuery(queryDb);
+                            List<Content> dbContentList = contentdao.getContentFromQuery(sanitizedSearchTermForDb);
 
                             for (Content dbContent : dbContentList) {
                                 if (forLabelLikeDisplay.size() >= MIN_LABEL_LIKE_DISPLAY_COUNT) {
@@ -266,9 +272,19 @@ public class SearchController {
             itemContainer.getChildren().add(button);
 
             if (i < contentList.size() - 1) {
-                Line verticalSeparator = new Line(0, 0, 0, 20);
-                verticalSeparator.setStrokeWidth(1.0);
-                verticalSeparator.setStroke(Color.LIGHTGRAY);
+                Line verticalSeparator = new Line(0, 0, 0, 40);
+                verticalSeparator.setStrokeWidth(1.5);
+
+                verticalSeparator.setStroke(
+                        new LinearGradient(
+                                0, 0,
+                                0, 1,
+                                true,
+                                CycleMethod.NO_CYCLE,
+                                new Stop(0.0, Color.TRANSPARENT),
+                                new Stop(0.5, Color.WHITE),
+                                new Stop(1.0, Color.TRANSPARENT)
+                        ));
                 HBox.setMargin(verticalSeparator, new Insets(0, 8, 0, 8));
                 itemContainer.getChildren().add(verticalSeparator);
             }
