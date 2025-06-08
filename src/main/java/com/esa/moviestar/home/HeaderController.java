@@ -19,7 +19,6 @@ import javafx.scene.text.Text;
 import java.util.List;
 
 
-
 public class HeaderController {
     @FXML
     HBox navContainer;
@@ -107,7 +106,7 @@ public class HeaderController {
 
 
     private void setupPopupMenu(MainPagesController mainPagesController, Account account, User user, List<User> users) {
-        // Create the popup menu - no stage needed
+        // Create the popup menu, It should close and dispose when an item is clicked
         popupMenu = new PopupMenu();
 
         // Add menu items
@@ -126,7 +125,7 @@ public class HeaderController {
         settingsItem.getChildren().addAll(profileIcon, text);
         settingsItem.setOnMouseClicked(e -> {
                     mainPagesController.settingsClick(user,account);
-                    popupMenu.close();
+                    popupMenu.dispose();
                 }
         );
 
@@ -151,7 +150,7 @@ public class HeaderController {
         Text logoutText = new Text("Logout") {{
             getStyleClass().addAll("medium-text", "on-primary");
         }};
-        emailButton.setOnMouseClicked(e -> {mainPagesController.emailClick();popupMenu.close();});
+        emailButton.setOnMouseClicked(e -> {mainPagesController.emailClick();popupMenu.dispose();});
         emailButton.getChildren().addAll(logoutIcon, logoutText);
         popupMenu.addItem(emailButton);
 
@@ -169,7 +168,7 @@ public class HeaderController {
             getStyleClass().addAll("medium-text", "on-primary");
         }};
         item.getChildren().addAll(profileIcon, text);
-        item.setOnMouseClicked(e -> {mainPagesController.profileClick(user);popupMenu.close();});
+        item.setOnMouseClicked(e -> {mainPagesController.profileClick(user);popupMenu.dispose();});
         popupMenu.addItem(item);
 
     }
@@ -197,7 +196,7 @@ public class HeaderController {
             getStyleClass().addAll("medium-text", "on-primary");
         }};
         item.getChildren().addAll(cross, text);
-        item.setOnMouseClicked(e -> {mainPagesController.createProfileUser(account);popupMenu.close();});
+        item.setOnMouseClicked(e -> {mainPagesController.createProfileUser(account);popupMenu.dispose();});
         popupMenu.addItem(item);
 
     }

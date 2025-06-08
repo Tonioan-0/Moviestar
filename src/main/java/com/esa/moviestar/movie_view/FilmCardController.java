@@ -18,7 +18,10 @@ import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-
+/**
+ * Film card controller is the controller of two fxml (FilmCard_Vertical.fxml and FilmCard_Horizontal.fxml)
+ * The idea beyond that was to make an object very similar to googleTV and Prime but with the intention of give the user the main information of the movie/series
+ */
 public class FilmCardController {
     @FXML
     ImageView imgView;
@@ -42,7 +45,7 @@ public class FilmCardController {
     Label ratingLabel;
 
     public int _id;
-    private Color color; // This will store the calculated color
+    private Color color;
 
 
     private static final ExecutorService imageProcessingExecutor =
@@ -63,19 +66,20 @@ public class FilmCardController {
         else
             descriptionLabel.setText("");
 
-        //In the first design (before the inclusion of the api)we have thought to be a modern and simple user
+        //In the first design (before the inclusion of the api we have thought to be a modern and simple user
         // function to give at the final user a data like the duration of the movie, the number of episodes of a series  or the number of season
-//        if(content.isSeasonDivided()){
-//            timeLabel.setText(content.getSeasonCount()+" Seasons");
-//            durationIcon.setContent(resources.getString("season"));
-//        }
-//        else if(content.isSeries()){
-//            timeLabel.setText(content.getEpisodeCount() +" Episodes");
-//            durationIcon.setContent(resources.getString("episodes"));
-//        }
-//        else{
-//            timeLabel.setText(((int)content.getTime()/60)+"h "+((int)content.getTime()%60)+"min" );
-//            durationIcon.setContent(resources.getString("clock"));}
+        /*
+        if(content.isSeasonDivided()){
+            timeLabel.setText(content.getSeasonCount()+" Seasons");
+            durationIcon.setContent(resources.getString("season"));
+        }
+        else if(content.isSeries()){
+            timeLabel.setText(content.getEpisodeCount() +" Episodes");
+            durationIcon.setContent(resources.getString("episodes"));
+        }
+        else{
+            timeLabel.setText(((int)content.getTime()/60)+"h "+((int)content.getTime()%60)+"min" );
+            durationIcon.setContent(resources.getString("clock"));}*/
 
         if(content.getRating() == 10.0)
             ratingLabel.setText("10");
@@ -152,32 +156,32 @@ public class FilmCardController {
         Rectangle clip = new Rectangle();
         clip.widthProperty().bind(cardContainer.widthProperty());
         clip.heightProperty().bind(cardContainer.heightProperty());
-        //the cards are medium item so have a radius of 24px, to have the same radius for the clip we need arc at radius*2
+        //The cards are medium item so have a radius of 24px, to have the same radius for the clip we need arc at radius*2
         clip.setArcWidth(48);
         clip.setArcHeight(48);
         cardContainer.setClip(clip);
 
         Duration duration = Duration.millis(250);
 
-        TranslateTransition contentEnterTransition = new TranslateTransition(duration, contentPane);
+        TranslateTransition contentEnterTransition = new TranslateTransition( duration, contentPane);
         contentEnterTransition.setToY(0);
         FadeTransition metadataFadeOut = new FadeTransition(duration, metadataPane);
         metadataFadeOut.setToValue(0);
         FadeTransition contentFadeIn = new FadeTransition(duration, contentPane);
         contentFadeIn.setToValue(1);
 
-        TranslateTransition contentExitTransition = new TranslateTransition(duration, contentPane);
+        TranslateTransition contentExitTransition = new TranslateTransition(duration, contentPane) ;
         contentExitTransition.setToY(50);
         FadeTransition metadataFadeIn = new FadeTransition(duration, metadataPane);
         metadataFadeIn.setToValue(1);
         FadeTransition contentFadeOut = new FadeTransition(duration, contentPane);
-        contentFadeOut.setToValue(0);
+        contentFadeOut.setToValue(0 );
 
         ParallelTransition onHover = new ParallelTransition(contentEnterTransition, metadataFadeOut, contentFadeIn);
-        ParallelTransition onExit = new ParallelTransition(contentExitTransition, metadataFadeIn, contentFadeOut);
+        ParallelTransition onExit = new ParallelTransition( contentExitTransition,  metadataFadeIn , contentFadeOut);
 
 
-        cardContainer.hoverProperty().addListener((observable, oldValue, isHovering) -> {
+        cardContainer.hoverProperty().addListener((observable,  oldValue, isHovering) -> {
             Color currentDominantColor = this.color; // Use the member variable
 
             if (isHovering) {
@@ -191,15 +195,14 @@ public class FilmCardController {
                         ),
                         new Stop(1,
                                 currentDominantColor==null  ?
-                                        Color.rgb(115, 65, 190) :
-                                        currentDominantColor
+                                        Color.rgb(115, 65, 190) : currentDominantColor
                         )
                 );
 
                 gradientOverlay.setBackground(Background.fill(hoverGradient));
                 onHover.play();
             } else {
-                onHover.stop(); // Stop hover animations if any
+                onHover.stop();
                 LinearGradient normalGradient = new LinearGradient(0, 0, 0, 1, true, CycleMethod.NO_CYCLE,
                         new Stop(0.6, Color.TRANSPARENT),
                         new Stop(1, Objects.requireNonNullElseGet(currentDominantColor, () -> Color.rgb(115, 65, 190))));
@@ -223,7 +226,7 @@ public class FilmCardController {
 
         double totalRed = 0;
         double totalGreen = 0;
-        double totalBlue = 0;
+        double totalBlue =  0;
 
 
         int numPixels = width * height;
@@ -231,7 +234,6 @@ public class FilmCardController {
         int sampleStride = numPixels > 0 ? Math.max(1, (int) Math.sqrt((double)numPixels / desiredSamples)) : 1;
 
         int samplesCount = 0;
-
         for (int y = 0; y < height; y += sampleStride) {
             for (int x = 0; x < width; x += sampleStride) {
                 try {
@@ -241,7 +243,7 @@ public class FilmCardController {
                     totalBlue += pixelColor.getBlue();
                     samplesCount++;
                 } catch (Exception e) {
-                    System.err.println("FilmCardController: Error processing image color");
+                    System.err.println("FilmCardController: Error processing image color" );
                 }
             }
         }
@@ -249,12 +251,11 @@ public class FilmCardController {
         if (samplesCount == 0)
             return null;
 
-
-        double avgRed = totalRed / samplesCount;
+        double avgRed =  totalRed /  samplesCount;
         double avgGreen = totalGreen / samplesCount;
         double avgBlue = totalBlue / samplesCount;
 
-        double brightness = 0.299 * avgRed + 0.587 * avgGreen + 0.114 * avgBlue;
+        double brightness = 0.299 *  avgRed + 0.587 * avgGreen + 0.114 * avgBlue;
 
         if (brightness > 0.75) {
             double reductionFactor = 0.75 / brightness;
@@ -273,15 +274,4 @@ public class FilmCardController {
         return _id;
     }
 
-    public static void shutdownExecutor() {
-        imageProcessingExecutor.shutdown();
-        try {
-            if (!imageProcessingExecutor.awaitTermination(800, java.util.concurrent.TimeUnit.MILLISECONDS)) {
-                imageProcessingExecutor.shutdownNow();
-            }
-        } catch (InterruptedException e) {
-            imageProcessingExecutor.shutdownNow();
-            Thread.currentThread().interrupt();
-        }
-    }
 }

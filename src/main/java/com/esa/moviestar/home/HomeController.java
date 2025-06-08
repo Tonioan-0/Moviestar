@@ -4,6 +4,7 @@ import com.esa.moviestar.Main;
 import com.esa.moviestar.database.ContentDao;
 import com.esa.moviestar.components.Carousel;
 import com.esa.moviestar.components.ScrollView;
+import com.esa.moviestar.database.UserDao;
 import com.esa.moviestar.model.Content;
 import com.esa.moviestar.model.User;
 import com.esa.moviestar.movie_view.WindowCardController;
@@ -35,7 +36,11 @@ public class HomeController {
                 Node body = loader.load();
                 WindowCardController windowCardController  = loader.getController();
                 windowCardController.setContent(c);
-                windowCardController.getPlayButton().setOnMouseClicked(e->mainPagesController.cardClickedPlay(c.getVideoUrl()));
+                windowCardController.getPlayButton().setOnMouseClicked(e-> {
+                    UserDao userDao = new UserDao();
+                    userDao.insertHistoryContent(user.getID(),c.getId());
+                    mainPagesController.cardClickedPlay(c.getVideoUrl());
+                });
                 windowCardController.getInfoButton().setOnMouseClicked(e->mainPagesController.openFilmScene(windowCardController.getCardId(),c.isSeries()));
                 carouselList.add(body);
             }
@@ -78,7 +83,7 @@ public class HomeController {
             }
 
             if (!contentList.get(7).isEmpty()) {
-                ScrollView favouriteScroll = new ScrollView("Favourites:", Color.rgb(155, 155, 155), MainPagesController.BACKGROUND_COLOR, null, 32.0);
+                ScrollView favouriteScroll = new ScrollView("Favourites:", Color.rgb(31, 31, 31), MainPagesController.BACKGROUND_COLOR, null, 32.0);
                 favouriteScroll.setContent(mainPagesController.createFilmNodes( contentList.get(7), true));
                 scrollViewContainer.getChildren().add(favouriteScroll);
             }

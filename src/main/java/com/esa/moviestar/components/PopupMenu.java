@@ -11,12 +11,21 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+/**
+ * The popupMenu provides a customizable popup menu component.
+ * It supports single or multiple columns of menu items.
+ * The menu can be dynamically populated with any  Node, and includes
+ * options for adding separators and controlling the display position relative to an anchor node.
+ * This component is styled to integrate with the application (it use general.css)
+ * Sources:
+ * <a href="https://docs.oracle.com/javase/8/javafx/api/javafx/stage/Popup.html">...</a>
+ */
 public class PopupMenu {
 
     private final Popup popup;
     private final HBox columnsContainer;
     private final List<VBox> columns;
-    private double columnWidth = 256;
+    private double columnWidth ;
     private int   columnsCount = 1;
     private boolean positionShowLeft = true;
 
@@ -102,10 +111,7 @@ public class PopupMenu {
         columns.get(columnIndex ).getChildren().add(new VBox() {{ setHeight(4); }});
     }
 
-    /**
-     * Adds a new column to the popup menu
-     * @return the index of the newly added column
-     */
+
     public int addColumn() {
         VBox newColumn = createColumn();
         columns.add(newColumn );
@@ -114,10 +120,7 @@ public class PopupMenu {
         return   columnsCount - 1;
     }
 
-    /**
-     * Gets the total number of columns
-     * @return the number of columns
-     */
+
     public int getNumberOfColumns() {
         return   columnsCount;
     }
@@ -135,15 +138,11 @@ public class PopupMenu {
         double posY = anchorY + anchor.getBoundsInLocal().getHeight();
         popup.show(anchor.getScene().getWindow(), anchorX, posY);
     }
-    /**
-     * Close the popup menu
-     */
+
     public void close() {
         this.popup.hide();
     }
-    /**
-     * Disposes of the popup menu and releases its resources.
-     */
+
     public void dispose() {
         close();
         if (columns != null) {

@@ -20,9 +20,11 @@ import javafx.stage.Window;
 import java.util.ArrayList;
 import java.util.List;
 
+//To facilitate understanding, I've organized this class in a manner that allows information to be collapsed, making it more easily understandable ⁓Antonio D'Ambrosio
+
 public class CarouselSkin extends SkinBase<Carousel> {
 
-    // --- Constants ---
+    //Constants
     private static final double CENTER_SCALE = 1.5;
     private static final double SIDE_SCALE = 1.0;
     private static final double CARD_OVERLAP = 0.85;
@@ -32,13 +34,13 @@ public class CarouselSkin extends SkinBase<Carousel> {
     private static final Duration AUTO_ROTATION_INTERVAL = Duration.seconds(10);
     private static final double DEFAULT_SIZE = 16;
 
-    // --- UI Components ---
+    //UI Components
     private final VBox mainContainer;
     private final HBox cardsContainer;
     private final HBox dotsContainer;
     private final Rectangle clipRect;
 
-    // --- State & Properties ---
+    //State & Properties
     private Timeline animationTimeline;
     private Timeline autoRotationTimeline;
     private final List<Node> cardWrappers;
@@ -47,6 +49,7 @@ public class CarouselSkin extends SkinBase<Carousel> {
     private boolean autoRotationEnabled = false;
     private double dynamicSlideDistance = 450;
 
+    /// Constructor and main methods
     /**
      * Constructor for the CarouselSkin.
      * @param control The Carousel control this skin is for.
@@ -76,7 +79,7 @@ public class CarouselSkin extends SkinBase<Carousel> {
         animationTimeline = new Timeline();
         autoRotationTimeline = createAutoRotationTimeline();
 
-        control.getItems().addListener((ListChangeListener<? super Node>) (c) ->  Platform.runLater(this::rebuildCarousel));
+        control.getItems().addListener((ListChangeListener<? super Node>) (c) ->  Platform.runLater(this::buildCarousel));
 
         control.currentIndexProperty().addListener((obs, oldVal, newVal) ->
                 handleIndexChange(oldVal, newVal));
@@ -92,111 +95,10 @@ public class CarouselSkin extends SkinBase<Carousel> {
                     adjustHeightToScreenPercentage(control));
         });
 
-        rebuildCarousel();
+        buildCarousel();
     }
 
-    /**
-     * Starts the automatic rotation of the carousel
-     */
-    public void start() {
-        if (autoRotationEnabled || getSkinnable().getItems().size() <= 1)
-            return;
-        autoRotationEnabled = true;
-        autoRotationTimeline.play();
-    }
-
-    /**
-     * Stops the rotation of the carousel.
-     */
-    public void stop() {
-        if (!autoRotationEnabled)
-            return;
-        autoRotationEnabled = false;
-        autoRotationTimeline.stop();
-    }
-
-    /**
-     * Creates a timeline for auto-rotation.
-     */
-    private Timeline createAutoRotationTimeline() {
-        Timeline timeline = new Timeline();
-        timeline.setCycleCount(Timeline.INDEFINITE);
-
-        KeyFrame keyFrame = new KeyFrame(AUTO_ROTATION_INTERVAL, event -> {
-            if (!animationInProgress && getSkinnable().getItems().size() > 1) {
-                int nextIndex = normalizeIndex(currentDisplayedIndex + 1, getSkinnable().getItems().size());
-                getSkinnable().goTo(nextIndex);
-            }
-        });
-
-        timeline.getKeyFrames().add(keyFrame);
-        return timeline;
-    }
-
-
-    private void adjustHeightToScreenPercentage(Carousel control) {
-        Scene scene = control.getScene();
-        if (scene == null)
-            return;
-        Window window = scene.getWindow();
-        if (window == null)
-            return;
-        double screenHeight = window.getHeight();
-        double carouselHeight = screenHeight * SCREEN_HEIGHT_PERCENTAGE;
-        control.setPrefHeight(carouselHeight);
-        control.setMinHeight(800);
-        control.setMaxHeight(carouselHeight * 1.2);
-    }
-
-
-    private void updateDynamicLayoutValues() {
-        double width = cardWrappers.stream().mapToDouble(node -> node.getBoundsInLocal().getWidth()).max().orElse(0);
-        if (width <= 0)
-            return;
-        double dynamicCardOverlap = width * CARD_OVERLAP;
-        cardsContainer.setSpacing(-dynamicCardOverlap);
-        dynamicSlideDistance = width * SLIDE_DISTANCE;
-    }
-
-
-    private void handleIndexChange(int oldIndex, int newIndex) {
-        if (animationInProgress) {
-            return;
-        }
-
-        int n = getSkinnable().getItems().size();
-        if (n == 0) return;
-
-        // Normalize indices to be within bounds [0, n-1]
-        int normalizedOldIndex = normalizeIndex(oldIndex, n);
-        int normalizedNewIndex = normalizeIndex(newIndex, n);
-
-        if (normalizedOldIndex == normalizedNewIndex) {
-            return;
-        }
-
-        // Determine if it's a jump (more than 1 step or initial load)
-        boolean isJump = oldIndex == -1 || Math.abs(normalizedOldIndex - normalizedNewIndex) > 1;
-        // Handle the wrap-around case as a non-jump animation
-        if (Math.abs(normalizedOldIndex - normalizedNewIndex) == n - 1) {
-            isJump = false;
-        }
-
-        if (isJump) {
-            jumpToIndex(normalizedNewIndex, false);
-        } else {
-            animateToIndex(normalizedNewIndex);
-        }
-    }
-
-
-    private int normalizeIndex(int index, int itemCount) {
-        if (itemCount == 0) return 0;
-        return ((index % itemCount) + itemCount) % itemCount;
-    }
-
-
-    private void rebuildCarousel() {
+    private void buildCarousel() {
         if (animationTimeline != null) {
             animationTimeline.stop();
             animationInProgress = false;
@@ -230,6 +132,36 @@ public class CarouselSkin extends SkinBase<Carousel> {
         adjustHeightToScreenPercentage(getSkinnable());
         jumpToIndex(0, true);
 
+    }
+
+    private void updateDots(int activeIndex ) {
+        int itemCount = getSkinnable().getItems().size();
+        if (itemCount == 0) return;
+        int normalizedActiveIndex = normalizeIndex(activeIndex, itemCount);
+
+        for (int i = 0; i < dotsContainer.getChildren().size(); i++) {
+            Node node = dotsContainer.getChildren().get( i);
+            if (node instanceof Button dot) {
+                if(i == normalizedActiveIndex)// is active
+                    dot.getStyleClass().add( "carousel-dot-active");
+                else
+                    dot.getStyleClass().remove("carousel-dot-active");
+            }
+        }
+    }
+
+    private void adjustHeightToScreenPercentage(Carousel control) {
+        Scene scene = control.getScene();
+        if (scene == null)
+            return;
+        Window window = scene.getWindow();
+        if (window == null)
+            return;
+        double screenHeight = window.getHeight();
+        double carouselHeight = screenHeight * SCREEN_HEIGHT_PERCENTAGE;
+        control.setPrefHeight(carouselHeight);
+        control.setMinHeight(800);
+        control.setMaxHeight(carouselHeight * 1.2);
     }
 
     private StackPane createCardWrapper(Node content) {
@@ -285,6 +217,20 @@ public class CarouselSkin extends SkinBase<Carousel> {
         return dot;
     }
 
+    private void updateDynamicLayoutValues() {
+        double width = cardWrappers.stream().mapToDouble(node -> node.getBoundsInLocal().getWidth()).max().orElse(0);
+        if (width <= 0)
+            return;
+        double dynamicCardOverlap = width * CARD_OVERLAP;
+        cardsContainer.setSpacing(-dynamicCardOverlap);
+        dynamicSlideDistance = width * SLIDE_DISTANCE;
+    }
+
+    ///Logic to switch (I've divided the logic of animate to index in three sub methods with the Intellij function (extract))
+    /// Sources that I have used:
+    /// https://docs.oracle.com/javase/8/javafx/api/javafx/animation/KeyFrame.html
+    /// https://www.youtube.com/watch?v=tiGZjpbXXnc
+
     /**
      * Animates the carousel transition to the target index.
      * @param targetIndex is the card of the user should move
@@ -299,23 +245,25 @@ public class CarouselSkin extends SkinBase<Carousel> {
      */
     private void animateToIndex(int targetIndex) {
         boolean goingRight;
-        if (currentDisplayedIndex == cardWrappers.size() - 1 && targetIndex == 0) {
+
+        if (currentDisplayedIndex == cardWrappers.size() - 1 && targetIndex == 0)
             goingRight = true;
-        } else if (currentDisplayedIndex == 0 && targetIndex == cardWrappers.size() - 1) {
+        else if (currentDisplayedIndex == 0 && targetIndex == cardWrappers.size() - 1)
             goingRight = false;
-        } else {
+        else
             goingRight = targetIndex > currentDisplayedIndex;
-        }
+
         int itemCount = getSkinnable().getItems().size();
+
         if (itemCount <= 1) {
             jumpToIndex(targetIndex, false);
             return;
         }
         animationInProgress = true;
 
-        if (animationTimeline != null) {
+        if (animationTimeline != null)
             animationTimeline.stop();
-        }
+
         animationTimeline = new Timeline();
 
         int normalizedCurrentIndex = normalizeIndex(currentDisplayedIndex, itemCount);
@@ -354,149 +302,158 @@ public class CarouselSkin extends SkinBase<Carousel> {
 
         cardsContainer.getChildren().clear();
         cardsContainer.getChildren().addAll(cardsToAnimate);
-        for (Node card : cardsToAnimate) {
-            if (card == currentCenterCard) {
-                card.setTranslateX(0);
-                card.setScaleX(CENTER_SCALE); card.setScaleY(CENTER_SCALE);
-                card.setViewOrder(0.1);
-                card.setOpacity(1);
-            }
-            else if (card == currentLeftCard) {
-                card.setTranslateX(-dynamicSlideDistance);
-                card.setScaleX(SIDE_SCALE); card.setScaleY(SIDE_SCALE);
-                card.setOpacity(1);
-            }
-            else if (card == currentRightCard) {
-                double initialRightTranslate = itemCount == 2 ?
-                        -dynamicSlideDistance / 1.5 : dynamicSlideDistance;
-                card.setTranslateX(initialRightTranslate);
-                card.setScaleX(SIDE_SCALE); card.setScaleY(SIDE_SCALE);
-                card.setOpacity(1);
-            }
-            else if (card == enteringCard) {
-                card.setTranslateX(goingRight ? dynamicSlideDistance * 1.5 : -dynamicSlideDistance * 2.5);
-                card.setScaleX(SIDE_SCALE); card.setScaleY(SIDE_SCALE);
-                card.setOpacity(0);
-            }
-            else {
-                card.setOpacity(0);
-                card.setTranslateX(0);
-                card.setScaleX(SIDE_SCALE); card.setScaleY(SIDE_SCALE);
-            }
-        }
+        for (Node card : cardsToAnimate)
+            animateToIndex_calculateItemStartPosition(card, currentCenterCard, currentLeftCard, currentRightCard, itemCount, enteringCard, goingRight);
 
         List<KeyFrame> keyFrames = new ArrayList<>();
 
-        for (Node card : cardsToAnimate) {double targetTranslateX = card.getTranslateX();
-            double targetScale = card.getScaleX();
-            double targetOpacity = card.getOpacity();
+        for (Node card : cardsToAnimate)
+            animateToIndex_calculateItemAnimation(card, targetCenterCard, goingRight, targetLeftCard, targetRightCard, leavingCard, keyFrames);
 
-            Interpolator translateInterpolator = Interpolator.EASE_BOTH;
-            Interpolator scaleInterpolator = Interpolator.EASE_BOTH;
-            Interpolator opacityInterpolator = Interpolator.EASE_BOTH;
-
-
-            if (card == targetCenterCard) {
-                targetTranslateX = goingRight ? 0 : dynamicSlideDistance/3;
-                targetScale = CENTER_SCALE;
-                targetOpacity = 1;
-                if(goingRight){
-                    card.setViewOrder(0);
-                }
-            } else if (card == targetLeftCard) {
-                targetTranslateX = goingRight ? -dynamicSlideDistance : -dynamicSlideDistance*1.5;
-                targetScale = SIDE_SCALE;
-                targetOpacity = 1;
-                if(!goingRight){
-                    card.setViewOrder(2);
-                }
-            } else if (card == targetRightCard) {
-                targetTranslateX = goingRight ? dynamicSlideDistance : dynamicSlideDistance*1.5;
-                targetScale = SIDE_SCALE;
-                targetOpacity = 1;
-                card.setViewOrder(2);
-
-            } else if (card == leavingCard) {
-                targetTranslateX = goingRight ? -dynamicSlideDistance * 1.5 : dynamicSlideDistance * 1.5;
-                targetScale = SIDE_SCALE;
-                targetOpacity = 0;
-                opacityInterpolator = Interpolator.EASE_IN;
-                if (!goingRight)
-                    card.setViewOrder(3);
-            }
-
-            List<KeyValue> cardKeyValues = new ArrayList<>();
-
-            if (Math.abs(card.getTranslateX() - targetTranslateX) > 0.1)
-                cardKeyValues.add(new KeyValue(card.translateXProperty(), targetTranslateX, translateInterpolator));
-
-
-            if (Math.abs(card.getScaleX() - targetScale) > 0.01) {
-                cardKeyValues.add(new KeyValue(card.scaleXProperty(), targetScale, scaleInterpolator));
-                cardKeyValues.add(new KeyValue(card.scaleYProperty(), targetScale, scaleInterpolator));
-            }
-
-            if (Math.abs(card.getOpacity() - targetOpacity) > 0.01)
-                cardKeyValues.add(new KeyValue(card.opacityProperty(), targetOpacity, opacityInterpolator));
-
-            if (!cardKeyValues.isEmpty())
-                keyFrames.add(new KeyFrame(TRANSITION_DURATION, cardKeyValues.toArray(new KeyValue[0])));
-
-        }
 
         animationTimeline.getKeyFrames().addAll(keyFrames);
 
-        animationTimeline.setOnFinished(e -> {
-            cardsContainer.getChildren().clear();
-            List<Node> finalVisibleCards = new ArrayList<>();
-            if (itemCount == 2) {
-                if (targetCenterCard == cardWrappers.get(0)) {
-                    finalVisibleCards.add(cardWrappers.get(1));
-                } else {
-                    finalVisibleCards.add(cardWrappers.getFirst());
-                }
-                finalVisibleCards.add(targetCenterCard);
-            } else {
-                if (targetLeftCard != null)
-                    finalVisibleCards.add(targetLeftCard );
+        animationTimeline.setOnFinished(e ->
+            animateToIndex_calculateItemsFinalPosition(itemCount, targetCenterCard, targetLeftCard, targetRightCard, normalizedTargetIndex)
+        );
 
-                finalVisibleCards.add(targetCenterCard );
-                if (targetRightCard!=null)
-                    finalVisibleCards.add(targetRightCard );
-            }
-            cardsContainer.getChildren().addAll(finalVisibleCards);
-            for (Node card : finalVisibleCards) {
-                boolean isCenter = (card == targetCenterCard);
-                boolean isLeft = (card == targetLeftCard);
-                double finalTranslateX = 0;
-                double finalScale = SIDE_SCALE;
-                double finalViewOrder = 1;
-                if (isCenter) {
-                    finalScale = CENTER_SCALE;
-                    finalViewOrder = 0;
-                }
-                else {
-                    if (itemCount == 2)
-                        finalTranslateX = -dynamicSlideDistance / 1.5;
-                    else
-                        finalTranslateX = isLeft ? -dynamicSlideDistance : dynamicSlideDistance;
-
-                }
-                card.setTranslateX(finalTranslateX);
-                card.setScaleX(finalScale);
-                card.setScaleY(finalScale);
-                card.setOpacity(1);
-                card.setViewOrder(finalViewOrder);
-            }
-            currentDisplayedIndex = normalizedTargetIndex;
-            animationInProgress = false;
-
-        });
         updateDots(normalizedTargetIndex);
-
         animationTimeline.play();
     }
+    private void animateToIndex_calculateItemStartPosition(Node card, Node currentCenterCard, Node currentLeftCard, Node currentRightCard, int itemCount, Node enteringCard, boolean goingRight) {
+        if (card == currentCenterCard) {
+            card.setTranslateX(0);
+            card.setScaleX(CENTER_SCALE); card.setScaleY(CENTER_SCALE);
+            card.setViewOrder(0.1);
+            card.setOpacity(1);
+        }
+        else if (card == currentLeftCard) {
+            card.setTranslateX(-dynamicSlideDistance);
+            card.setScaleX(SIDE_SCALE); card.setScaleY(SIDE_SCALE);
+            card.setOpacity(1);
+        }
+        else if (card == currentRightCard) {
+            double initialRightTranslate = itemCount == 2 ?
+                    -dynamicSlideDistance / 1.5 : dynamicSlideDistance;
+            card.setTranslateX(initialRightTranslate);
+            card.setScaleX(SIDE_SCALE); card.setScaleY(SIDE_SCALE);
+            card.setOpacity(1);
+        }
+        else if (card == enteringCard) {
+            card.setTranslateX(goingRight ? dynamicSlideDistance * 1.5 : -dynamicSlideDistance * 2.5);
+            card.setScaleX(SIDE_SCALE); card.setScaleY(SIDE_SCALE);
+            card.setOpacity(0);
+        }
+        else {
+            card.setOpacity(0);
+            card.setTranslateX(0);
+            card.setScaleX(SIDE_SCALE); card.setScaleY(SIDE_SCALE);
+        }
+    }
+    private void animateToIndex_calculateItemAnimation(Node card, Node targetCenterCard, boolean goingRight, Node targetLeftCard, Node targetRightCard, Node leavingCard, List<KeyFrame> keyFrames) {
+        double targetTranslateX = card.getTranslateX();
+        double targetScale = card.getScaleX();
+        double targetOpacity = card.getOpacity();
 
+        Interpolator translateInterpolator = Interpolator.EASE_BOTH;
+        Interpolator scaleInterpolator = Interpolator.EASE_BOTH;
+        Interpolator opacityInterpolator = Interpolator.EASE_BOTH;
+
+
+        if (card == targetCenterCard) {
+            targetTranslateX = goingRight ? 0 : dynamicSlideDistance/3;
+            targetScale = CENTER_SCALE;
+            targetOpacity = 1;
+            if(goingRight){
+                card.setViewOrder(0);
+            }
+        } else if (card == targetLeftCard) {
+            targetTranslateX = goingRight ? -dynamicSlideDistance : -dynamicSlideDistance*1.5;
+            targetScale = SIDE_SCALE;
+            targetOpacity = 1;
+            if(!goingRight){
+                card.setViewOrder(2);
+            }
+        } else if (card == targetRightCard) {
+            targetTranslateX = goingRight ? dynamicSlideDistance : dynamicSlideDistance*1.5;
+            targetScale = SIDE_SCALE;
+            targetOpacity = 1;
+            card.setViewOrder(2);
+
+        } else if (card == leavingCard) {
+            targetTranslateX = goingRight ? -dynamicSlideDistance * 1.5 : dynamicSlideDistance * 1.5;
+            targetScale = SIDE_SCALE;
+            targetOpacity = 0;
+            opacityInterpolator = Interpolator.EASE_IN;
+            if (!goingRight)
+                card.setViewOrder(3);
+        }
+
+        List<KeyValue> cardKeyValues = new ArrayList<>();
+
+        if (Math.abs(card.getTranslateX() - targetTranslateX) > 0.1)
+            cardKeyValues.add(new KeyValue(card.translateXProperty(), targetTranslateX, translateInterpolator));
+
+
+        if (Math.abs(card.getScaleX() - targetScale) > 0.01) {
+            cardKeyValues.add(new KeyValue(card.scaleXProperty(), targetScale, scaleInterpolator));
+            cardKeyValues.add(new KeyValue(card.scaleYProperty(), targetScale, scaleInterpolator));
+        }
+
+        if (Math.abs(card.getOpacity() - targetOpacity) > 0.01)
+            cardKeyValues.add(new KeyValue(card.opacityProperty(), targetOpacity, opacityInterpolator));
+
+        if (!cardKeyValues.isEmpty())
+            keyFrames.add(new KeyFrame(TRANSITION_DURATION, cardKeyValues.toArray(new KeyValue[0])));
+    }
+    private void animateToIndex_calculateItemsFinalPosition(int itemCount, Node targetCenterCard, Node targetLeftCard, Node targetRightCard, int normalizedTargetIndex) {
+        cardsContainer.getChildren().clear();
+        List<Node> finalVisibleCards = new ArrayList<>();
+        if (itemCount == 2) {
+            if (targetCenterCard == cardWrappers.get(0))
+                finalVisibleCards.add(cardWrappers.get(1));
+            else
+                finalVisibleCards.add(cardWrappers.getFirst());
+
+            finalVisibleCards.add(targetCenterCard);
+        }
+        else {
+
+            if (targetLeftCard != null)
+                finalVisibleCards.add(targetLeftCard);
+
+            finalVisibleCards.add(targetCenterCard);
+
+            if (targetRightCard !=null)
+                finalVisibleCards.add(targetRightCard);
+        }
+        cardsContainer.getChildren().addAll(finalVisibleCards);
+        for (Node card : finalVisibleCards) {
+            boolean isCenter = (card == targetCenterCard);
+            boolean isLeft = (card == targetLeftCard);
+            double finalTranslateX = 0;
+            double finalScale = SIDE_SCALE;
+            double finalViewOrder = 1;
+            if (isCenter) {
+                finalScale = CENTER_SCALE;
+                finalViewOrder = 0;
+            }
+            else {
+                if (itemCount == 2)
+                    finalTranslateX = -dynamicSlideDistance / 1.5;
+                else
+                    finalTranslateX = isLeft ? -dynamicSlideDistance : dynamicSlideDistance;
+
+            }
+            card.setTranslateX(finalTranslateX);
+            card.setScaleX(finalScale);
+            card.setScaleY(finalScale);
+            card.setOpacity(1);
+            card.setViewOrder(finalViewOrder);
+        }
+        currentDisplayedIndex = normalizedTargetIndex;
+        animationInProgress = false;
+    }
 
     private void jumpToIndex(int targetIndex, boolean forceRecalculateDynamics) {
         int itemCount = getSkinnable().getItems().size();
@@ -533,7 +490,8 @@ public class CarouselSkin extends SkinBase<Carousel> {
                 visibleCards.add(leftCard);
                 visibleCards.add(centerCard);
             }
-        } else {
+        }
+        else {
             if (leftCard != null)
                 visibleCards.add(leftCard);
 
@@ -572,22 +530,74 @@ public class CarouselSkin extends SkinBase<Carousel> {
         }
     }
 
-    private void updateDots(int activeIndex) {
-        int itemCount = getSkinnable().getItems().size();
-        if (itemCount == 0) return;
-        int normalizedActiveIndex = normalizeIndex(activeIndex, itemCount);
-
-        for (int i = 0; i < dotsContainer.getChildren().size(); i++) {
-            Node node = dotsContainer.getChildren().get( i);
-            if (node instanceof Button dot) {
-
-                if(i == normalizedActiveIndex)// is active
-                    dot.getStyleClass().add( "carousel-dot-active");
-                else
-                    dot.getStyleClass().remove("carousel-dot-active");
-            }
-        }
+    private int normalizeIndex(int index, int itemCount) {
+        if (itemCount == 0) return 0;
+        return ((index % itemCount) + itemCount) % itemCount;
     }
+
+    private void handleIndexChange(int oldIndex, int newIndex) {
+        if (animationInProgress)
+            return;
+
+        int n = getSkinnable().getItems().size();
+        if (n == 0)
+            return;
+
+        // Normalize indices to be within bounds [0, n-1]
+        int normalizedOldIndex = normalizeIndex(oldIndex, n);
+        int normalizedNewIndex = normalizeIndex(newIndex, n);
+
+        if (normalizedOldIndex == normalizedNewIndex) {
+            return;
+        }
+
+        // Determine if it's a jump (more than 1 step or initial load)
+        boolean isJump = oldIndex == -1 || Math.abs(normalizedOldIndex - normalizedNewIndex) > 1;
+        // Handle the wrap-around case as a non-jump animation
+        if (Math.abs(normalizedOldIndex - normalizedNewIndex) == n - 1)
+            isJump = false;
+
+        if (isJump)
+            jumpToIndex(normalizedNewIndex, false);
+        else
+            animateToIndex(normalizedNewIndex);
+
+    }
+
+
+
+    /// autorotation methods
+
+    private Timeline createAutoRotationTimeline() {
+        Timeline timeline = new Timeline();
+        timeline.setCycleCount(Timeline.INDEFINITE);
+
+        KeyFrame keyFrame = new KeyFrame(AUTO_ROTATION_INTERVAL, event -> {
+            if (!animationInProgress && getSkinnable().getItems().size() > 1) {
+                int nextIndex = normalizeIndex(currentDisplayedIndex + 1, getSkinnable().getItems().size());
+                getSkinnable().goTo(nextIndex);
+            }
+        });
+
+        timeline.getKeyFrames().add(keyFrame);
+        return timeline;
+    }
+
+    public void start() {
+        if (autoRotationEnabled || getSkinnable().getItems().size() <= 1)
+            return;
+        autoRotationEnabled = true;
+        autoRotationTimeline.play();
+    }
+
+    public void stop() {
+        if (!autoRotationEnabled)
+            return;
+        autoRotationEnabled = false;
+        autoRotationTimeline.stop();
+    }
+
+
 
     @Override
     public void dispose() {

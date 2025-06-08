@@ -69,7 +69,6 @@ public class ProfileView {
 
                 TMDbApiManager tmdbApiManager = TMDbApiManager.getInstance();
                 TMDbApiManager.getInstance().setContentDao(new ContentDao());
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////uncommenting the app will send request to the api, for now is better to disable that
                 try {
                     tmdbApiManager.updateAllContentInDatabase().join();
                 } catch (Exception e) {
@@ -97,15 +96,15 @@ public class ProfileView {
     private void loadUser() {
         grid.getChildren().clear();
         UserDao dao = new UserDao();
-        List<User> user = dao.findAllUsers(account.getEmail());
+        List<User> users = dao.findAllUsers(account.getEmail());
 
-        for (User utente : user) {
-            VBox userBox = createUserBox(utente);
+        for (User u : users) {
+            VBox userBox = createUserBox(u);
             grid.getChildren().add(userBox);
         }
 
 
-        if (user.size() < 4) {
+        if (users.size() < 4) {
             VBox addUserBox = createAddUserBox();
             grid.getChildren().add(addUserBox);
         }
@@ -284,7 +283,7 @@ public class ProfileView {
             CreateProfileController createProfileController = loader.getController();
 
             createProfileController.setAccount(account);
-            createProfileController.setSource(CreateProfileController.Origine.PROFILE);
+            createProfileController.setSource(CreateProfileController.Source.PROFILE);
 
             Scene currentScene = fatherContainer.getScene();
             Scene newScene = new Scene(createContent, currentScene.getWidth(), currentScene.getHeight());

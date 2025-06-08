@@ -7,7 +7,7 @@ public class Account {
     private String password;
     private User[] user; //
 
-    //Costruttore
+    //Constructor
     public Account(String email , String password){
         this.email=email;
         this.password=password;

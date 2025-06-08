@@ -68,7 +68,7 @@ public class Register {
     private String email_regex = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$";
     private String password_regex = "^(?=.*[A-Z])(?=.*[!@#$%^&*()_+{}\\[\\]:;<>,.?~\\-])(?=.*\\d)[A-Za-z\\d!@#$%^&*()_+{}\\[\\]:;<>,.?~\\-]{8,}$";
 
-    // Valori di riferimento per il layout responsivo
+    // Values for responsive layout
     private final double REFERENCE_WIDTH = 1720.0;
     private final double REFERENCE_HEIGHT = 980.0;
     private final double REFERENCE_REGISTER_WIDTH = 433.0;
@@ -182,7 +182,7 @@ public class Register {
     private void adjustLayout(double width, double height) {
 
         double rawScale = Math.min(width / REFERENCE_WIDTH, height / REFERENCE_HEIGHT);
-        double scale = 1 - (1 - rawScale) * 0.5; // Applica smorzamento del 50%
+        double scale = 1 - (1 - rawScale) * 0.5; //Apply 50% damping
 
         if (titleImage != null) {
 
@@ -199,7 +199,7 @@ public class Register {
             }
         }
 
-        // Gestione del registerBox
+        // Manage registerBox
         if (registerBox != null) {
             boolean showRegisterBox = width > MIN_SCREEN_WIDTH / 2;
             registerBox.setVisible(showRegisterBox);
@@ -211,12 +211,12 @@ public class Register {
 
 
                 //Minimum height of BASE (fixed percentage of reference height)
-                double baseMinHeightPercentage = 0.75; // Prova con 75%
+                double baseMinHeightPercentage = 0.75; //Try 75%
                 double baseMinRegisterHeight = REFERENCE_REGISTER_HEIGHT * baseMinHeightPercentage;
 
-                // BLOCCO Altezza per larghezza stretta
-                double narrowWidthThreshold = 700.0; // Soglia di larghezza per attivare il blocco
-                double lockedMinRegisterHeight = 500.0; // Altezza minima fissa quando la larghezza è stretta
+                //BLOCK Height for narrow width
+                double narrowWidthThreshold = 700.0; //Width threshold to activate the block
+                double lockedMinRegisterHeight = 500.0; // Fixed minimum height when width is narrow
 
                 double calculatedRegisterHeight = (REFERENCE_REGISTER_HEIGHT * scale)+25;
 
@@ -244,15 +244,15 @@ public class Register {
                 double warningTextScale = Math.max(scale, 0.7);
                 double backToLoginScale = Math.max(scale, 0.7);
 
-                // Imposta stile per welcomeText PRIMA di calcolarne la larghezza
+                // Set style for welcomeText BEFORE calculating its width
                 String welcomeTextStyle = "-fx-font-size: " + (15 * welcomeTextScale * 2) + "px;";
                 welcomeText.setStyle(welcomeTextStyle);
 
-                // Imposta stile per bottone register
+                // Set style for register button
                 String registerButtonStyle = "-fx-font-size: " + (15 * registerButtonScale * 2) + "px;";
                 register.setStyle(registerButtonStyle);
 
-                // Imposta stili per altri elementi
+                // Set styles for other elements
                 warning1.setStyle("-fx-font-size: " + (warningTextScale * 12 + 2) + "px;");
                 warning2.setStyle("-fx-font-size: " + (warningTextScale * 12 + 2) + "px;");
                 warningSpecial.setStyle("-fx-font-size: " + (warningTextScale * 12 + 2) + "px;");
@@ -389,7 +389,7 @@ public class Register {
                 CreateProfileController createProfileController = loader.getController();
 
                 createProfileController.setAccount(account);
-                createProfileController.setSource(CreateProfileController.Origine.REGISTER);
+                createProfileController.setSource(CreateProfileController.Source.REGISTER);
 
                 Scene currentScene = mainContainer.getScene();
                 Scene newScene = new Scene(homeContent, currentScene.getWidth(), currentScene.getHeight());

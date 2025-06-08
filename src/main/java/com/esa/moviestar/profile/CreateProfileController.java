@@ -20,9 +20,9 @@ public class CreateProfileController extends BaseProfileController {
 
     private User user;
     private UserDao dao;
-    private Origine source;
+    private Source source;
 
-    public enum Origine {
+    public enum Source {
         HOME,
         PROFILE,
         REGISTER
@@ -33,7 +33,7 @@ public class CreateProfileController extends BaseProfileController {
         System.out.println("CreateProfileController = user : " + user.getName());
     }
 
-    public void setSource(Origine source) {
+    public void setSource(Source source) {
         this.source = source;
     }
 
@@ -54,11 +54,11 @@ public class CreateProfileController extends BaseProfileController {
 
     @Override
     protected void handleCancel() {
-        if (source == Origine.HOME) {
+        if (source == Source.HOME) {
             goToHome();
-        } else if (source == Origine.PROFILE) {
+        } else if (source == Source.PROFILE) {
             backToProfiles();
-        } else if (source == Origine.REGISTER || dao.countProfilesByEmail(account.getEmail()) == 0) {
+        } else if (source == Source.REGISTER || dao.countProfilesByEmail(account.getEmail()) == 0) {
             textName.setText("");
         }
     }

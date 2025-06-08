@@ -12,7 +12,6 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class ContentDao {
-    // private static Connection connection; // REMOVED STATIC CONNECTION
     private final ContentCacheManager cacheManager;
 
     public ContentDao() {
@@ -311,8 +310,7 @@ public class ContentDao {
         String bottomGenresString  =   buildGenreFilter(getGenreIdsStringFromTaste(userId, "ASC", 3));
         String firstTopGenreString = buildGenreFilter( getGenreIdsStringFromTaste(userId, "DESC", 1));
         String query =
-                "SELECT DISTINCT   * , 0 AS List FROM (SELECT C.* FROM Content C JOIN Content_Genre CG ON C.ID_Content = CG.ID_Content " +
-                        topGenresString +" ORDER BY C.Popularity DESC LIMIT 5) UNION ALL " +
+                "SELECT DISTINCT   * , 0 AS List FROM (SELECT C.* FROM Content C  ORDER BY C.Popularity DESC LIMIT 5) UNION ALL " +
 
                         // Random top genres content
                         "SELECT DISTINCT * , 1 AS List FROM (SELECT C.* FROM Content C JOIN Content_Genre CG ON C.ID_Content = CG.ID_Content " +

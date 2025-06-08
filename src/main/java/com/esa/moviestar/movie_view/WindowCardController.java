@@ -34,6 +34,7 @@ public class WindowCardController {
 
     @FXML
     public void initialize(){
+        //This listener is important for Carousel
         windowCardRoot.viewOrderProperty().addListener((observable, oldValue, newValue) -> {
             if(Objects.equals(oldValue, newValue))
                 return;
@@ -59,7 +60,7 @@ public class WindowCardController {
     public void setContent(Content film){
         _id= film.getId();
         titleLabel.setText(film.getTitle());
-        // descriptionLabel.setText(film.getPlot());
+        // descriptionLabel.setText(film.getPlot()); //I've tried to integrate that, but it would cover the image too much
         if(film.getRating() == 10.0)
             ratingLabel.setText("10");
         else

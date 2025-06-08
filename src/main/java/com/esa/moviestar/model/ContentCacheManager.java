@@ -14,9 +14,8 @@ public class ContentCacheManager {
     public static ContentCacheManager getInstance() {
         if (instance == null) {
             synchronized (ContentCacheManager.class) {
-                if (instance == null) {
+                if (instance == null)
                     instance = new ContentCacheManager();
-                }
             }
         }
         return instance;
@@ -32,9 +31,8 @@ public class ContentCacheManager {
      * If the content (by ID) already exists, it will be replaced.
      */
     public void put(Content content) {
-        if (content != null && content.getId() != 0) {
-            contentCache.put(content.getId(), content);
-        }
+        if (content  != null && content.getId()  != 0)
+            contentCache.put(content.getId(),  content);
     }
 
     /**
@@ -42,19 +40,19 @@ public class ContentCacheManager {
      *
      * @param contentId The ID of the content to remove.
      */
-    public void remove(int contentId) {
+    public void remove(int contentId ) {
         contentCache.remove(contentId);
     }
 
     public void clearAll() {
         contentCache.clear();
-        System.out.println("ContentCacheManager: Cache cleared.");
+        System.out.println("ContentCacheManager: Cache cleared." );
     }
 
     /**
      * Gets the current size of the cache.
      */
     public int size() {
-        return contentCache.size();
+        return  contentCache.size();
     }
 }

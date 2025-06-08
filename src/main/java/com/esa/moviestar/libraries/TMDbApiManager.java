@@ -30,21 +30,24 @@ import java.util.concurrent.Executors;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
-//Hint for the prof: we have ordered all methods in a way they could be easily readable collapsed
+
+//We have ordered all methods in a way they could be easily readable collapsed
+//Sources:
+//https://developer.themoviedb.org/docs/getting-started
+
 public class TMDbApiManager {
 
     // Constants
     private static final String BASE_URL = "https://api.themoviedb.org/3";
     private static final String API_KEY = "";
-    private static final String LANGUAGE = "en-US"; // The language we have chose for owr project (the content in it-IT )
+    private static final String LANGUAGE = "en-US";
     private static final String IMAGE_BASE_URL = "https://image.tmdb.org/t/p/";
     private static final String DEFAULT_IMAGE_SIZE = "w500";
-    private static final String BACKDROP_IMAGE_SIZE_DETAILS = "w1280"; // For film scene background
-    private static final String STILL_IMAGE_SIZE = "w300"; // For episode stills
 
-    // Enum and classes to make code more readable and usable
+
+    /// Enum and classes to make code more readable and usable
     public enum ContentType {
-        MOVIE, TV, UNKNOWN
+        MOVIE, TV,  UNKNOWN
     }
     public static class ApiSeasonDetails {
         public int seasonNumber;
@@ -59,8 +62,8 @@ public class TMDbApiManager {
             episodes = new ArrayList<>();
         }
 
-        public String getFullPosterUrl(String size) {
-            return TMDbApiManager.getInstance().getImageUrl(posterPath, size);
+        public String getFullPosterUrl(String size ) {
+            return TMDbApiManager.getInstance().getImageUrl(posterPath ,  size);
         }
     }
     public static class ApiEpisodeDetails {
@@ -68,7 +71,7 @@ public class TMDbApiManager {
         public String name;
         public String overview;
         public String stillPath;
-        public int runtime; // in minutes
+        public int runtime;
         public String airDate;
         public double voteAverage;
         public int id;
@@ -78,17 +81,17 @@ public class TMDbApiManager {
         }
     }
 
-    // Singleton instance
+    /// Singleton instance
     private static volatile TMDbApiManager  instance;
-    private final OkHttpClient client;
+    private final OkHttpClient  client;
     private final ExecutorService executor;
-    private ContentDao contentDao;
+    private ContentDao  contentDao;
     private final ContentCacheManager cacheManager;
 
-    // Constructor and singleton implementation
+    /// Constructor and singleton implementation
     private TMDbApiManager() {
-        this.client = new OkHttpClient.Builder()
-                .addInterceptor(new AuthInterceptor())
+        this.client =  new OkHttpClient.Builder()
+                .addInterceptor( new AuthInterceptor())
                 .build();
         this.executor = Executors.newFixedThreadPool(10);
         this.cacheManager = ContentCacheManager.getInstance();
@@ -96,9 +99,8 @@ public class TMDbApiManager {
     public static TMDbApiManager getInstance() {
         if (instance == null) {
             synchronized (TMDbApiManager.class) {
-                if (instance == null) {
+                if (instance  == null)
                     instance =  new TMDbApiManager();
-                }
             }
         }
         return instance;
@@ -112,7 +114,7 @@ public class TMDbApiManager {
         public Response intercept(Chain chain) throws IOException {
             Request original = chain.request();
             HttpUrl originalHttpUrl = original.url();
-            HttpUrl url = originalHttpUrl.newBuilder().build(); // No need to add API key as query param with Bearer token
+            HttpUrl url = originalHttpUrl.newBuilder().build();
             Request.Builder requestBuilder  = original.newBuilder()
                     .url(url)
                     .header("accept", "application/json")
@@ -125,7 +127,7 @@ public class TMDbApiManager {
         }
     }
 
-    //Requests
+    /// Requests
     private Request buildRequest(String endpointPathAndQuery) {
         HttpUrl parsedUrl  = HttpUrl.parse(BASE_URL + endpointPathAndQuery);
         if (parsedUrl == null) {
@@ -136,7 +138,7 @@ public class TMDbApiManager {
         HttpUrl.Builder urlBuilder = parsedUrl.newBuilder();
         // Add language parameter unless it's an image URL or already present
         if (!endpointPathAndQuery.startsWith( "/t/p/") && parsedUrl.queryParameter("language") ==  null) {
-            urlBuilder.addQueryParameter("language", LANGUAGE);
+            urlBuilder.addQueryParameter("language",  LANGUAGE);
         }
         return new Request.Builder().url(urlBuilder.build()).get().build();
     }
@@ -147,11 +149,11 @@ public class TMDbApiManager {
                 ResponseBody errorBody = response.body();
                 String errorDetails = errorBody != null ?  errorBody.string() : "No error body";
                 // Log the full request URL for debugging
-                System.err.println("TMDbApiManager: Request URL: " + request.url());
+                System.err.println("TMDbApiManager: Request URL: "  + request.url());
                 System.err.println("TMDbApiManager: Response Code: " + response.code());
                 System.err.println("TMDbApiManager: Error Details: " + errorDetails);
                 // Include the URL in the exception message
-                throw new IOException("Unexpected response code: " + response.code() + " for URL: " + request.url() + ". Details: " + errorDetails);
+                throw new IOException("Unexpected response code: " + response.code() + " for URL: " + request.url() + ". Details: "  + errorDetails);
             }
             ResponseBody body = response.body();
             return body != null ? body.string() : "";
@@ -176,29 +178,30 @@ public class TMDbApiManager {
         }
         String encodedQuery;
         try {
-            encodedQuery = URLEncoder.encode(query, StandardCharsets.UTF_8.name());
+            //Don't replace it with the recommend
+            encodedQuery = URLEncoder.encode( query, StandardCharsets.UTF_8.name() );
         } catch (UnsupportedEncodingException e) {
             System.err.println("TMDbApiManager: UTF-8 encoding error for query '" + query + "': " + e.getMessage());
-            return CompletableFuture.failedFuture(new RuntimeException("Failed to encode query.", e));
+            return CompletableFuture.failedFuture(new   RuntimeException("Failed to encode query.", e));
         }
         String endpointWithQuery = "/search/multi?query=" + encodedQuery + "&page=" + page ;
         return fetchAsMoviestarContentList(endpointWithQuery, ContentType.UNKNOWN);
     }
     @Nullable
-    public String getImageUrl(@Nullable String imagePath, String size) {
-        if (imagePath == null || imagePath.trim().isEmpty() || "null".equalsIgnoreCase(imagePath.trim())) {
+    public String getImageUrl(@Nullable  String imagePath, String size) {
+        if (imagePath == null || imagePath.trim().isEmpty() || "null".equalsIgnoreCase(imagePath.trim()))
             return null;
-        }
+
         String finalSize = (size != null && !size.trim().isEmpty()) ? size : DEFAULT_IMAGE_SIZE;
-        String finalImagePath = imagePath.startsWith("/") ? imagePath : "/" + imagePath;
+        String finalImagePath = imagePath.startsWith("/") ? imagePath : "/" +  imagePath;
         return IMAGE_BASE_URL + finalSize + finalImagePath;
     }
 
-    //Receives
+    /// Receives
     public CompletableFuture<List<Content>> fetchAsMoviestarContentList(String endpoint, @Nullable ContentType expectedType) {
         return makeRequestAsync(endpoint).thenApplyAsync(responseString -> {
-            List<Content> contentList = new ArrayList<>();
-            if (responseString == null || responseString.isEmpty()) {
+            List<Content> contentList =  new ArrayList<>();
+            if (responseString == null  || responseString.isEmpty()) {
                 System.err.println("TMDbApiManager: Empty or null response for endpoint: " + endpoint);
                 return contentList;
             }
@@ -304,26 +307,25 @@ public class TMDbApiManager {
                 String responseSnippet = responseString.length() > 500 ? responseString.substring(0, 500) + "..." : responseString;
                 System.err.println("TMDbApiManager: Failed to parse/map content list from JSON for endpoint: " + endpoint + ". Error: " + e.getMessage() + ". Response snippet: " + responseSnippet);
             }
-            if (contentDao != null && !contentList.isEmpty()) {
+            if (contentDao != null   && !contentList.isEmpty()) {
                 CompletableFuture.runAsync(() -> {
                     try {
                         contentDao.insertContents(contentList);
                         System.out.println("TMDbApiManager: Successfully inserted " + contentList.size() + " contents to database asynchronously.");
                     } catch (Exception e) {
-                        System.err.println("TMDbApiManager: Error inserting contents to database: " + e.getMessage());
+                        System.err.println("TMDbApiManager: Error inserting contents to database: "  + e.getMessage());
                     }
-                }, executor);
+                },  executor);
             }
-            return contentList;
+            return  contentList;
         }, executor);
     }
-    private String getStringOrNull(JsonObject jsonObject, String memberName) {
-        if (jsonObject != null && jsonObject.has(memberName) && !jsonObject.get(memberName).isJsonNull()) {
-            JsonElement element = jsonObject.get(memberName);
-            if (element.isJsonPrimitive() && element.getAsJsonPrimitive().isString()) {
-                return element.getAsString();
-            }
-            System.err.println("TMDbApiManager: Expected string for member '" + memberName + "', but found " + element.getClass().getSimpleName());
+    private String getStringOrNull( JsonObject jsonObject, String memberName) {
+        if (jsonObject != null &&  jsonObject.has(memberName) && !jsonObject.get(memberName).isJsonNull()) {
+            JsonElement element =  jsonObject.get(memberName);
+            if (element.isJsonPrimitive() && element.getAsJsonPrimitive().isString() )
+                return element.getAsString() ;
+            System.err.println("TMDbApiManager: Expected string for member '" + memberName  + "', but found " + element.getClass().getSimpleName());
         }
         return null;
     }
@@ -375,19 +377,19 @@ public class TMDbApiManager {
                 }, executor);
     }
 
-    private CompletableFuture<List<Content>> getDiscoverTvShowsAsMoviestarContent(int page) {
-        return fetchAsMoviestarContentList("/discover/tv?include_adult=false&sort_by=popularity.desc&page=" + page, ContentType.TV);
+    private CompletableFuture<List<Content>> getDiscoverTvShowsAsMoviestarContent(int page ) {
+        return fetchAsMoviestarContentList("/discover/tv?include_adult=false&sort_by=popularity.desc&page=" + page ,  ContentType.TV );
 
     }
 
     private CompletableFuture<List<Content>> getDiscoverFilmsAsMoviestarContent(int page) {
-        return fetchAsMoviestarContentList("/discover/movie?include_adult=false&sort_by=popularity.desc&page=" + page, ContentType.MOVIE);
+        return  fetchAsMoviestarContentList("/discover/movie?include_adult=false&sort_by=popularity.desc&page=" + page, ContentType.MOVIE);
     }
 
-    // Helper to filter distinct elements in a stream
+    /// Helper to filter distinct elements in a stream
     private static <T> Predicate<T> distinctByKey(Function<? super T, ?> keyExtractor) {
-        Set<Object> seen = ConcurrentHashMap.newKeySet();
-        return t -> seen.add(keyExtractor.apply(t));
+        Set<Object> seen =  ConcurrentHashMap.newKeySet() ;
+        return t  -> seen.add(keyExtractor.apply(t));
     }
 
 

@@ -121,7 +121,7 @@ public class UserDao {
 
 
     public boolean updateUser(User user){
-        String query = "UPDATE User SET Nome = ? , Icon = ? WHERE ID_User=?;";
+        String query = "UPDATE User SET Name = ? , Icon = ? WHERE ID_User=?;";
         try(PreparedStatement stmt = connection.prepareStatement(query)){
             stmt.setString(1, user.getName());
             stmt.setInt(2, user.getIDIcon());

@@ -1,4 +1,4 @@
-package com.esa.moviestar.database;  // Declares the package where this class resides
+package com.esa.moviestar.database;
 
 import java.net.URL;
 import java.net.URISyntaxException;
@@ -7,7 +7,7 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
-public class DataBaseManager {
+public class  DataBaseManager {
 
     // Defines the resource path for the SQLite database file.
     // This path is relative to the classpath root.

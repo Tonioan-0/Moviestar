@@ -25,62 +25,62 @@ public class ScrollView extends Control {
     private final ObjectProperty<Paint> edgeColor = new SimpleObjectProperty<>(this, "edgeColor" , null );
     private final DoubleProperty radius = new SimpleDoubleProperty(this, "radius", 0 );
     private final DoubleProperty spacing = new SimpleDoubleProperty(this, "spacing" , 4 );
-    private final ObservableList<Node> items = FXCollections.observableArrayList( );
+    private final ObservableList<Node> items = FXCollections.observableArrayList();
     // Constructor
     public ScrollView( ) {
         this("" );
     }
 
     public ScrollView(String title ) {
-        this.title.set(title );
-        initialize( );
+        this.title.set(title);
+        initialize();
     }
     public ScrollView(String title, Color backgroundColor , Color foregroundColor ) {
         this.foreColor.set(foregroundColor );
         this.backgroundColor.set(backgroundColor);
         this.title.set(title );
-        initialize( );
+        initialize();
     }
     public ScrollView(String title,Color backgroundColor ,Color foregroundColor,Color edgeColor ) {
         this.foreColor.set(foregroundColor );
         this.backgroundColor.set(backgroundColor);
-        this.edgeColor.set(edgeColor );
+        this.edgeColor.set(edgeColor);
         this.title.set(title);
         initialize();
     }
     public ScrollView(String title,Color backgroundColor , Color foregroundColor,Color edgeColor,Double border ) {
         this.foreColor.set( foregroundColor);
-        this.backgroundColor.set(backgroundColor );
-        this.edgeColor.set(edgeColor );
-        this.title.set(title );
-        initialize( );
-        this.setClipRadius(border );
+        this.backgroundColor.set(backgroundColor);
+        this.edgeColor.set(edgeColor);
+        this.title.set(title);
+        initialize();
+        this.setClipRadius(border);
     }
     private void initialize() {
-        getStyleClass( ).add( DEFAULT_STYLE_CLASS);
+        getStyleClass().add( DEFAULT_STYLE_CLASS);
         new ScrollViewSkin( this);
     }
 
     @Override
-    protected Skin<?> createDefaultSkin( ) {
+    protected Skin<?> createDefaultSkin() {
         return  new ScrollViewSkin(this );
     }
 
     // Getters and setters for properties
     public void setContent(List<Node> objects ) {
-        items.clear( );
+        items.clear();
         items.addAll(objects );
     }
 
-    public void addItem(Node item ) {
-        items.add(item );
+    public void addItem(Node item) {
+        items.add(item);
     }
 
-    public void removeItem(Node item ) {
-        items.remove(item );
+    public void removeItem(Node item) {
+        items.remove(item);
     }
 
-    public String getTitle( ) {
+    public String getTitle() {
         return title.get( );
     }
 
@@ -92,11 +92,11 @@ public class ScrollView extends Control {
         this.title.set(title );
     }
 
-    public String getButtonText( ) {
-        return buttonText.get( );
+    public String getButtonText() {
+        return buttonText.get();
     }
 
-    public StringProperty buttonTextProperty( ) {
+    public StringProperty buttonTextProperty() {
         return buttonText;
     }
 
@@ -104,11 +104,11 @@ public class ScrollView extends Control {
         this.buttonText.set(text );
     }
 
-    public String getArrowIcon( ) {
-        return arrowIcon.get( );
+    public String getArrowIcon() {
+        return arrowIcon.get();
     }
 
-    public StringProperty arrowIconProperty( ) {
+    public StringProperty arrowIconProperty() {
         return arrowIcon;
     }
 
@@ -116,19 +116,19 @@ public class ScrollView extends Control {
         this.arrowIcon.set(svg );
     }
 
-    public Paint getBackgroundColor( ) {
-        return backgroundColor.get( );
+    public Paint getBackgroundColor() {
+        return backgroundColor.get();
     }
 
-    public ObjectProperty<Paint> backgroundColorProperty( ) {
+    public ObjectProperty<Paint> backgroundColorProperty() {
         return backgroundColor;
     }
 
-    public void setBackgroundColor(Paint color ) {
+    public void setBackgroundColor(Paint color) {
         this.backgroundColor.set(color );
     }
 
-    public Paint getForeColor( ) {
+    public Paint getForeColor() {
         return foreColor.get( );
     }
 
@@ -136,28 +136,28 @@ public class ScrollView extends Control {
         return foreColor;
     }
 
-    public void setForeColor(Color color ) {
+    public void setForeColor(Color color) {
         this.foreColor.set(color );
     }
 
-    public double getSpacing( ) {
+    public double getSpacing() {
         return spacing.get( );
     }
 
-    public DoubleProperty spacingProperty( ) {
+    public DoubleProperty spacingProperty() {
         return spacing;
     }
 
-    public void setSpacing(double value ) {
-        this.spacing.set(value );
+    public void setSpacing(double value) {
+        this.spacing.set(value);
     }
 
-    public ObservableList<Node> getItems( ) {
+    public ObservableList<Node> getItems() {
         return items;
     }
 
-    public Paint getEdgeColor( ) {
-        return this.edgeColor.get( );
+    public Paint getEdgeColor() {
+        return this.edgeColor.get();
     }
     public void setEdgeColor(Color c ) {
         edgeColor.set(c );
@@ -166,7 +166,7 @@ public class ScrollView extends Control {
         return edgeColor;
     }
 
-    public double getRadius( ) {
+    public double getRadius() {
         return radius.get( );
     }
     public void setClipRadius(double n ) {

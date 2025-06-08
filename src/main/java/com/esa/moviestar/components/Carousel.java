@@ -52,7 +52,7 @@ public class  Carousel extends Control {
         return new CarouselSkin(this);
     }
 
-    //A possible integration could be a control that move the to the left or to the right the objects
+    //I 've created this method for a possible integration could be a control that move the to the left or to the right the objects
     /**
      * Moves to the next item in the carousel.
      */
