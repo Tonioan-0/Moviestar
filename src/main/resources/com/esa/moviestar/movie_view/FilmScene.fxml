@@ -71,7 +71,7 @@
                                 </padding>
                             </HBox>
                             <HBox fx:id="addToFavouriteButton" layoutX="10.0" layoutY="10.0" prefHeight="48.0">
-                                <StackPane maxHeight="48.0" maxWidth="48.0" minHeight="48.0" minWidth="48.0"
+                                <StackPane fx:id="styleFavouriteButton" maxHeight="48.0" maxWidth="48.0" minHeight="48.0" minWidth="48.0"
                                            prefHeight="48.0" prefWidth="48.0">
                                     <styleClass>
                                         <String fx:value="small-item"/>
@@ -82,7 +82,7 @@
                                 </StackPane>
                             </HBox>
                             <HBox fx:id="addToWatchListButton" layoutX="207.0" layoutY="10.0" prefHeight="48.0">
-                                <StackPane maxHeight="48.0" maxWidth="48.0" minHeight="48.0" minWidth="48.0"
+                                <StackPane fx:id="styleWatchListButton" maxHeight="48.0" maxWidth="48.0" minHeight="48.0" minWidth="48.0"
                                            prefHeight="48.0" prefWidth="48.0">
                                     <styleClass>
                                         <String fx:value="small-item"/>

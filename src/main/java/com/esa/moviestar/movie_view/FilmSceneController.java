@@ -44,6 +44,8 @@ public class FilmSceneController {
     public VBox mainVBox;
     public ImageView heroImageView;
     public Label runtimeOrSeasons;
+    public StackPane styleFavouriteButton;
+    public StackPane styleWatchListButton;
     MainPagesController mainPagesController;
     private TMDbApiManager apiManager;
     private FilmSeriesDetails currentContent;
@@ -104,14 +106,14 @@ public class FilmSceneController {
             addToWatchListButton.setOnMouseClicked(event ->{
                 if(!isInWatchList) {
                     addToWatchlist();
-                    addToWatchListButton.getStyleClass().add( "watchlist-active");
-                    addToFavouriteButton.getStyleClass().remove( "surface-transparent");
+                    styleWatchListButton.getStyleClass().add( "watchlist-active");
+                    styleFavouriteButton.getStyleClass().remove( "surface-transparent");
                 }
                 else
                 {
                     deleteFromWatchlist();
-                    addToWatchListButton.getStyleClass().remove( "watchlist-active");
-                    addToFavouriteButton.getStyleClass().add( "surface-transparent");
+                    styleWatchListButton.getStyleClass().remove( "watchlist-active");
+                    styleFavouriteButton.getStyleClass().add( "surface-transparent");
                 }
                 isInWatchList = !isInWatchList;
             });
@@ -120,13 +122,13 @@ public class FilmSceneController {
             addToFavouriteButton.setOnMouseClicked(event -> {
                 if(!isInFavourite) {
                     addToFavourites();
-                    addToFavouriteButton.getStyleClass().add( "favourite-active");
-                    addToFavouriteButton.getStyleClass().remove( "surface-transparent");
+                    styleFavouriteButton.getStyleClass().add( "favourite-active");
+                    styleFavouriteButton.getStyleClass().remove( "surface-transparent");
                 }
                 else {
                     deleteFromFavourites();
-                    addToFavouriteButton.getStyleClass().remove( "favourite-active");
-                    addToFavouriteButton.getStyleClass().add( "surface-transparent");
+                    styleFavouriteButton.getStyleClass().remove( "favourite-active");
+                    styleFavouriteButton.getStyleClass().add( "surface-transparent");
                 }
                 isInFavourite = !isInFavourite;
             });
@@ -1018,13 +1020,13 @@ public class FilmSceneController {
         UserDao userDao = new UserDao();
         List<Boolean> list= userDao.checkIfIsInFavouritesOrWatchList(user.getID(),contentId);
         if(list.get(0) ) {
-            addToFavouriteButton.getStyleClass().remove( "surface-transparent");
-            addToFavouriteButton.getStyleClass().add("favourite-active");
+            styleFavouriteButton.getStyleClass().remove( "surface-transparent");
+            styleFavouriteButton.getStyleClass().add("favourite-active");
             isInFavourite = true;
         }
         if(list.get(1)){
-            addToFavouriteButton.getStyleClass().remove( "surface-transparent");
-            addToWatchListButton.getStyleClass().add( "watchlist-active");
+            styleFavouriteButton.getStyleClass().remove( "surface-transparent");
+            styleWatchListButton.getStyleClass().add( "watchlist-active");
             isInWatchList = true;
         }
     }

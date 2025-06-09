@@ -204,11 +204,26 @@
 }
 
 .watchlist-active{
-    -fx-background-color:#a30f0f;
+    -fx-background-color:#333333;
 }
 .watchlist-active:hover{
-    -fx-background-color:#7a0a0a;
+    -fx-background-color:#1f1f1f;
 }
 .watchlist-active{
-    -fx-background-color:#3b0404;
+    -fx-background-color:#101010;
+}
+/* ========== RESPONSIVE MEDIA QUERIES ========== */
+
+@media (max-width: 800px) {
+    .seasons-dropdown-button {
+        -fx-min-width: 150px;
+    }
+
+    .episode-item {
+        -fx-padding: 10px;
+    }
+
+    .episode-number {
+        -fx-min-width: 25px;
+    }
 }

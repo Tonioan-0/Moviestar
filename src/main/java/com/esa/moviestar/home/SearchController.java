@@ -1,5 +1,6 @@
 package com.esa.moviestar.home;
 
+import com.esa.moviestar.Main;
 import com.esa.moviestar.database.ContentDao;
 import com.esa.moviestar.libraries.TMDbApiManager;
 import com.esa.moviestar.model.Content;
@@ -9,8 +10,10 @@ import javafx.fxml.FXML;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.CycleMethod;
 import javafx.scene.paint.LinearGradient;
@@ -109,6 +112,7 @@ public class SearchController {
     }
 
     public void performSearch(String searchText) {
+        separatorLine.setVisible(true);
         Platform.runLater(() ->{
             recommendations.getChildren().clear();
             filmSeriesRecommendations.getChildren().clear();
@@ -198,9 +202,25 @@ public class SearchController {
                                 System.err.println("SearchController: NullPointerException during film node creation. Check setupController: " + e.getMessage());
                             }
                         } else{
-                            SVGPath path = new SVGPath();
-                            path.setContent("M 100 100 L 300 100 L 200 300 Z");
-                            filmSeriesRecommendations.getChildren().add(path);
+                            if(filmSeriesRecommendations.getChildren().isEmpty()) {
+                                separatorLine.setVisible(false);
+                                SVGPath path = new SVGPath() {{
+                                    setContent(Main.resourceBundle.getString("icon.nothing-found"));
+                                    getStyleClass().add("on-primary");
+                                }};
+                                String response = "";
+                                if (searchText.length() > 16)
+                                    response = searchText.substring(0, 16) + "...";
+                                else
+                                    response = searchText;
+
+                                Label label = new Label("No icons found for ‘" + response + "’") {{
+                                    getStyleClass().addAll("on-primary", "very-large-text");
+                                }};
+                                VBox nothingFound = new VBox(path,label);
+                                nothingFound.setAlignment(Pos.CENTER);
+                                filmSeriesRecommendations.getChildren().add(nothingFound);
+                            }
                         }
 
                         List<Content> forLabelLikeDisplay = uniquePopularContentFromApi.stream()
