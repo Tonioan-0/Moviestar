@@ -27,12 +27,27 @@ import java.util.regex.Pattern;
 
 
 public class Register {
+    //Managing general register warnings
+    @FXML
+    private Label warning1;
+    @FXML
+    private Label warning2;
+    @FXML
+    private Label warningSpecial;
+    @FXML
+    private Label warningSpecial2;
 
-    // FXML injected UI components
+    @FXML
+    private StackPane mainContainer;
+
     @FXML
     private Label welcomeText;
+    //Button section respectively, access from register scene ,going back to access scene
     @FXML
     private Button register;
+    @FXML
+    private Button backToLogin;
+    //Managing general input access section
     @FXML
     private TextField emailField;
     @FXML
@@ -43,18 +58,8 @@ public class Register {
     private Button togglePasswordButton;
     @FXML
     private StackPane passwordContainer;
-    @FXML
-    private Label warning1;
-    @FXML
-    private Label warning2;
-    @FXML
-    private Label warningSpecial;
-    @FXML
-    private Label warningSpecial2;
-    @FXML
-    private StackPane mainContainer;
-    @FXML
-    private Button backToLogin;
+
+
     @FXML
     private VBox registerBox;
     @FXML
@@ -68,36 +73,46 @@ public class Register {
     private String email_regex = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$";
     private String password_regex = "^(?=.*[A-Z])(?=.*[!@#$%^&*()_+{}\\[\\]:;<>,.?~\\-])(?=.*\\d)[A-Za-z\\d!@#$%^&*()_+{}\\[\\]:;<>,.?~\\-]{8,}$";
 
-    // Valori di riferimento per il layout responsivo
+    //Reference quantities for the responsive layout
     private final double REFERENCE_WIDTH = 1720.0;
     private final double REFERENCE_HEIGHT = 980.0;
     private final double REFERENCE_REGISTER_WIDTH = 433.0;
     private final double REFERENCE_REGISTER_HEIGHT = 560.0;
     private final double REFERENCE_IMAGE_WIDTH = 700.0;
     private final double REFERENCE_IMAGE_HEIGHT = 194.0;
+    //Currently the compact mode is unused due to general settings of the application
     private final double MIN_SCREEN_WIDTH = 600.0;
     private final double MIN_SCREEN_HEIGHT = 700.0;
 
 
-    public void initialize() {
+    public void initialize(){
+
+        setupBasicGeneralObjects();
+        setupPasswordToggle();
+        setupActionButtons();
+        setupPasswordRequirements();
+        Node[] formElements = {togglePasswordButton, welcomeText, emailField, passwordField, warning1, warningSpecial, warningSpecial2, warning2, register, backToLogin};
+        AnimationUtils.animateSimultaneously(formElements, 1);
+
+        setupResponsiveLayout();
+    }
+
+    private void setupBasicGeneralObjects(){
         // Set default prompts for email and password fields
         emailField.setPromptText("Email");
         passwordField.setPromptText("Password");
         passwordTextField.setPromptText("Password");
-        mainContainer.setMinWidth(1080);
-        mainContainer.setMinHeight(700);
+        mainContainer.setMinWidth(1280);
+        mainContainer.setMinHeight(720);
         togglePasswordButton.setGraphic(new SVGPath(){{setContent(Main.resourceBundle.getString("passwordField.showPassword"));getStyleClass().add("on-primary");}});
+    }
 
-
-        // Setup password toggle functionality
-        setupPasswordToggle();
-
-        // Set event handler for the register button
+    private void setupActionButtons(){
         register.setOnAction(event -> saveUser());
-
-        // Set event handler for the back to login button
         backToLogin.setOnAction(event -> switchToLoginPage());
+    }
 
+    private void setupPasswordRequirements(){
         // Display password requirements
         warning1.setText("Password must contain at least:");
         warning2.setText("   · 8 characters");
@@ -106,41 +121,30 @@ public class Register {
         welcomeText.setText("SIGN UP");
         backToLogin.setText("Already have an account? Sign in");
         register.setText("Register");
-
-        Node[] formElements = {togglePasswordButton, welcomeText, emailField, passwordField, warning1, warningSpecial, warningSpecial2, warning2, register, backToLogin};
-        AnimationUtils.animateSimultaneously(formElements, 1);
-
-        setupResponsiveLayout();
     }
-
-    private void setupPasswordToggle() {
-
+    //Function to set up listeners for password toggle button
+    private void setupPasswordToggle(){
         passwordField.textProperty().addListener((obs, oldText, newText) -> {
 
-            if (!passwordTextField.isFocused()) {
+            if(!passwordTextField.isFocused())
                 passwordTextField.setText(newText);
-            }
         });
-
         passwordTextField.textProperty().addListener((obs, oldText, newText) -> {
 
-            if (!passwordField.isFocused()) {
+            if(!passwordField.isFocused())
                 passwordField.setText(newText);
-            }
         });
-
         togglePasswordButton.setOnAction(event -> togglePasswordVisibility());
 
         StackPane.setAlignment(togglePasswordButton, Pos.CENTER_RIGHT);
         StackPane.setMargin(togglePasswordButton, new Insets(0, 10, 0, 0));
-
     }
 
+    //Function to toggle password visibility settings
+    private void togglePasswordVisibility(){
 
-    private void togglePasswordVisibility() {
         isPasswordVisible = !isPasswordVisible;
-
-        if (isPasswordVisible) {
+        if(isPasswordVisible) {
             passwordTextField.setText(passwordField.getText());
             passwordField.setVisible(false);
             passwordField.setManaged(false);
@@ -150,9 +154,8 @@ public class Register {
             passwordTextField.positionCaret(passwordTextField.getText().length());
             togglePasswordButton.setGraphic(new SVGPath(){{setContent(Main.resourceBundle.getString("passwordField.hidePassword"));getStyleClass().add("on-primary");}});
         }
-
-
-        else {
+        else
+        {
             passwordField.setText(passwordTextField.getText());
             passwordTextField.setVisible(false);
             passwordTextField.setManaged(false);
@@ -160,18 +163,16 @@ public class Register {
             passwordField.setManaged(true);
             passwordField.requestFocus();
             passwordField.positionCaret(passwordField.getText().length());
-
             togglePasswordButton.setGraphic(new SVGPath(){{setContent(Main.resourceBundle.getString("passwordField.showPassword"));getStyleClass().add("on-primary");}});
         }
     }
 
-    private String getCurrentPassword() {
-        return isPasswordVisible ? passwordTextField.getText() : passwordField.getText();
-    }
+    private String getCurrentPassword(){
+        return isPasswordVisible ? passwordTextField.getText() : passwordField.getText();}
 
-    private void setupResponsiveLayout() {
+    private void setupResponsiveLayout(){
         mainContainer.sceneProperty().addListener((obs, oldScene, newScene) -> {
-            if (newScene != null) {
+            if(newScene != null){
                 newScene.widthProperty().addListener((observable, oldValue, newValue) -> adjustLayout(newValue.doubleValue(), newScene.getHeight()));
                 newScene.heightProperty().addListener((observable, oldValue, newValue) -> adjustLayout(newScene.getWidth(), newValue.doubleValue()));
                 adjustLayout(newScene.getWidth(), newScene.getHeight());
@@ -179,57 +180,78 @@ public class Register {
         });
     }
 
-    private void adjustLayout(double width, double height) {
+    private void setupRegisterBoxLayout(double registerWidth, double registerHeight){
+        registerBox.setPrefWidth(registerWidth);
+        registerBox.setPrefHeight(registerHeight);
+        registerBox.setMaxWidth(registerWidth);
+        registerBox.setMaxHeight(registerHeight);
 
-        double rawScale = Math.min(width / REFERENCE_WIDTH, height / REFERENCE_HEIGHT);
-        double scale = 1 - (1 - rawScale) * 0.5; // Applica smorzamento del 50%
+    }
+    private void setupWarningsLayout(double TextScale){
+        warning1.setStyle("-fx-font-size: " + (TextScale * 12 + 2) + "px;");
+        warning2.setStyle("-fx-font-size: " + (TextScale * 12 + 2) + "px;");
+        String welcomeTextStyle = "-fx-font-size: " + (15 * TextScale * 2) + "px;";
+        backToLogin.setStyle("-fx-font-size: " + (TextScale * 12 + 2) + "px;");
+        welcomeText.setStyle(welcomeTextStyle);
+        warningSpecial.setStyle("-fx-font-size: " + (TextScale * 12 + 2) + "px;");
+        warningSpecial2.setStyle("-fx-font-size: " + (TextScale * 12 + 2) + "px;");
+    }
 
-        if (titleImage != null) {
+    private void setupTextFields(double fieldWidth){
+        passwordField.setPrefWidth(fieldWidth);
+        passwordTextField.setPrefWidth(fieldWidth);
+        passwordContainer.setPrefWidth(fieldWidth);
+        passwordField.setMaxWidth(fieldWidth);
+        passwordTextField.setMaxWidth(fieldWidth);
+        passwordContainer.setMaxWidth(fieldWidth);
+        emailField.setPrefWidth(fieldWidth);
+        emailField.setMaxWidth(fieldWidth);
+    }
+
+    private void setupVBoxLayout(double verticalMargin){
+        VBox.setMargin(welcomeText, new Insets(0, 0, verticalMargin * 3, 0));
+        VBox.setMargin(emailField, new Insets(0, 0, (verticalMargin * 2) + 10, 0));
+        VBox.setMargin(passwordContainer, new Insets(0, 0, (verticalMargin * 2) + 10, 0));
+        VBox.setMargin(warning1, new Insets(0, 0, verticalMargin, 0));
+        VBox.setMargin(warning2, new Insets(0, 0, verticalMargin, 0));
+        VBox.setMargin(warningSpecial, new Insets(0, 0, verticalMargin , 0));
+        VBox.setMargin(warningSpecial2, new Insets(0, 0, verticalMargin * 2, 0));
+        VBox.setMargin(register, new Insets(0, 0, verticalMargin, 0));
+        VBox.setMargin(backToLogin, new Insets(0, 0, 0, 0));
+    }
+    private void adjustLayout(double width, double height ){
+        //Adjust the scale to provide a more gradual scaling curve instead of linear scaling
+
+        double scale = Math.min(width / REFERENCE_WIDTH, height / REFERENCE_HEIGHT);
+        scale = 1 - (1 - scale) * 0.5;
+
+        if(titleImage != null){
 
             boolean showImage = width > MIN_SCREEN_WIDTH;
-
             titleImage.setVisible(showImage);
             titleImage.setManaged(showImage);
-            if (showImage) {
+            if(showImage){
 
                 titleImage.setFitWidth(REFERENCE_IMAGE_WIDTH * scale);
                 titleImage.setFitHeight(REFERENCE_IMAGE_HEIGHT * scale);
                 VBox.setMargin(titleImage, new Insets(((scale + 10) * 0.85),0,0,0));
-
             }
         }
 
-        // Gestione del registerBox
-        if (registerBox != null) {
+        //Managing register box
+        if(registerBox != null){
             boolean showRegisterBox = width > MIN_SCREEN_WIDTH / 2;
             registerBox.setVisible(showRegisterBox);
             registerBox.setManaged(showRegisterBox);
-
-            if (showRegisterBox) {
+            /*COMPACT_MODE and the MIN_VBOX_VISIBILITY_THRESHOLD are used to set the scene into a smaller one
+            to provide the responsive layout shadowing the MOVIESTAR logo*/
+            if(showRegisterBox){
                 boolean compactMode = width < MIN_SCREEN_WIDTH;
                 double registerWidth = compactMode ? 280 : REFERENCE_REGISTER_WIDTH * scale;
 
-
                 //Minimum height of BASE (fixed percentage of reference height)
-                double baseMinHeightPercentage = 0.75; // Prova con 75%
-                double baseMinRegisterHeight = REFERENCE_REGISTER_HEIGHT * baseMinHeightPercentage;
-
-                double narrowWidthThreshold = 700.0;
-                double lockedMinRegisterHeight = 500.0;
-
-                double calculatedRegisterHeight = (REFERENCE_REGISTER_HEIGHT * scale)+25;
-
-                double registerHeight;
-                if (width < narrowWidthThreshold) {
-                    registerHeight = Math.max(calculatedRegisterHeight, lockedMinRegisterHeight);
-                } else {
-                    registerHeight = Math.max(calculatedRegisterHeight, baseMinRegisterHeight);
-                }
-
-                registerBox.setPrefWidth(registerWidth);
-                registerBox.setPrefHeight(registerHeight);
-                registerBox.setMaxWidth(registerWidth);
-                registerBox.setMaxHeight(registerHeight);
+                double registerHeight = getRegisterHeight(width, scale);
+                setupRegisterBoxLayout(registerWidth, registerHeight);
 
                 //dynamic Padding e Spacing
                 double paddingValue = Math.max(10, 20 * scale);
@@ -237,38 +259,19 @@ public class Register {
                 registerBox.setPadding(new Insets(paddingValue));
                 registerBox.setSpacing(spacing);
 
-                // --- FONT ---
-                double welcomeTextScale = Math.max(scale, 0.7);
-                double registerButtonScale = Math.max(scale, 0.6);
-                double warningTextScale = Math.max(scale, 0.7);
-                double backToLoginScale = Math.max(scale, 0.7);
+                //Font adjustments for dynamic settings
+                double TextScale = Math.max(scale, 0.7);
 
-                String welcomeTextStyle = "-fx-font-size: " + (15 * welcomeTextScale * 2) + "px;";
-                welcomeText.setStyle(welcomeTextStyle);
-
-                String registerButtonStyle = "-fx-font-size: " + (15 * registerButtonScale * 2) + "px;";
+                setupWarningsLayout(TextScale);
+                String registerButtonStyle = "-fx-font-size: " + (15 * Math.max(scale, 0.6) * 2) + "px;";
                 register.setStyle(registerButtonStyle);
 
-                warning1.setStyle("-fx-font-size: " + (warningTextScale * 12 + 2) + "px;");
-                warning2.setStyle("-fx-font-size: " + (warningTextScale * 12 + 2) + "px;");
-                warningSpecial.setStyle("-fx-font-size: " + (warningTextScale * 12 + 2) + "px;");
-                warningSpecial2.setStyle("-fx-font-size: " + (warningTextScale * 12 + 2) + "px;");
-                backToLogin.setStyle("-fx-font-size: " + (backToLoginScale * 12 + 2) + "px;");
 
                 double availableWidth = registerWidth - paddingValue * 2;
                 double fieldWidth = Math.min(availableWidth, registerWidth * 0.9);
-
-                emailField.setPrefWidth(fieldWidth);
-                emailField.setMaxWidth(fieldWidth);
-
-                passwordField.setPrefWidth(fieldWidth);
-                passwordTextField.setPrefWidth(fieldWidth);
-                passwordContainer.setPrefWidth(fieldWidth);
-                passwordField.setMaxWidth(fieldWidth);
-                passwordTextField.setMaxWidth(fieldWidth);
-                passwordContainer.setMaxWidth(fieldWidth);
-
-
+                //TextField adjustments for dynamic settings
+                setupTextFields(fieldWidth);
+                //Buttons adjustments for dynamic settings
                 double buttonWidth = Math.min(availableWidth, registerWidth * 0.6);
                 buttonWidth = Math.max(buttonWidth, 100);
 
@@ -277,35 +280,40 @@ public class Register {
 
                 backToLogin.setMaxWidth(availableWidth);
                 backToLogin.setWrapText(true);
-
-                // Dynamic margin
+                // Dynamic margin only vertical because simply horizontal are not needed
                 double verticalMargin = 10 * scale;
-                VBox.setMargin(welcomeText, new Insets(0, 0, verticalMargin * 3, 0));
-                VBox.setMargin(emailField, new Insets(0, 0, (verticalMargin * 2) + 10, 0));
-                VBox.setMargin(passwordContainer, new Insets(0, 0, (verticalMargin * 2) + 10, 0));
-                VBox.setMargin(warning1, new Insets(0, 0, verticalMargin, 0));
-                VBox.setMargin(warning2, new Insets(0, 0, verticalMargin, 0));
-                VBox.setMargin(warningSpecial, new Insets(0, 0, verticalMargin , 0));
-                VBox.setMargin(warningSpecial2, new Insets(0, 0, verticalMargin * 2, 0));
-                VBox.setMargin(register, new Insets(0, 0, verticalMargin, 0));
-                VBox.setMargin(backToLogin, new Insets(0, 0, 0, 0));
+                setupVBoxLayout(verticalMargin);
             }
         }
     }
+    //Always fix the actual scale before adding responsive layout as this function's job
+    private double getRegisterHeight(double width, double scale){
+        double baseMinHeightPercentage = 0.75;
+        double baseMinRegisterHeight = REFERENCE_REGISTER_HEIGHT * baseMinHeightPercentage;
 
-    private void switchToLoginPage() {
+        double narrowWidthThreshold = 700.0;
+        double lockedMinRegisterHeight = 500.0;
+        double calculatedRegisterHeight = (REFERENCE_REGISTER_HEIGHT * scale)+25;
 
-        try {
+        double registerHeight;
+        if (width < narrowWidthThreshold)
+            registerHeight = Math.max(calculatedRegisterHeight, lockedMinRegisterHeight);
+        else
+            registerHeight = Math.max(calculatedRegisterHeight, baseMinRegisterHeight);
+        return registerHeight;
+    }
+    //Function to go back to login page if the user already has an account
+    private void switchToLoginPage(){
+
+        try{
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/esa/moviestar/login/access.fxml"), Main.resourceBundle);
             Parent loginContent = loader.load();
-
             Scene currentScene = mainContainer.getScene();
             Scene newScene = new Scene(loginContent, currentScene.getWidth(), currentScene.getHeight());
-
             Stage stage = (Stage) mainContainer.getScene().getWindow();
             stage.setScene(newScene);
         }
-        catch (IOException e) {
+        catch(IOException e){
             System.err.println("Register: Access page error to load" + e.getMessage());
         }
     }
@@ -314,15 +322,15 @@ public class Register {
         return password_regex;
     }
 
-
-    private void saveUser() {
+    //Function to save the user if all the requirements are met
+    private void saveUser(){
 
         String email = emailField.getText();
         String password = getCurrentPassword();
-
-        if (!Pattern.matches(email_regex, email) && !Pattern.matches(password_regex, password)) {
+        if(!Pattern.matches(email_regex, email) && !Pattern.matches(password_regex, password) ){
             AnimationUtils.shake(emailField);
             AnimationUtils.shake(passwordContainer);
+
             emailField.setPromptText("Invalid email");
             emailField.setText("");
 
@@ -331,48 +339,35 @@ public class Register {
 
             passwordTextField.setPromptText("Invalid password");
             passwordTextField.setText("");
-
             return;
         }
-
         // Validate email using regex
-        if (!Pattern.matches(email_regex, email)) {
-
+        if(!Pattern.matches(email_regex, email)){
             AnimationUtils.shake(emailField);
-
             emailField.setPromptText("Invalid email");
             emailField.setText("");
-
             return;
         }
-
         // Validate password using regex
-        if (!Pattern.matches(password_regex, password)) {
-
+        if(!Pattern.matches(password_regex, password)){
             AnimationUtils.shake(passwordContainer);
-
             passwordField.setPromptText("Invalid password");
             passwordField.setText("");
-
             passwordTextField.setPromptText("Invalid password");
             passwordTextField.setText("");
-
             return;
         }
         AnimationUtils.pulse(register);
-
-        try {
+        try{
 
             String hashedPassword = CredentialCryptManager.hashPassword(password);
-
             // Create account with hashed password
             Account account = new Account(email, hashedPassword);
             AccountDao dao = new AccountDao();
-
-            if (dao.insertAccount(account)) {
+            //Adding the account in the db
+            if(dao.insertAccount(account)){
                 welcomeText.setText("User registered successfully!");
                 AnimationUtils.pulse(welcomeText);
-
                 FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/esa/moviestar/profile/create-profile-view.fxml"), Main.resourceBundle);
 
                 Parent homeContent = loader.load();
@@ -383,14 +378,15 @@ public class Register {
 
                 Scene currentScene = mainContainer.getScene();
                 Scene newScene = new Scene(homeContent, currentScene.getWidth(), currentScene.getHeight());
-
                 Stage stage = (Stage) mainContainer.getScene().getWindow();
                 stage.setScene(newScene);
-            } else {
+            }
+            else{
                 welcomeText.setText("User already exists");
                 AnimationUtils.shake(welcomeText);
             }
-        }catch (IOException e) {
+        }
+        catch(IOException e){
             throw new RuntimeException(e);
         }
     }

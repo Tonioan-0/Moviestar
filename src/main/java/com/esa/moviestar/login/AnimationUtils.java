@@ -7,21 +7,17 @@ import javafx.scene.Node;
 import javafx.util.Duration;
 
 public class AnimationUtils {
-
-    public static void fadeIn(Node node, double durationMs) {
-
+    public static void fadeIn(Node node, double durationMs){
         FadeTransition fadeTransition = new FadeTransition(Duration.millis(durationMs), node);
         fadeTransition.setFromValue(0.0);
         fadeTransition.setToValue(1.0);
         fadeTransition.play();
 
     }
-
     public static void fadeIn(Node node) {
-        fadeIn(node, 300);
-    }
+        fadeIn(node, 300);}
 
-    public static void fadeOut(Node node, double durationMs) {
+    public static void fadeOut(Node node, double durationMs){
 
         FadeTransition fadeTransition = new FadeTransition(Duration.millis(durationMs), node);
         fadeTransition.setFromValue(1.0);
@@ -30,11 +26,10 @@ public class AnimationUtils {
 
     }
 
-    public static void fadeOut(Node node) {
-        fadeOut(node, 300);
-    }
+    public static void fadeOut(Node node){
+        fadeOut(node, 300);}
 
-    public static void slideInFromRight(Node node, double durationMs, double distance) {
+    public static void slideInFromRight(Node node, double durationMs, double distance){
 
         TranslateTransition translateTransition = new TranslateTransition(Duration.millis(durationMs), node);
 
@@ -46,19 +41,18 @@ public class AnimationUtils {
 
         fadeTransition.setFromValue(0.0);
         fadeTransition.setToValue(1.0);
+
         translateTransition.play();
         fadeTransition.play();
     }
 
     public static void slideInFromRight(Node node) {
-        slideInFromRight(node, 300, 50);
-    }
+        slideInFromRight(node, 300, 50);}
 
     public static void quickSlideInFromRight(Node node) {
-        slideInFromRight(node, 150, 30);
-    }
+        slideInFromRight(node, 150, 30);}
 
-    public static void slideInFromLeft(Node node, double durationMs, double distance) {
+    public static void slideInFromLeft(Node node, double durationMs, double distance){
         TranslateTransition translateTransition = new TranslateTransition(Duration.millis(durationMs), node);
 
         translateTransition.setFromX(-distance);
@@ -73,17 +67,14 @@ public class AnimationUtils {
         fadeTransition.play();
     }
 
-    public static void slideInFromLeft(Node node) {
-        slideInFromLeft(node, 300, 50);
-    }
+    public static void slideInFromLeft(Node node){
+        slideInFromLeft(node, 300, 50);}
 
-    public static void quickSlideInFromLeft(Node node) {
-        slideInFromLeft(node, 150, 30);
-    }
+    public static void quickSlideInFromLeft(Node node){
+        slideInFromLeft(node, 150, 30);}
 
-    public static void shake(Node node, double durationMs, double distance, int cycles) {
+    public static void shake(Node node, double durationMs, double distance, int cycles){
         TranslateTransition translateTransition = new TranslateTransition(Duration.millis(durationMs), node);
-
         translateTransition.setCycleCount(cycles);
         translateTransition.setFromX(0);
         translateTransition.setByX(distance);
@@ -92,34 +83,30 @@ public class AnimationUtils {
 
     }
 
-    public static void shake(Node node) {
+    public static void shake(Node node){
         shake(node, 50, 10, 4);
     }
 
-    public static void pulse(Node node) {
-
+    public static void pulse(Node node){
         double originalScaleX = node.getScaleX();
         double originalScaleY = node.getScaleY();
-
         node.setScaleX(originalScaleX * 1.2);
         node.setScaleY(originalScaleY * 1.2);
-
         PauseTransition pause = new PauseTransition(Duration.millis(70));
 
         pause.setOnFinished(e -> {
             node.setScaleX(originalScaleX);
             node.setScaleY(originalScaleY);
         });
-
         pause.play();
     }
 
-    public static void animateSequentially(Node[] nodes, int animationType, double delayBetweenMs) {
-        for (int i = 0; i < nodes.length; i++) {
+    public static void animateSequentially(Node[] nodes, int animationType, double delayBetweenMs ){
+        for(int i = 0; i < nodes.length; i++){
             PauseTransition delay = new PauseTransition(Duration.millis(i * delayBetweenMs));
             final int index = i;
-            delay.setOnFinished(e -> {
-                switch (animationType) {
+            delay.setOnFinished(e ->{
+                switch(animationType){
                     case 0:
                         fadeIn(nodes[index]);
                         break;
@@ -141,11 +128,10 @@ public class AnimationUtils {
         }
     }
 
-    public static void animateSequentiallyFast(Node[] nodes, int animationType) {
-        animateSequentially(nodes, animationType, 30);
-    }
+    public static void animateSequentiallyFast(Node[] nodes, int animationType){
+        animateSequentially(nodes, animationType, 30);}
 
-    public static void animateSimultaneously(Node[] nodes, int animationType, double durationMs) {
+    public static void animateSimultaneously(Node[] nodes, int animationType, double durationMs){
         for (Node node : nodes) {
             switch (animationType) {
                 case 0:
@@ -167,11 +153,11 @@ public class AnimationUtils {
         }
     }
 
-    public static void animateSimultaneously(Node[] nodes, int animationType) {
+    public static void animateSimultaneously(Node[] nodes, int animationType){
         animateSimultaneously(nodes, animationType, 500);
     }
 
-    public static void animateContainerWithChildren(javafx.scene.Parent container, int animationType, double durationMs) {
+    public static void animateContainerWithChildren(javafx.scene.Parent container, int animationType, double durationMs){
         switch (animationType) {
             case 0:
                 fadeIn(container, durationMs);
