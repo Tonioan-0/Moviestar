@@ -177,7 +177,6 @@ public class SettingsViewController {
             contentArea.getChildren().setAll(view);
         } catch (IOException e) {
             System.err.println("Error loading view: " + pathFXML);
-            e.printStackTrace();
         }
     }
 

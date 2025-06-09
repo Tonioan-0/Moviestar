@@ -8,14 +8,18 @@ public class CredentialCryptManager {
 
     private static final int BCRYPT_ROUNDS = 12;
 
-    public static boolean verifyPassword(String plainTextPassword, String hashedPassword) {
-        try {
+    public static boolean verifyPassword(String plainTextPassword, String hashedPassword){
+        try
+        {
             return BCrypt.checkpw(plainTextPassword, hashedPassword);
-        } catch (IllegalArgumentException e) {
-            return plainTextPassword.equals(hashedPassword);
         }
+        catch (IllegalArgumentException e) {
+            return plainTextPassword.equals(hashedPassword);}
     }
-    public static String hashPassword(String plainTextPassword) {
-        return BCrypt.hashpw(plainTextPassword, BCrypt.gensalt(BCRYPT_ROUNDS));
+    public static String hashPassword(String plainTextPassword ) {
+        return BCrypt.hashpw(
+                plainTextPassword,
+                BCrypt.gensalt(BCRYPT_ROUNDS)
+        );
     }
 }

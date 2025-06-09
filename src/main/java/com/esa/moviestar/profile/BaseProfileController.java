@@ -14,36 +14,26 @@ import javafx.scene.layout.VBox;
 
 public abstract class BaseProfileController {
 
-    @FXML
-    protected GridPane pageContainer;
-    @FXML
-    protected VBox elementContainer;
-    @FXML
-    protected Group defaultImagine;
-    @FXML
-    protected Label creationTitle;
-    @FXML
-    protected TextField textName;
-    @FXML
-    protected HBox imageScroll1;
-    @FXML
-    protected HBox imageScroll2;
-    @FXML
-    protected HBox imageScroll3;
-    @FXML
-    protected HBox imageScroll4;
-    @FXML
-    protected VBox scrollContainer;
-    @FXML
-    protected Button saveButton;
-    @FXML
-    protected Button cancelButton;
-    @FXML
-    protected Label warningText;
-    @FXML
-    protected Label errorText;
-    @FXML
-    protected VBox imageContainer;
+    @FXML protected GridPane pageContainer;
+    @FXML protected Group defaultImagine;
+
+    @FXML protected VBox scrollContainer;
+    @FXML protected HBox imageScroll1;
+    @FXML protected HBox imageScroll2;
+    @FXML protected HBox imageScroll3;
+    @FXML protected HBox imageScroll4;
+
+    @FXML protected Button saveButton;
+    @FXML protected Button cancelButton;
+
+    @FXML protected Label warningText;
+    @FXML protected Label errorText;
+    @FXML protected Label creationTitle;
+
+    @FXML protected VBox imageContainer;
+    @FXML protected VBox elementContainer;
+
+    @FXML protected TextField textName;
 
     protected Group originalProfileImage;
     protected int codCurrentImage;

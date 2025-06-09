@@ -362,13 +362,12 @@ public class ContentDao{
         }
         return String.join(",", genreIds);
     }
-    
-    public List<Content> getFavourites(int idUser, int limit ){
-        return  getListWithLimit(idUser , limit, "SELECT C.* FROM Content C JOIN Favourite Pr ON C.ID_Content = Pr.ID_Content WHERE Pr.ID_User = ?"  );
+
+    public List<Content> getContentFromQuery(String title){
+        String query="SELECT DISTINCT * , 0 AS List FROM Content C WHERE C.title LIKE '%" + title + "%'";
+        return getContentFromDB(query,1).get(0);
     }
-    public List<Content> getWatched(int  idUser, int limit ){
-        return getListWithLimit(idUser, limit, "SELECT C.* FROM Content C JOIN History Cr ON C.ID_Content  = Cr.ID_Content WHERE Cr.ID_User = ?"  );
-    }
+
     private List<Content> getListWithLimit(int idUser, int limit, String queryWithoutLimitAndPlaceholder ){
         List<Content> resultContents = new ArrayList<>();
         String fullQuery = queryWithoutLimitAndPlaceholder.trim();

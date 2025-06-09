@@ -29,6 +29,7 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
+import javafx.scene.shape.Rectangle;
 import javafx.stage.Popup;
 import javafx.stage.Stage;
 
@@ -52,46 +53,28 @@ public class FilmSceneController {
     private String VIDEO_PLACEHOLDER= "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerFun.mp4";
 
     // Main containers
-    @FXML
-    public StackPane background;
-    @FXML
-    public ScrollPane scrollPane;
-    @FXML
-    public VBox episodesList;
+    @FXML public StackPane background;
+    @FXML public ScrollPane scrollPane;
+    @FXML public VBox episodesList;
 
     // Buttons
-    @FXML
-    private StackPane closeButton;
-    @FXML
-    private HBox playButton;
-    @FXML
-    private HBox addToWatchListButton;
-    @FXML
-    private HBox addToFavouriteButton;
+    @FXML private StackPane closeButton;
+    @FXML private HBox playButton;
+    @FXML private HBox addToWatchListButton;
+    @FXML private HBox addToFavouriteButton;
 
     // Labels for content info
-    @FXML
-    private Label titleLabel;
-    @FXML
-    private Label yearLabel;
-    @FXML
-    private Label episodesLabel;
-    @FXML
-    private Label ratingLabel;
-    @FXML
-    private Label maturityLabel;
-    @FXML
-    private Label violenceLabel;
-    @FXML
-    private Label descriptionLabel;
-    @FXML
-    private Label castLabel;
-    @FXML
-    private Label genresLabel;
-    @FXML
-    private Label showTypeLabel;
-    @FXML
-    private Label seriesTitleLabel;
+    @FXML private Label titleLabel;
+    @FXML private Label yearLabel;
+    @FXML private Label episodesLabel;
+    @FXML private Label ratingLabel;
+    @FXML private Label maturityLabel;
+    @FXML private Label violenceLabel;
+    @FXML private Label descriptionLabel;
+    @FXML private Label castLabel;
+    @FXML private Label genresLabel;
+    @FXML private Label showTypeLabel;
+    @FXML private Label seriesTitleLabel;
 
     // Season selection components
     private HBox seasonsContainer;
@@ -103,25 +86,50 @@ public class FilmSceneController {
 
     // Event filter for closing dropdown
     private javafx.event.EventHandler<javafx.scene.input.MouseEvent> closeDropdownFilter;
+    private boolean isInFavourite= false;
+    private boolean isInWatchList= false;
 
 
     public void initialize() {
         apiManager = TMDbApiManager.getInstance();
 
         // Set button actions
-        if (closeButton != null) {
+        if (closeButton != null)
             closeButton.setOnMouseClicked(event -> closeView());
-        }
-        if (playButton != null) {
-            playButton.setOnMouseClicked(event -> playContent());
-        }
-        if (addToWatchListButton != null) {
-            addToWatchListButton.setOnMouseClicked(event -> addToWatchlist());
-        }
-        if (addToFavouriteButton != null) {
-            addToFavouriteButton.setOnMouseClicked(event -> addToFavourites());
-        }
 
+        if (playButton != null)
+            playButton.setOnMouseClicked(event -> playContent());
+
+        if (addToWatchListButton != null)
+            addToWatchListButton.setOnMouseClicked(event ->{
+                if(!isInWatchList) {
+                    addToWatchlist();
+                    addToWatchListButton.getStyleClass().add( "watchlist-active");
+                    addToFavouriteButton.getStyleClass().remove( "surface-transparent");
+                }
+                else
+                {
+                    deleteFromWatchlist();
+                    addToWatchListButton.getStyleClass().remove( "watchlist-active");
+                    addToFavouriteButton.getStyleClass().add( "surface-transparent");
+                }
+                isInWatchList = !isInWatchList;
+            });
+
+        if (addToFavouriteButton != null)
+            addToFavouriteButton.setOnMouseClicked(event -> {
+                if(!isInFavourite) {
+                    addToFavourites();
+                    addToFavouriteButton.getStyleClass().add( "favourite-active");
+                    addToFavouriteButton.getStyleClass().remove( "surface-transparent");
+                }
+                else {
+                    deleteFromFavourites();
+                    addToFavouriteButton.getStyleClass().remove( "favourite-active");
+                    addToFavouriteButton.getStyleClass().add( "surface-transparent");
+                }
+                isInFavourite = !isInFavourite;
+            });
     }
 
     /**
@@ -133,7 +141,8 @@ public class FilmSceneController {
     public void loadContent(int contentId, boolean isMovie) {
         // Show loading state
         showLoadingState();
-
+        // Check  if the content is in the favourites or in the watchList
+        checkFavouriteAndWatchList(user,contentId);
         if (isMovie) {
             loadMovieData(contentId);
         } else {
@@ -406,8 +415,8 @@ public class FilmSceneController {
         }
     }
 
-    private void createSeasonsSelector() {
-        if (episodesList == null || !(episodesList.getParent() instanceof VBox)) {
+    private void createSeasonsSelector(){
+        if (episodesList == null ||  !(episodesList.getParent() instanceof VBox)) {
             System.err.println("Cannot create seasons selector: episodesList is null or its parent is not a VBox.");
             return;
         }
@@ -417,55 +426,49 @@ public class FilmSceneController {
             System.err.println("Cannot create seasons selector: episodesSectionVBox is null.");
             return;
         }
-        if (seasonsContainer == null) {
+        if (seasonsContainer == null){
             seasonsContainer = new HBox();
             seasonsContainer.setAlignment(Pos.CENTER_LEFT);
-            seasonsContainer.setSpacing(10);
-            seasonsContainer.setStyle("-fx-padding: 0 0 15 0;");
+            seasonsContainer.setSpacing(10 );
+            seasonsContainer.setStyle( "-fx-padding: 0 0 15 0;");
 
             seasonsDropdownButton = new Button();
-            seasonsDropdownButton.getStyleClass().addAll("seasons-dropdown-button","small-item","on-primary","primary-border");
+            seasonsDropdownButton.getStyleClass().addAll("seasons-dropdown-button", "small-item", "on-primary","primary-border");
             seasonsDropdownButton.setPrefHeight(35);
             seasonsDropdownButton.setOnAction(e -> popUpSeasonContainer());
-            if (currentContent.getSeasons() != null && !currentContent.getSeasons().isEmpty() && currentContent.getSeasons().getFirst() != null) {
-                FilmSeriesDetails.SeasonDetails season = currentContent.getSeasons().getFirst();
-                if (season.getName() != null && !season.getName().isEmpty()) {
-                    seasonsDropdownButton.setText(season.getName());
-                }
-            } else {
-                seasonsDropdownButton.setText("Season " + (1));
-            }
+
 
             seasonsDropdownMenu = new VBox();
-            seasonsDropdownMenu.getStyleClass().addAll("seasons-dropdown-menu","small-item","on-primary");
+            seasonsDropdownMenu.getStyleClass().addAll( "seasons-dropdown-menu","small-item","on-primary");
             seasonsDropdownMenu.setVisible(false);
             seasonsDropdownMenu.setManaged(false);
-            seasonsDropdownMenu.setSpacing(2);
+            seasonsDropdownMenu.setSpacing( 2);
             seasonsDropdownMenu.setMaxHeight(200);
 
-            StackPane dropdownWrapper = new StackPane(seasonsDropdownButton, seasonsDropdownMenu);
+            StackPane dropdownWrapper = new StackPane( seasonsDropdownButton, seasonsDropdownMenu);
             StackPane.setAlignment(seasonsDropdownMenu, Pos.TOP_LEFT);
             seasonsDropdownMenu.setTranslateY(37);
 
-            seasonsContainer.getChildren().add(dropdownWrapper);
+            seasonsContainer.getChildren().add( dropdownWrapper);
         }
 
         if (!episodesSectionParent.getChildren().contains(seasonsContainer)) {
-            int insertIndex = episodesSectionParent.getChildren().indexOf(episodesList);
+            int insertIndex = episodesSectionParent.getChildren().indexOf( episodesList);
             if (insertIndex == -1) insertIndex = 0;
-            episodesSectionParent.getChildren().add(insertIndex, seasonsContainer);
+            episodesSectionParent.getChildren().add(insertIndex, seasonsContainer );
         }
 
         seasonsContainer.setVisible(true);
         seasonsContainer.setManaged(true);
+        updateSeasonDropdownButtonText();
     }
 
     private void popUpSeasonContainer(){
         Popup popup = new Popup();
         StackPane stackPane = new StackPane();
-        stackPane.getStylesheets().add(getClass().getResource("/com/esa/moviestar/styles/general.css").toExternalForm());
-        stackPane.setPadding(new Insets(8));
-        stackPane.getStyleClass().addAll("medium-item","surface-dim","primary-border");
+        stackPane.getStylesheets().add(getClass().getResource( "/com/esa/moviestar/styles/general.css").toExternalForm());
+        stackPane.setPadding(new Insets( 8));
+        stackPane.getStyleClass().addAll( "medium-item","surface-dim","primary-border");
         ScrollPane scroll = new ScrollPane();
         scroll.setFitToWidth(true);
         scroll.setMaxHeight(200);
@@ -513,12 +516,13 @@ public class FilmSceneController {
             return;
         }
         currentSeasonIndex = seasonIndex;
+        updateSeasonDropdownButtonText();
         updateEpisodesDisplay();
     }
 
     private void updateEpisodesDisplay() {
         if (episodesList == null) {
-            System.err.println("episodesList VBox is null, cannot update display.");
+            System.err.println("FilmSceneController: EpisodesList is null, cannot update display.");
             return;
         }
         episodesList.getChildren().clear();
@@ -632,13 +636,27 @@ public class FilmSceneController {
             // Keep the "episode-thumbnail-missing" or "episode-thumbnail-error" class already set
         }
     }
-
+    private void updateSeasonDropdownButtonText() {
+        if (seasonsDropdownButton == null || currentContent == null || !currentContent.isSeries()) {
+            return;
+        }
+        String buttonText = "Season " + (currentSeasonIndex + 1);
+        List<FilmSeriesDetails.SeasonDetails> seasons = currentContent.getSeasons();
+        if (seasons != null && currentSeasonIndex >= 0 && currentSeasonIndex < seasons.size()) {
+            FilmSeriesDetails.SeasonDetails season = seasons.get(currentSeasonIndex);
+            if (season != null && season.getName() != null && !season.getName().isEmpty()) {
+                buttonText = season.getName();
+            }
+        }
+        seasonsDropdownButton.setText(buttonText);
+    }
 
     private HBox createEpisodeItem(FilmSeriesDetails.EpisodeDetails episode) {
         HBox episodeItem = new HBox();
         episodeItem.setAlignment(Pos.CENTER_LEFT);
         episodeItem.setSpacing(15);
-        episodeItem.getStyleClass().add("episode-item");
+        episodeItem.getStyleClass().addAll("episode-item","small-item");
+
 
         Label episodeNumber = new Label(String.valueOf(episode.getEpisodeNumber()));
         episodeNumber.getStyleClass().addAll("episode-number","on-primary");
@@ -650,6 +668,12 @@ public class FilmSceneController {
         episodeThumbnail.setFitHeight(70);
         episodeThumbnail.setPreserveRatio(true);
         episodeThumbnail.getStyleClass().add("episode-thumbnail-image");
+        Rectangle clip = new Rectangle();
+        clip.widthProperty().bind(episodeItem.widthProperty());
+        clip.heightProperty().bind(episodeItem.heightProperty());
+        clip.setArcWidth(32);
+        clip.setArcHeight(32);
+        episodeItem.setClip(clip);
         // Use the updated loadEpisodeThumbnail which includes fallback logic
         loadEpisodeThumbnail(episode.getStillUrl(), episodeThumbnail);
 
@@ -706,18 +730,12 @@ public class FilmSceneController {
                 // heroImageView.setFitHeight(backgroundVBox.getPrefHeight());
 
             } catch (IllegalArgumentException e) {
-                // This can happen if the URL string is malformed
                 System.err.println("Invalid image URL format for backdrop: " + backdropUrl + " - " + e.getMessage());
-                // heroImageView.setImage(null); // or some default error image
             } catch (Exception e) {
-                // Catch any other unexpected errors during image instantiation or setting
                 System.err.println("Failed to load backdrop image: " + backdropUrl + " - " + e.getMessage());
-
-                // heroImageView.setImage(null); // or some default error image
             }
         } else {
             System.err.println("Backdrop URL is null, empty, or invalid: " + backdropUrl);
-            // heroImageView.setImage(null); // Clear image or set a default placeholder
         }
     }
 
@@ -822,16 +840,24 @@ public class FilmSceneController {
 
     @FXML
     private void addToWatchlist() {
-        System.out.println("Add to watchlist button clicked");
+
         UserDao dao = new UserDao();
         dao.insertWatchlistContent(user.getID(), currentContent.getId());
     }
-
+    @FXML
+    private void deleteFromWatchlist() {
+        UserDao dao = new UserDao();
+        dao.deleteWatchlist(user.getID(), currentContent.getId());
+    }
     @FXML
     private void addToFavourites() {
-        System.out.println("add to favourites button clicked");
         UserDao dao = new UserDao();
         dao.insertFavouriteContent(user.getID(),currentContent.getId());
+    }
+    @FXML
+    private void deleteFromFavourites() {
+        UserDao dao = new UserDao();
+        dao.deleteFavourite(user.getID(),currentContent.getId());
     }
 
     public void setTitle(String title) {
@@ -938,16 +964,17 @@ public class FilmSceneController {
                                 }
                             } catch (Exception e) {
                                 System.err.println("Error parsing season " + seasonNumber + " data: " + e.getMessage());
-                                e.printStackTrace();
                             }
                         });
                     })
                     .exceptionally(ex -> {
                         System.err.println("Error loading season " + seasonNumber + ": " + ex.getMessage());
-                        ex.printStackTrace();
                         if (currentSeasonIndex == seasonNumber - 1) {
                             Platform.runLater(this::updateEpisodesDisplay);
-                        }
+                            Platform.runLater(() -> {
+                                updateSeasonDropdownButtonText();
+                                updateEpisodesDisplay();
+                            });                        }
                         return null;
                     });
         }
@@ -981,5 +1008,24 @@ public class FilmSceneController {
         return titleLabel != null && "Loading...".equals(titleLabel.getText());
     }
 
-    public void setUserAndAccount(User user,Account account){this.user=user;this.account=account;}
+    public void setUserAndAccount(User user,Account account){
+        this.user=user;
+        this.account=account;
+
+    }
+    // Check  if the content is in the favourites or in the watchList
+    private void checkFavouriteAndWatchList(User user,int contentId) {
+        UserDao userDao = new UserDao();
+        List<Boolean> list= userDao.checkIfIsInFavouritesOrWatchList(user.getID(),contentId);
+        if(list.get(0) ) {
+            addToFavouriteButton.getStyleClass().remove( "surface-transparent");
+            addToFavouriteButton.getStyleClass().add("favourite-active");
+            isInFavourite = true;
+        }
+        if(list.get(1)){
+            addToFavouriteButton.getStyleClass().remove( "surface-transparent");
+            addToWatchListButton.getStyleClass().add( "watchlist-active");
+            isInWatchList = true;
+        }
+    }
 }

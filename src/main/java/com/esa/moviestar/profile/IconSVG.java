@@ -6,7 +6,9 @@ import javafx.scene.shape.SVGPath;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-
+// We made the icons by hand, they represent characters from pop culture.
+// First generating a png test, then copying them by hand with https://yqnn.github.io/svg-path-editor/
+// Finally built a javafx code to test them and transform in Group objects
 public class IconSVG {
     // Horseman    Walter White    Man Petroleum   Pablo Escobar   Tommy Shelby    Woman Purple    Man Blue    Woman Blue    Man Yellow      Monster     Gandalf   Misa    Trouper     Witcher     Venom       Marco
     final static List<Group> content = new ArrayList<>(Arrays.asList(
@@ -33,7 +35,7 @@ public class IconSVG {
      * @param index The index of the element to retrieve
      * @return A copy of the Group at the specified index, or the first Group if index is out of bounds
      */
-    public static Group takeElement(int index) {
+    public static Group takeElement(int index){
         Group original;
         if(index >= 0 && index < content.size())
             original = content.get(index);
@@ -47,7 +49,7 @@ public class IconSVG {
      * Returns a copy of all elements to prevent modification of the original collection.
      * @return A list containing copies of all the Group elements
      */
-    public static List<Group> takeAllElement() {
+    public static List<Group> takeAllElement(){
         List<Group> copies = new ArrayList<>(content.size());
         for(Group group : content)
             copies.add(copyGroup(group));
@@ -59,7 +61,7 @@ public class IconSVG {
      * @param original The original Group to copy
      * @return A new Group containing copies of the original's children
      */
-    public static Group copyGroup(Group original) {
+    public static Group copyGroup(Group original){
         Group copy = new Group();
         original.getChildren().forEach(node ->
         {

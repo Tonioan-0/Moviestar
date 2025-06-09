@@ -249,18 +249,19 @@ public class ScrollViewSkin extends SkinBase<ScrollView>{
                 if (rightGradient != null) rightGradient.setBackground(getOverlayGradientBackgroundFill((Color)newVal, false));
             }
             if (sliderContainer != null){
-                if (leftGradient != null && sliderContainer.getChildren().contains(leftGradient)){
+
+                if (leftGradient != null && sliderContainer.getChildren().contains(leftGradient))
                     leftGradient.toFront();
-                }
-                if (rightGradient != null && sliderContainer.getChildren().contains(rightGradient)){
+
+                if (rightGradient != null && sliderContainer.getChildren().contains(rightGradient))
                     rightGradient.toFront();
-                }
-                if (leftButton != null && sliderContainer.getChildren().contains(leftButton)){
+
+                if (leftButton != null && sliderContainer.getChildren().contains(leftButton))
                     leftButton.toFront();
-                }
-                if (rightButton != null && sliderContainer.getChildren().contains(rightButton)){
+
+                if (rightButton != null && sliderContainer.getChildren().contains(rightButton))
                     rightButton.toFront();
-                }
+
             }
         };
         control.edgeColorProperty().addListener(edgeColorListener);

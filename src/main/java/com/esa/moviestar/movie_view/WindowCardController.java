@@ -15,21 +15,15 @@ import javafx.util.Duration;
 import java.util.Objects;
 
 public class WindowCardController {
-    @FXML
-    private AnchorPane windowCardRoot;
-    @FXML
-    private VBox controlsContainer;
-    @FXML
-    private ImageView imgView;
-    @FXML
-    private HBox playButton;
-    @FXML
-    private HBox infoButton;
-    @FXML
-    private Text titleLabel;
 
-    @FXML
-    private Text ratingLabel;
+    @FXML private AnchorPane windowCardRoot;
+    @FXML private VBox controlsContainer;
+    @FXML private ImageView imgView;
+    @FXML private HBox playButton;
+    @FXML private HBox infoButton;
+    @FXML private Text titleLabel;
+    @FXML private Text ratingLabel;
+
     private int _id;
 
     @FXML

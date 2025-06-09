@@ -10,10 +10,10 @@ import java.sql.SQLException;
 public class  DataBaseManager {
     private static final String DB_NAME = "com/esa/moviestar/DatabaseProjectUID.db";
 
-    public static Connection getConnection() throws SQLException {
-        try {
+    public static Connection getConnection() throws SQLException{
+        try{
             URL dbUrl = DataBaseManager.class.getResource("/" + DB_NAME);
-            if (dbUrl == null) {
+            if (dbUrl == null){
                 throw new RuntimeException("Database file '" + DB_NAME + "' not found in the classpath.");
             }
 
@@ -24,7 +24,7 @@ public class  DataBaseManager {
             String jdbcUrl = "jdbc:sqlite:" + Paths.get(dbUrl.toURI());
             return DriverManager.getConnection(jdbcUrl);
 
-        } catch (URISyntaxException e) {
+        } catch (URISyntaxException e){
             throw new RuntimeException("Error converting the database URL to a URI. Ensure the path is valid.", e);
         }
     }

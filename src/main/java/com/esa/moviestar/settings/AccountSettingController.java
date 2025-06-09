@@ -202,7 +202,7 @@ public class AccountSettingController {
                 Parent modifyContent = loader.load();
                 ModifyProfileController modifyProfileController = loader.getController();
                 modifyProfileController.setUser(user);
-                modifyProfileController.setSource(ModifyProfileController.Origine.SETTINGS);
+                modifyProfileController.setSource(ModifyProfileController.Source.SETTINGS);
                 modifyProfileController.setAccount(account);
 
                 Scene currentScene = accountContentSetting.getScene();

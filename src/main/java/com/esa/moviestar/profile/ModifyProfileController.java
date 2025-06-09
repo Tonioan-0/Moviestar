@@ -19,9 +19,9 @@ public class ModifyProfileController extends BaseProfileController {
     private VBox modifyPageContainer;
 
     private User user;
-    private Origine source;
+    private Source source;
 
-    public enum Origine {
+    public enum Source {
         SETTINGS,
         PROFILE,
     }
@@ -38,7 +38,7 @@ public class ModifyProfileController extends BaseProfileController {
         defaultImagine.getChildren().add(g);
     }
 
-    public void setSource(Origine source) {
+    public void setSource(Source source) {
         this.source = source;
     }
 
@@ -93,9 +93,9 @@ public class ModifyProfileController extends BaseProfileController {
 
     private void navigateToDestination() {
         try {
-            if (source == Origine.PROFILE) {
+            if (source == Source.PROFILE) {
                 loadProfilesPage();
-            } else if (source == Origine.SETTINGS) {
+            } else if (source == Source.SETTINGS) {
                 loadSettingsPage();
             } else {
                 System.err.println("ModifyProfileController: Unrecognized source:" + source);

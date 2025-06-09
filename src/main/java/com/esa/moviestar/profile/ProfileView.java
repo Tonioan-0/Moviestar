@@ -25,17 +25,10 @@ import java.util.List;
 public class ProfileView {
 
     // FXML Components
-    @FXML
-    Label text;
-
-    @FXML
-    HBox grid;
-
-    @FXML
-    StackPane fatherContainer;
-
-    @FXML
-    Label warningText;
+    @FXML Label text;
+    @FXML HBox grid;
+    @FXML StackPane fatherContainer;
+    @FXML Label warningText;
 
 
     private Account account;
@@ -234,7 +227,7 @@ public class ProfileView {
                 ModifyProfileController modifyProfileController = loader.getController();
                 modifyProfileController.setAccount(account);
                 modifyProfileController.setUser(user);
-                modifyProfileController.setSource(ModifyProfileController.Origine.PROFILE);
+                modifyProfileController.setSource(ModifyProfileController.Source.PROFILE);
 
                 Scene currentScene = fatherContainer.getScene();
                 Scene newScene = new Scene(modifyContent, currentScene.getWidth(), currentScene.getHeight());

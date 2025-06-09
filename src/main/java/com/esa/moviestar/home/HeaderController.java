@@ -95,12 +95,12 @@ public class HeaderController {
         currentActive = button;
         if (currentActive != null) {
             currentActive.getStyleClass().remove("surface-transparent");
-            if (!currentActive.getStyleClass().contains("primary")) {
+            if (!currentActive.getStyleClass().contains("primary"))
                 currentActive.getStyleClass().add("primary");
-            }
-            if (currentActive == searchButton) {
+
+            if (currentActive == searchButton)
                 tbxSearch.requestFocus();
-            }
+
         }
     }
 

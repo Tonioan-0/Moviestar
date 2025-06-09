@@ -21,7 +21,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 //To facilitate understanding, I've organized this class in a manner that allows information to be collapsed, making it more easily understandable ⁓Antonio D'Ambrosio
-
+// Sources that I have used:
+// https://docs.oracle.com/javase/8/javafx/api/javafx/animation/KeyFrame.html
+// https://www.youtube.com/watch?v=tiGZjpbXXnc
 public class CarouselSkin extends SkinBase<Carousel> {
 
     //Constants
@@ -227,9 +229,7 @@ public class CarouselSkin extends SkinBase<Carousel> {
     }
 
     ///Logic to switch (I've divided the logic of animate to index in three sub methods with the Intellij function (extract))
-    /// Sources that I have used:
-    /// https://docs.oracle.com/javase/8/javafx/api/javafx/animation/KeyFrame.html
-    /// https://www.youtube.com/watch?v=tiGZjpbXXnc
+
 
     /**
      * Animates the carousel transition to the target index.

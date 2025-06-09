@@ -1,0 +1,214 @@
+/* ========== STREAMING INTERFACE ELEMENTS ========== */
+
+/* Hero section for content */
+.hero-section {
+    -fx-background-color: transparent;
+}
+
+.hero-title {
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.8), 10, 0, 2, 2);
+    -fx-max-width: 600px;
+}
+.big-title{
+    -fx-font-size:48px;
+}
+
+
+.icon-button {
+    -fx-background-color: rgba(42, 42, 42, 0.6);
+    -fx-border-color: rgba(255, 255, 255, 0.7);
+    -fx-border-width: 2px;
+    -fx-pref-height: 40px;
+    -fx-pref-width: 40px;
+}
+.play-button{
+    -fx-pref-height: 44px;
+}
+.icon-button:hover {
+    -fx-background-color: rgba(42, 42, 42, 0.8);
+    -fx-border-color: white;
+}
+
+.close-button {
+    -fx-background-color: rgba(42, 42, 42, 0.6);
+    -fx-font-weight: bold;
+    -fx-pref-height: 50px;
+    -fx-pref-width: 50px;
+}
+
+.close-button:hover {
+    -fx-background-color: rgba(42, 42, 42, 0.8);
+}
+
+/* Content details */
+.content-details {
+    -fx-background-color: #141414;
+}
+
+
+.rating-badge {
+    -fx-text-fill: black;
+    -fx-font-weight: bold;
+    -fx-padding: 1px 4px;
+    -fx-background-radius: 4px;
+    -fx-background-color: linear-gradient(
+                                 to bottom right,
+                                 #f6e27a 33%,
+                                 #cb9b51 80%,
+                                 #462523 100%
+                             );
+}
+
+.content-warning {
+    -fx-text-fill: #999999;
+}
+
+.description-text {
+    -fx-line-spacing: 2px;
+}
+
+.info-label {
+    -fx-text-fill: #777777;
+    -fx-font-weight: bold;
+}
+
+.info-text {
+    -fx-line-spacing: 1px;
+}
+
+.section-title {
+    -fx-font-weight: bold;
+}
+
+.series-title {
+    -fx-text-fill: #777777;
+}
+
+/* Episodes */
+.episodes-container {
+    -fx-background-color: transparent;
+    -fx-padding: 10 0 0 0;
+}
+
+.episode-item {
+    -fx-background-color: rgb(31, 31, 31);
+    -fx-padding: 15px;
+}
+
+.episode-item:hover {
+    -fx-background-color: rgba(42, 42, 42, 0.6);
+}
+
+.episode-item.clickable:hover {
+    -fx-background-color: rgba(42, 42, 42, 0.8);
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.3), 5, 0, 0, 2);
+}
+
+.episode-number {
+    -fx-font-weight: bold;
+    -fx-min-width: 50px;
+    -fx-alignment: center;
+}
+
+.button-big-text {
+    -fx-font-size: 18px;
+    -fx-font-weight: bold;
+    -fx-border-radius: 24px;
+    -fx-background-radius: 24px;
+    -fx-pref-height: 40px;
+}
+
+/* Button with class style */
+.button-big {
+    -fx-font-size: 25px;
+    -fx-font-weight: bold;
+    -fx-border-color: #262626;
+    -fx-border-radius: 24px;
+    -fx-background-radius: 24px;
+    -fx-pref-height: 40px;
+    -fx-pref-width: 200px;
+    -fx-alignment: center;
+    -fx-background-color: rgba(100, 100, 100, 0.7);
+}
+
+
+.episode-thumbnail {
+    -fx-background-color: #333333;
+    -fx-background-radius: 4px;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.3), 3, 0, 0, 1);
+}
+
+.episode-title {
+    -fx-font-weight: bold;
+}
+
+
+.episode-description {
+    -fx-wrap-text: true;
+}
+
+/* Season selector */
+.seasons-dropdown-button {
+    -fx-background-color: transparent;
+    -fx-border-width: 1px;
+    -fx-font-weight: bold;
+    -fx-padding: 8 16 8 16;
+
+    -fx-min-width: 180px;
+}
+
+.seasons-dropdown-button:hover {
+    -fx-background-color: rgba(255, 255, 255, 0.1);
+}
+
+.seasons-dropdown-button:pressed {
+    -fx-background-color: rgba(255, 255, 255, 0.2);
+}
+
+.seasons-dropdown-menu {
+    -fx-background-color: rgba(15,15,15,0.97);
+    -fx-border-width: 1px;
+    -fx-padding: 8;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.5), 10, 0, 0, 4);
+    -fx-spacing: 2px;
+}
+
+.season-option-button {
+    -fx-background-color: transparent;
+    -fx-padding: 8 12 8 12;
+    -fx-alignment: center-left;
+}
+
+.season-option-button:hover {
+    -fx-background-color: rgba(255, 255, 255, 0.1);
+}
+
+.season-option-button.selected-season {
+    -fx-background-color: #7341BE;
+}
+
+.season-option-button.selected-season:hover {
+    -fx-background-color: #593294;
+}
+
+.favourite-active{
+    -fx-background-color:#a30f0f;
+}
+.favourite-active:hover{
+    -fx-background-color:#7a0a0a;
+}
+.favourite-active:pressed{
+    -fx-background-color:#3b0404;
+}
+
+.watchlist-active{
+    -fx-background-color:#a30f0f;
+}
+.watchlist-active:hover{
+    -fx-background-color:#7a0a0a;
+}
+.watchlist-active{
+    -fx-background-color:#3b0404;
+}

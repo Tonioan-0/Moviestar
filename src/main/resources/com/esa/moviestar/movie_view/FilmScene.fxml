@@ -12,7 +12,8 @@
 <?import javafx.scene.shape.SVGPath?>
 <?import javafx.scene.shape.Rectangle?>
 
-<StackPane fx:id="background" prefHeight="800.0" prefWidth="1200.0" stylesheets="@../styles/general.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.esa.moviestar.movie_view.FilmSceneController">
+<?import java.net.URL?>
+<StackPane fx:id="background" prefHeight="800.0" prefWidth="1200.0" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.esa.moviestar.movie_view.FilmSceneController">
 
     <ScrollPane fx:id="scrollPane" fitToWidth="true" hbarPolicy="NEVER" pannable="true" StackPane.alignment="CENTER">
         <StackPane>
@@ -246,4 +247,8 @@
         </StackPane.margin>
         <SVGPath content="%close" fill="#f5f5f5" scaleX="0.6" scaleY="0.6" StackPane.alignment="CENTER" />
     </StackPane>
+    <stylesheets>
+        <URL value="@../styles/filmScene.css" />
+        <URL value="@../styles/general.css" />
+    </stylesheets>
 </StackPane>

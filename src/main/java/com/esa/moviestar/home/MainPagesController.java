@@ -453,8 +453,8 @@ public class MainPagesController{
 
             filmController.setMainPagesController(this);
             filmController.setProperties(screenshotView, this);
-            filmController.loadContent(contentId, !isSeries);
             filmController.setUserAndAccount(user,account);
+            filmController.loadContent(contentId, !isSeries);
 
             transitionInProgress = false;
 
