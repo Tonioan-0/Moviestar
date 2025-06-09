@@ -26,7 +26,7 @@ public class DeletePopUp extends StackPane {
     private Button togglePasswordButton;
     private boolean isPasswordVisible = false;
 
-    public DeletePopUp(boolean isAccount, Account account) {
+    public DeletePopUp(boolean isAccount, Account account){
         page(isAccount, account);
         passwordProperty();
         setupPasswordToggle();
@@ -56,7 +56,7 @@ public class DeletePopUp extends StackPane {
         titleLabel.setPrefWidth(405.0);
         titleLabel.getStyleClass().addAll("large-text", "bold-text", "on-primary");
 
-        // Text
+        //Text
         Text descriptionText = new Text(isAccount ?
                 "Are you sure you want to delete your account? By proceeding, you will be logged out and will no longer be able to access it."
                 :
@@ -106,12 +106,12 @@ public class DeletePopUp extends StackPane {
         buttonHBox.setSpacing(35.0);
         VBox.setMargin(buttonHBox, new Insets(0, 40.0, 0, 0));
 
-        // Pulsante Annulla
+        // Cancel Button
         cancelButton = new Button("Cancel");
         cancelButton.setMnemonicParsing(false);
         cancelButton.getStyleClass().addAll("medium-item", "back-button");
 
-        // Pulsante Elimina account
+        // Delete Button
         deleteButton = new Button(isAccount ? "Delete account" : "Delete user");
         deleteButton.setMnemonicParsing(false);
         deleteButton.setPrefHeight(35.0);
@@ -132,22 +132,22 @@ public class DeletePopUp extends StackPane {
         this.setStyle("-fx-background-color: rgba(0, 0, 0, 0.7);");
     }
 
-    private void passwordProperty() {
-        // Listener per abilitare/disabilitare il pulsante in base al contenuto del TextField
-        passwordField.textProperty().addListener((observable, oldValue, newValue) -> {
+    private void passwordProperty(){
+        // Listener to enable/disable the button based on the contents of the TextField
+        passwordField.textProperty().addListener((observable, oldValue, newValue) ->{
             deleteButton.setDisable(newValue == null || newValue.trim().isEmpty());
         });
     }
 
-    private void setupPasswordToggle() {
-        passwordField.textProperty().addListener((obs, oldText, newText) -> {
-            if (!passwordTextField.isFocused()) {
+    private void setupPasswordToggle(){
+        passwordField.textProperty().addListener((obs, oldText, newText) ->{
+            if (!passwordTextField.isFocused()){
                 passwordTextField.setText(newText);
             }
         });
 
         passwordTextField.textProperty().addListener((obs, oldText, newText) -> {
-            if (!passwordField.isFocused()) {
+            if (!passwordField.isFocused()){
                 passwordField.setText(newText);
             }
         });
@@ -155,7 +155,7 @@ public class DeletePopUp extends StackPane {
         togglePasswordButton.setOnAction(event -> togglePasswordVisibility());
     }
 
-    private void togglePasswordVisibility() {
+    private void togglePasswordVisibility(){
         isPasswordVisible = !isPasswordVisible;
 
         passwordField.setVisible(!isPasswordVisible);
@@ -163,12 +163,12 @@ public class DeletePopUp extends StackPane {
         passwordTextField.setVisible(isPasswordVisible);
         passwordTextField.setManaged(isPasswordVisible);
 
-        if (isPasswordVisible) {
+        if (isPasswordVisible){
             passwordTextField.setText(passwordField.getText());
             passwordTextField.requestFocus();
             passwordTextField.positionCaret(passwordTextField.getText().length());
             togglePasswordButton.setGraphic(new SVGPath(){{setContent(Main.resourceBundle.getString("passwordField.hidePassword"));getStyleClass().add("on-primary");}});;
-        } else {
+        } else{
             passwordField.setText(passwordTextField.getText());
             passwordField.requestFocus();
             passwordField.positionCaret(passwordField.getText().length());
@@ -186,11 +186,11 @@ public class DeletePopUp extends StackPane {
         return passwordVBox;
     }
 
-    public Button getCancelButton() {
+    public Button getCancelButton(){
         return cancelButton;
     }
 
-    public TextField getPasswordField() {
+    public TextField getPasswordField(){
         return passwordField;
     }
 }
