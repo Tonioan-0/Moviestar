@@ -130,7 +130,7 @@ public class UpdatePasswordController{
                     newPasswordContainer, confirmPasswordContainer,
                     updateButton
             };
-            AnimationUtils.animateSimultaneously(formElements, 1);
+            AnimationUtils.animateSimultaneously(formElements);
         }
     }
 

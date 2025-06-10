@@ -6,8 +6,7 @@ import org.mindrot.jbcrypt.BCrypt;
 
 public class CredentialCryptManager {
 
-    private static final int BCRYPT_ROUNDS = 12;
-
+    private static int BCRYPT_ROUNDS = 12;
     public static boolean verifyPassword(String plainTextPassword, String hashedPassword){
         try
         {

@@ -24,16 +24,12 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Set;
-import java.util.HashSet;
 import java.util.concurrent.CompletableFuture;
-import java.util.function.Function;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import javafx.scene.shape.SVGPath;
 import java.util.*;
-
-//Samuele metti le sources grz
+//This class main job is to perform the search method which is one of the main methods of the whole code
+//basically everytime the page is updated with the results matching the search box text
 
 public class SearchController {
     @FXML
@@ -58,23 +54,13 @@ public class SearchController {
     private static final int MIN_LABEL_LIKE_DISPLAY_COUNT = 5;
     private static final int MIN_CONTENT_RICH_DISPLAY = 8;
 
-    private static <T> Predicate<T> distinctByKey(Function<? super T, ?> keyExtractor){
-        Set<Object> seen = new HashSet<>();
-        return t ->{
-            Object key = keyExtractor.apply(t);
-            if (key == null){
-                return false;
-            }
-            return seen.add(key);
-        };
-    }
-
     public void initialize(){
+        tmdbApiManager = TMDbApiManager.getInstance();
         if (this.setupController == null)
             this.setupController = new MainPagesController();
 
-        tmdbApiManager = TMDbApiManager.getInstance();
         this.seen = new HashMap<>();
+
         if (separatorLine != null){
             separatorLine.setStroke(
                     new LinearGradient(
@@ -83,9 +69,8 @@ public class SearchController {
                             new Stop(0.5, Color.WHITE),
                             new Stop(1.0, Color.TRANSPARENT)
                     ));
-        } else{
-            System.err.println("SearchController: separatorLine is null. Check FXML linkage.");
         }
+        else System.err.println("SearchController: separatorLine is null. Check FXML linkage.");
     }
 
     public void setParamController(HeaderController header, User user, MainPagesController mainPagesController) {
@@ -112,16 +97,21 @@ public class SearchController {
     }
 
     public void performSearch(String searchText) {
+
         separatorLine.setVisible(true);
         Platform.runLater(() ->{
+
             recommendations.getChildren().clear();
             filmSeriesRecommendations.getChildren().clear();
+
             if (findOutButton != null) findOutButton.setVisible(false);
         });
 
         List<CompletableFuture<List<Content>>> pageFutures = new ArrayList<>();
+
         for (int i = 1; i <= MAX_PAGES_TO_FETCH_SEARCH; i++)
             pageFutures.add(tmdbApiManager.searchMultiContent(searchText, i));
+
 
 
         CompletableFuture<Void> allPagesFuture = CompletableFuture.allOf(pageFutures.toArray(new CompletableFuture[0]));
@@ -129,15 +119,19 @@ public class SearchController {
         allPagesFuture.thenAcceptAsync(v ->{
                     List<Content> allRawResultsFromApi = new ArrayList<>();
                     for (CompletableFuture<List<Content>> pageFuture : pageFutures){
-                        try{
+                        try
+                        {
+
                             List<Content> pageResult = pageFuture.join();
-                            if (pageResult != null){
-                                allRawResultsFromApi.addAll(pageResult);
-                            }
-                        } catch (Exception e){
+                            if (pageResult != null)allRawResultsFromApi.addAll(pageResult);
+                        }
+                        catch (Exception e)
+                        {
                             System.err.println("SearchController: Error fetching or joining one page of search results: " + e.getMessage());
                         }
                     }
+
+
 
                     // Process the combined list on the JavaFX Application Thread
                     Platform.runLater(() -> {
@@ -149,32 +143,37 @@ public class SearchController {
                         String lowerCaseSearchText = searchText.toLowerCase();
                         seen.clear();
 
+
                         List<Content> uniquePopularContentFromApi = allRawResultsFromApi.stream()
                                 .filter(content -> content != null && content.getTitle() != null &&
                                         !content.getTitle().trim().isEmpty() &&
                                         content.getTitle().toLowerCase().contains(lowerCaseSearchText))
                                 .sorted(Comparator.comparingDouble(Content::getPopularity).reversed())
                                 .filter(content ->{
+
                                     String titleKey = content.getTitle().toLowerCase();
                                     if (seen.containsKey(titleKey))
                                         return false;
                                     else{seen.put(titleKey, true);
                                         return true;}
-                                })
-                                .toList();
+                                }).toList();
 
                         List<Content> forRichDisplay = uniquePopularContentFromApi.stream()
+
                                 .limit(TOP_N_COUNT_FOR_RICH_DISPLAY)
+
                                 .collect(Collectors.toCollection(ArrayList::new));
 
                         // Supplement forRichDisplay from DB if it's not full yet
                         if (forRichDisplay.size() < MIN_CONTENT_RICH_DISPLAY){
                             ContentDao contentDao = new ContentDao();
+
                             List<Content> dbContentList = contentDao.getContentFromQuery(searchText);
 
                             for (Content dbContent : dbContentList){
                                 if (forRichDisplay.size() >= MIN_CONTENT_RICH_DISPLAY){
                                     break;
+
                                 }
                                 if (dbContent.getTitle() != null && !dbContent.getTitle().trim().isEmpty()){
                                     String titleKey = dbContent.getTitle().toLowerCase();
@@ -191,11 +190,13 @@ public class SearchController {
                                 if (setupController == null)
                                     System.err.println("SearchController: setupController is null. Cannot create film nodes.");
                                 else
-                               {
+                                {
                                     filmSeriesRecommendations.getChildren().clear();
+
                                     List<Node> filmNodes =  setupController.createFilmNodes(forRichDisplay, false);
                                     filmSeriesRecommendations.getChildren().addAll(filmNodes);
-                               }
+                                }
+
                             } catch (IOException e){
                                 System.err.println("SearchController: Error creating film nodes for filmSeriesRecommendations: " + e.getMessage());
                             } catch (NullPointerException e) {
@@ -203,13 +204,16 @@ public class SearchController {
                             }
                         } else{
                             if(filmSeriesRecommendations.getChildren().isEmpty()) {
+
                                 separatorLine.setVisible(false);
                                 SVGPath path = new SVGPath() {{
+
                                     setContent(Main.resourceBundle.getString("icon.nothing-found"));
                                     getStyleClass().add("on-primary");
                                 }};
                                 String response = "";
                                 if (searchText.length() > 16)
+
                                     response = searchText.substring(0, 16) + "...";
                                 else
                                     response = searchText;
@@ -221,6 +225,7 @@ public class SearchController {
                                 nothingFound.setAlignment(Pos.CENTER);
                                 filmSeriesRecommendations.getChildren().add(nothingFound);
                             }
+
                         }
 
                         List<Content> forLabelLikeDisplay = uniquePopularContentFromApi.stream()
@@ -254,8 +259,8 @@ public class SearchController {
                             if (findOutButton != null)
                                 findOutButton.setVisible(true);
                         } else
-                            if (findOutButton != null)
-                                findOutButton.setVisible(false);
+                        if (findOutButton != null)
+                            findOutButton.setVisible(false);
 
 
                         if (forRichDisplay.isEmpty() && forLabelLikeDisplay.isEmpty()) {
@@ -273,7 +278,8 @@ public class SearchController {
                     return null;
                 });
     }
-
+    /*Function to create labels like buttons which have the same functionality of the content, so they are clickable,
+      and they connect the content to the film scene  */
     private List<Node> createLabelLikeButtons(List<Content> contentList){
         List<Node> buttons = new ArrayList<>();
         if (contentList == null || contentList.isEmpty()) return buttons;
@@ -289,11 +295,9 @@ public class SearchController {
             Button button = new Button(content.getTitle());
             button.getStyleClass().addAll("register-text-recommendation-mid", "on-primary", "button-big-text");
             button.setOnAction(event ->{
-                if (setupController != null) {
-                    setupController.openFilmScene(content.getId(), content.isSeries());
-                } else{
-                    System.err.println("SearchController: setupController is null. Cannot open film scene.");
-                }
+                if (setupController != null) setupController.openFilmScene(content.getId(), content.isSeries());
+                else System.err.println("SearchController: setupController is null. Cannot open film scene.");
+
             });
 
             itemContainer.getChildren().add(button);
@@ -319,4 +323,5 @@ public class SearchController {
         }
         return buttons;
     }
+
 }

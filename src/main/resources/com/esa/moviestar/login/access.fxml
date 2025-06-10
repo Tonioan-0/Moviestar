@@ -22,12 +22,12 @@
     </StackPane>
     <VBox fx:id="loginBox" alignment="CENTER" fillWidth="false" StackPane.alignment="CENTER">
         <Label fx:id="welcomeText" alignment="CENTER" styleClass="welcome-text" />
-        <TextField fx:id="emailField" styleClass="small-item" text="prova2@gmail.com" />
+        <TextField fx:id="emailField" styleClass="small-item" />
 
         <!-- Container per il campo password con bottone toggle -->
         <StackPane fx:id="passwordContainer" alignment="CENTER_RIGHT">
-            <PasswordField fx:id="passwordField" text="Eugenio04." />
-            <TextField fx:id="passwordTextField" managed="false" text="Eugenio04." visible="false" />
+            <PasswordField fx:id="passwordField"  />
+            <TextField fx:id="passwordTextField" managed="false" visible="false" />
             <Button fx:id="togglePasswordButton" styleClass="toggle-password-button"  />
         </StackPane>
 
