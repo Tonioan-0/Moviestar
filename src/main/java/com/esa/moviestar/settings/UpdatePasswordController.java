@@ -135,72 +135,120 @@ public class UpdatePasswordController{
     }
 
     private void setupPasswordToggle(){
+        // Setup for New Password
         if (newPasswordField != null && newPasswordTextField != null && toggleNewPasswordButton != null){
-            newPasswordField.textProperty().addListener((obs, oldText, newText) ->{
-                if (!newPasswordTextField.isFocused())
+            // Sincronizza i testi tra i due campi
+            newPasswordField.textProperty().addListener((obs, oldText, newText) -> {
+                if (!newPasswordTextField.isFocused()) {
                     newPasswordTextField.setText(newText);
+                }
             });
 
-            newPasswordTextField.textProperty().addListener((obs, oldText, newText) ->{
-                if (!newPasswordField.isFocused())
+            newPasswordTextField.textProperty().addListener((obs, oldText, newText) -> {
+                if (!newPasswordField.isFocused()) {
                     newPasswordField.setText(newText);
+                }
             });
 
-            toggleNewPasswordButton.setOnAction(event -> togglePasswordVisibility( isNewPasswordVisible, newPasswordField, newPasswordTextField, toggleNewPasswordButton));
+            //  toggle button
+            toggleNewPasswordButton.setOnAction(event -> toggleNewPasswordVisibility());
             StackPane.setAlignment(toggleNewPasswordButton, Pos.CENTER_RIGHT);
             StackPane.setMargin(toggleNewPasswordButton, new Insets(0, 10, 0, 0));
         }
 
+        // Setup for Confirm Password
         if (confirmPasswordField != null && confirmPasswordTextField != null && toggleConfirmPasswordButton != null){
-            confirmPasswordField.textProperty().addListener((obs, oldText, newText) ->{
-                if (!confirmPasswordTextField.isFocused())
+            // Sincronizza i testi tra i due campi
+            confirmPasswordField.textProperty().addListener((obs, oldText, newText) -> {
+                if (!confirmPasswordTextField.isFocused()) {
                     confirmPasswordTextField.setText(newText);
-
+                }
             });
 
-            confirmPasswordTextField.textProperty().addListener((obs, oldText, newText) ->{
-                if (!confirmPasswordField.isFocused())
+            confirmPasswordTextField.textProperty().addListener((obs, oldText, newText) -> {
+                if (!confirmPasswordField.isFocused()) {
                     confirmPasswordField.setText(newText);
+                }
             });
 
-            toggleConfirmPasswordButton.setOnAction(event -> togglePasswordVisibility(isConfirmPasswordVisible, confirmPasswordField, confirmPasswordTextField, toggleConfirmPasswordButton));
+            //  toggle button
+            toggleConfirmPasswordButton.setOnAction(event -> toggleConfirmPasswordVisibility());
             StackPane.setAlignment(toggleConfirmPasswordButton, Pos.CENTER_RIGHT);
             StackPane.setMargin(toggleConfirmPasswordButton, new Insets(0, 10, 0, 0));
         }
     }
-    private void togglePasswordVisibility(boolean variable, PasswordField passwordField, TextField textField, Button toggleButton){
-        variable = !variable;
-        String currentPassword = variable ? passwordField.getText() : textField.getText();
 
-        if (variable){
-            textField.setText(currentPassword);
-            passwordField.setVisible(false);
-            passwordField.setManaged(false);
-            textField.setVisible(true);
-            textField.setManaged(true);
-            textField.requestFocus();
-            textField.positionCaret(textField.getText().length());
-            toggleButton.setGraphic(new SVGPath(){{
+    private void toggleNewPasswordVisibility(){
+        isNewPasswordVisible = !isNewPasswordVisible;
+        String currentText = isNewPasswordVisible ? newPasswordField.getText() : newPasswordTextField.getText();
+
+        if (isNewPasswordVisible) {
+            // password like text
+            newPasswordTextField.setText(currentText);
+            newPasswordField.setVisible(false);
+            newPasswordField.setManaged(false);
+            newPasswordTextField.setVisible(true);
+            newPasswordTextField.setManaged(true);
+            newPasswordTextField.requestFocus();
+            newPasswordTextField.positionCaret(newPasswordTextField.getText().length());
+
+            // change icon
+            toggleNewPasswordButton.setGraphic(new SVGPath(){{
                 setContent(Main.resourceBundle.getString("passwordField.hidePassword"));
                 getStyleClass().add("on-primary");
             }});
-        } else{
-            passwordField.setText(currentPassword);
-            textField.setVisible(false);
-            textField.setManaged(false);
-            passwordField.setVisible(true);
-            passwordField.setManaged(true);
-            passwordField.requestFocus();
-            passwordField.positionCaret(passwordField.getText().length());
-            toggleButton.setGraphic(new SVGPath(){{
+        } else {
+            // hide the password
+            newPasswordField.setText(currentText);
+            newPasswordTextField.setVisible(false);
+            newPasswordTextField.setManaged(false);
+            newPasswordField.setVisible(true);
+            newPasswordField.setManaged(true);
+            newPasswordField.requestFocus();
+            newPasswordField.positionCaret(newPasswordField.getText().length());
+
+            // change the icon
+            toggleNewPasswordButton.setGraphic(new SVGPath(){{
                 setContent(Main.resourceBundle.getString("passwordField.showPassword"));
                 getStyleClass().add("on-primary");
             }});
         }
     }
 
+    private void toggleConfirmPasswordVisibility(){
+        isConfirmPasswordVisible = !isConfirmPasswordVisible;
+        String currentText = isConfirmPasswordVisible ? confirmPasswordField.getText() : confirmPasswordTextField.getText();
 
+        if (isConfirmPasswordVisible) {
 
+            confirmPasswordTextField.setText(currentText);
+            confirmPasswordField.setVisible(false);
+            confirmPasswordField.setManaged(false);
+            confirmPasswordTextField.setVisible(true);
+            confirmPasswordTextField.setManaged(true);
+            confirmPasswordTextField.requestFocus();
+            confirmPasswordTextField.positionCaret(confirmPasswordTextField.getText().length());
+
+            // Cambia icona per nascondere
+            toggleConfirmPasswordButton.setGraphic(new SVGPath(){{
+                setContent(Main.resourceBundle.getString("passwordField.hidePassword"));
+                getStyleClass().add("on-primary");
+            }});
+        } else {
+            confirmPasswordField.setText(currentText);
+            confirmPasswordTextField.setVisible(false);
+            confirmPasswordTextField.setManaged(false);
+            confirmPasswordField.setVisible(true);
+            confirmPasswordField.setManaged(true);
+            confirmPasswordField.requestFocus();
+            confirmPasswordField.positionCaret(confirmPasswordField.getText().length());
+
+            toggleConfirmPasswordButton.setGraphic(new SVGPath(){{
+                setContent(Main.resourceBundle.getString("passwordField.showPassword"));
+                getStyleClass().add("on-primary");
+            }});
+        }
+    }
 
     private String getCurrentNewPassword(){
         return isNewPasswordVisible ? newPasswordTextField.getText() : newPasswordField.getText();
@@ -211,6 +259,32 @@ public class UpdatePasswordController{
     }
 
 
+
+    private void changePassword(String email, String newPassword) throws SQLException{
+        AccountDao dao = new AccountDao();
+        dao.updatePassword(email, CredentialCryptManager.hashPassword(newPassword));
+    }
+
+    private void navigateToAccess(){
+        try{
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/esa/moviestar/login/access.fxml"), Main.resourceBundle);
+            Parent accountSettingContent = loader.load();
+            Access access = loader.getController();
+            access.setAccount(account);
+
+            Scene currentScene = parentContainer.getScene();
+            Scene newScene = new Scene(accountSettingContent, currentScene.getWidth(), currentScene.getHeight());
+
+            Stage stage = (Stage) parentContainer.getScene().getWindow();
+            stage.setScene(newScene);
+
+        } catch (IOException e){
+            System.err.println("Error while loading the page : access"+e.getMessage());
+            if(warningText != null){
+                warningText.setText("Error loading login page.");
+            }
+        }
+    }
     private void validatePasswordUpdate(){
         String oldPassword = oldPasswordField.getText();
         String newPassword = getCurrentNewPassword();
@@ -222,18 +296,10 @@ public class UpdatePasswordController{
             return;
         }
 
-        AccountDao dao = new AccountDao();
-        if (CredentialCryptManager.verifyPassword(account.getPassword(), oldPassword)){
-            boolean oldPasswordCorrect = dao.checkPassword(account.getEmail(), oldPassword);
-            if (!oldPasswordCorrect){
-                warningText.setText("The old password is incorrect.");
-                AnimationUtils.shake(warningText);
-                return;
-            }
-        } else{
+        if (!CredentialCryptManager.verifyPassword(oldPassword, account.getPassword() )){
             warningText.setText("The old password is incorrect.");
             AnimationUtils.shake(warningText);
-            System.out.println("error: CredentialCryptManager.verifyPassword returned false for old password");
+            System.out.println("ERROR: Password verification failed");
             return;
         }
 
@@ -263,33 +329,6 @@ public class UpdatePasswordController{
             System.err.println("Error while changing password " + e.getMessage());
         }
     }
-
-    private void changePassword(String email, String newPassword) throws SQLException{
-        AccountDao dao = new AccountDao();
-        dao.updatePassword(email, CredentialCryptManager.hashPassword(newPassword));
-    }
-
-    private void navigateToAccess(){
-        try{
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/esa/moviestar/login/access.fxml"), Main.resourceBundle);
-            Parent accountSettingContent = loader.load();
-            Access access = loader.getController();
-            // access.setAccount(account);
-
-            Scene currentScene = parentContainer.getScene();
-            Scene newScene = new Scene(accountSettingContent, currentScene.getWidth(), currentScene.getHeight());
-
-            Stage stage = (Stage) parentContainer.getScene().getWindow();
-            stage.setScene(newScene);
-
-        } catch (IOException e){
-            System.err.println("Error while loading the page : access"+e.getMessage());
-            if(warningText != null){
-                warningText.setText("Error loading login page.");
-            }
-        }
-    }
-
     private void navigateToSetting(){
         try{
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/esa/moviestar/settings/settings-view.fxml"), Main.resourceBundle);
