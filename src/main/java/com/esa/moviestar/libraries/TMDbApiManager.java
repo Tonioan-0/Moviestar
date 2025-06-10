@@ -345,14 +345,11 @@ public class TMDbApiManager {
             return CompletableFuture.failedFuture(new IllegalStateException("ContentDao not initialized."));
         }
         contentDao.deleteExpiredContent();
-        List<CompletableFuture<List<Content>>> futures = List.of(
-                getDiscoverFilmsAsContent(1),
-                getDiscoverTvShowsAsContent(1),
-                getDiscoverFilmsAsContent(2),
-                getDiscoverTvShowsAsContent(2),
-                getDiscoverFilmsAsContent(3),
-                getDiscoverTvShowsAsContent(3)
-        );
+        List<CompletableFuture<List<Content>>> futures = new ArrayList<>();
+        for (int i = 1; i <= 10; i++){
+            futures.add(getDiscoverFilmsAsContent(i));
+            futures.add(getDiscoverTvShowsAsContent(i));
+        }
 
         // Use handle to collect results or exceptions from all futures
         return CompletableFuture.allOf(futures.toArray(new CompletableFuture[0] ))

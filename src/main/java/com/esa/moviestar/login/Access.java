@@ -2,11 +2,17 @@ package com.esa.moviestar.login;
 
 import com.esa.moviestar.database.AccountDao;
 import com.esa.moviestar.Main;
+import com.esa.moviestar.database.ContentDao;
 import com.esa.moviestar.libraries.EmailService;
+import com.esa.moviestar.libraries.TMDbApiManager;
 import com.esa.moviestar.profile.ProfileView;
 import com.esa.moviestar.model.Account;
 import  com.esa.moviestar.libraries.CredentialCryptManager;
 import jakarta.mail.MessagingException;
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
+import javafx.application.Platform;
+import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
@@ -22,11 +28,16 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.layout.*;
 import javafx.scene.shape.SVGPath;
 import javafx.stage.Stage;
+import javafx.util.Duration;
 
 import java.io.IOException;
+import java.net.InetSocketAddress;
+import java.net.Socket;
 import java.sql.SQLException;
 import java.util.Random;
-
+// For the connection part we used sources:
+ //https://docs.oracle.com/javase/8/docs/api/java/net/InetSocketAddress.html
+ //
 public class Access {
     @FXML private Label welcomeText;
     @FXML private Label warningText;
@@ -63,6 +74,11 @@ public class Access {
     private final double COMPACT_MODE_THRESHOLD = 500.0;
     private final double IMAGE_VISIBILITY_THRESHOLD = 600.0;
 
+    //Variable to manage the internet connection
+    private Timeline internetCheckTime;
+    private static final String NO_INTERNET_MESSAGE = "Connect to internet. Retrying...";
+
+
     public void initialize(){
 
         setupBasicGeneralObjects();
@@ -74,6 +90,8 @@ public class Access {
 
         setupResponsiveLayout();
         setupKeyboardNavigation();
+
+        checkAndSetupInternetDependentFeatures();
     }
 
     private void setupBasicButtons(){
@@ -410,8 +428,116 @@ public class Access {
             warningText.setText("An error occurred: "  + e.getMessage());
         }
     }
+
+    private boolean hasInternetConnection() {
+        try (Socket socket = new Socket()) {
+            // Try connecting to Google's public DNS server
+            InetSocketAddress socketAddress = new InetSocketAddress("8.8.8.8", 53);
+            socket.connect(socketAddress, 2000);
+            return true;
+        } catch (IOException e) {
+            return false;
+        }
+    }
+
+    private void checkAndSetupInternetDependentFeatures() {
+        if (hasInternetConnection())
+            configureOnlineState();
+        else
+            configureOfflineStateAndRetry();
+
+    }
+    private void configureOfflineStateAndRetry() {
+
+        Platform.runLater(() ->{
+            warningText.setText( NO_INTERNET_MESSAGE);
+            AnimationUtils.shake(warningText);
+
+            javafx.event.EventHandler<javafx.event.ActionEvent> offlineAction =  event-> {
+                warningText.setText(NO_INTERNET_MESSAGE);
+                AnimationUtils.shake(warningText);
+                // Ensure retry is active or restart it
+                if (internetCheckTime == null || internetCheckTime.getStatus() != Timeline.Status.RUNNING) {
+                    startInternetCheckRetry();
+                }
+            };
+
+            register.setOnAction(offlineAction);
+            access.setOnAction(offlineAction);
+            resetPassword.setOnAction(offlineAction);
+
+            startInternetCheckRetry();
+        });
+    }
+
+    private void startInternetCheckRetry() {
+        if (internetCheckTime != null)
+            internetCheckTime.stop();
+        //This event check if the connection is restored or is not lost
+        internetCheckTime = new Timeline(new KeyFrame(Duration.seconds(3), event -> {
+
+            if (hasInternetConnection())
+                configureOnlineState();
+            else
+                Platform.runLater(() -> {
+                    if (!warningText.getText().equals(NO_INTERNET_MESSAGE))
+                        warningText.setText(NO_INTERNET_MESSAGE);
+                    AnimationUtils.shake(warningText);
+                });
+        }));
+        internetCheckTime.setCycleCount(Timeline.INDEFINITE);
+        internetCheckTime.play();
+    }
+
+    private void configureOnlineState(){
+        Platform.runLater(() ->{
+            warningText.setText("");
+            if (internetCheckTime != null) {
+                internetCheckTime.stop();
+                internetCheckTime = null;
+            }
+
+            register.setOnAction( event -> switchToRegistrationPage());
+            access.setOnAction(event -> {
+                try {
+                    loginUser();
+                } catch (SQLException e) {
+                    warningText.setText("Login failed. Please try again.");
+                    AnimationUtils.shake(warningText);
+                }
+            });
+            resetPassword.setOnAction(event -> {
+                try {
+                    sendCredential();
+                } catch (SQLException | IOException | MessagingException e) {
+                    warningText.setText("Failed to send credentials. Please try again.");
+                    AnimationUtils.shake(warningText);
+                }
+            });
+            updateDB();
+        });
+    }
+
+    private static void updateDB(){
+        Task<Void> updateDbTask= new Task<>(){
+            @Override
+            protected Void call() {updateMessage("Starting database content update..." ); // For Task progress
+                TMDbApiManager tmdbApiManager = TMDbApiManager.getInstance();
+                TMDbApiManager.getInstance().setContentDao(new ContentDao());
+                try {
+                    tmdbApiManager.updateAllContentInDatabase().join();
+                } catch (Exception e) {
+                    System.err.println("Access: Exception during TMDb content update: " + e.getMessage());
+                }
+                return null;
+            }
+        };
+        Thread taskThread =  new Thread(updateDbTask);
+        taskThread.setDaemon( true);
+        taskThread.start();
+    }
+    
     public void setAccount(Account account){
         this.account = account;
-        System.out.println("Access : email " + account.getEmail());
     }
 }
