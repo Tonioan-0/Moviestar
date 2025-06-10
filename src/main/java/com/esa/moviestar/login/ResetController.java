@@ -471,7 +471,6 @@ public class ResetController{
 
             String hashedPassword = CredentialCryptManager.hashPassword(newPassword);
             swapPassword(userEmail, hashedPassword);
-            updateStatus("Password changed successfully");
             AnimationUtils.pulse(resetButton);
             countdownTimeline.stop();
             if(countdownLabel != null){
@@ -482,7 +481,6 @@ public class ResetController{
             PauseTransition pause = new PauseTransition(Duration.seconds(0.25));
 
             pause.setOnFinished(e -> navigateToLogin());
-
             pause.play();
 
         }

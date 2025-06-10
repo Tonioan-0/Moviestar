@@ -79,6 +79,7 @@ public class AccountDao {
         try (PreparedStatement stmt = connection.prepareStatement(query)){
             stmt.setString(1,  password);
             stmt.setString(2, email);
+            stmt.executeUpdate();
             System.out.println("AccountDao :account with updated password : "+email);
         } catch (SQLException e){
             System.err.println("accountDao : Account password update error"+e.getMessage());
