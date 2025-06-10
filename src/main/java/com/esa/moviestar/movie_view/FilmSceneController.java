@@ -16,7 +16,6 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -29,7 +28,6 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
-import javafx.scene.shape.Rectangle;
 import javafx.stage.Popup;
 import javafx.stage.Stage;
 
@@ -53,35 +51,52 @@ public class FilmSceneController {
     private Account account;
     // The api doesn't provide the entire film, to make owr app work we take this sample video
     private String VIDEO_PLACEHOLDER= "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerFun.mp4";
-
     // Main containers
-    @FXML public StackPane background;
-    @FXML public ScrollPane scrollPane;
-    @FXML public VBox episodesList;
+    @FXML
+    public StackPane background;
+    @FXML
+    public ScrollPane scrollPane;
+    @FXML
+    public VBox episodesList;
 
     // Buttons
-    @FXML private StackPane closeButton;
-    @FXML private HBox playButton;
-    @FXML private HBox addToWatchListButton;
-    @FXML private HBox addToFavouriteButton;
+    @FXML
+    private StackPane closeButton;
+    @FXML
+    private HBox playButton;
+    @FXML
+    private HBox addToWatchListButton;
+    @FXML
+    private HBox addToFavouriteButton;
 
     // Labels for content info
-    @FXML private Label titleLabel;
-    @FXML private Label yearLabel;
-    @FXML private Label episodesLabel;
-    @FXML private Label ratingLabel;
-    @FXML private Label maturityLabel;
-    @FXML private Label violenceLabel;
-    @FXML private Label descriptionLabel;
-    @FXML private Label castLabel;
-    @FXML private Label genresLabel;
-    @FXML private Label showTypeLabel;
-    @FXML private Label seriesTitleLabel;
+    @FXML
+    private Label titleLabel;
+    @FXML
+    private Label yearLabel;
+    @FXML
+    private Label episodesLabel;
+    @FXML
+    private Label ratingLabel;
+    @FXML
+    private Label maturityLabel;
+    @FXML
+    private Label violenceLabel;
+    @FXML
+    private Label descriptionLabel;
+    @FXML
+    private Label castLabel;
+    @FXML
+    private Label genresLabel;
+    @FXML
+    private Label showTypeLabel;
+    @FXML
+    private Label seriesTitleLabel;
 
     // Season selection components
     private HBox seasonsContainer;
-    private Button seasonsDropdownButton;
-    private VBox seasonsDropdownMenu;
+    private Button seasonsListButton;
+    private VBox seasonsListMenu;
     private boolean isDropdownOpen = false;
     private int currentSeasonIndex = 0;
     private int currentSeriesId = 0; // Store series ID for loading additional seasons
@@ -92,221 +107,177 @@ public class FilmSceneController {
     private boolean isInWatchList= false;
 
 
-    public void initialize() {
+    public void initialize(){
+
         apiManager = TMDbApiManager.getInstance();
 
-        // Set button actions
-        if (closeButton != null)
-            closeButton.setOnMouseClicked(event -> closeView());
-
-        if (playButton != null)
-            playButton.setOnMouseClicked(event -> playContent());
+        closeButton.setOnMouseClicked(event -> closeView());
+        playButton.setOnMouseClicked(event -> playContent());
 
         if (addToWatchListButton != null)
+
             addToWatchListButton.setOnMouseClicked(event ->{
-                if(!isInWatchList) {
+                if(!isInWatchList){
                     addToWatchlist();
+
                     styleWatchListButton.getStyleClass().add( "watchlist-active");
-                    styleFavouriteButton.getStyleClass().remove( "surface-transparent");
+                    styleWatchListButton.getStyleClass().remove( "surface-transparent");
+
                 }
                 else
                 {
                     deleteFromWatchlist();
                     styleWatchListButton.getStyleClass().remove( "watchlist-active");
-                    styleFavouriteButton.getStyleClass().add( "surface-transparent");
+                    styleWatchListButton.getStyleClass().add( "surface-transparent");
                 }
                 isInWatchList = !isInWatchList;
             });
-
         if (addToFavouriteButton != null)
             addToFavouriteButton.setOnMouseClicked(event -> {
-                if(!isInFavourite) {
+                if(!isInFavourite){
+
                     addToFavourites();
                     styleFavouriteButton.getStyleClass().add( "favourite-active");
                     styleFavouriteButton.getStyleClass().remove( "surface-transparent");
                 }
-                else {
+                else
+                {
+
                     deleteFromFavourites();
                     styleFavouriteButton.getStyleClass().remove( "favourite-active");
                     styleFavouriteButton.getStyleClass().add( "surface-transparent");
+
+
                 }
                 isInFavourite = !isInFavourite;
             });
+
     }
 
-    /**
-     * Main method to load content data from TMDb API
-     *
-     * @param contentId The TMDb ID of the content
-     * @param isMovie   true for movie, false for TV series
-     */
-    public void loadContent(int contentId, boolean isMovie) {
-        // Show loading state
-        showLoadingState();
-        // Check  if the content is in the favourites or in the watchList
-        checkFavouriteAndWatchList(user,contentId);
-        if (isMovie) {
-            loadMovieData(contentId);
-        } else {
-            currentSeriesId = contentId; // Store series ID
-            loadTVSeriesData(contentId);
-        }
-    }
+    //This function stores the data gotten from the json file given by the api
+    private void loadMovieData(int idMovie){
 
-    private void loadMovieData(int movieId) {
-        String endpoint = "/movie/" + movieId + "?append_to_response=credits";
-
+        String endpoint = "/movie/" + idMovie + "?append_to_response=credits";
+        //This point is crucial to get the actual information by the movie id in the apiManager
         apiManager.makeRequestAsync(endpoint)
-                .thenAccept(jsonString -> {
+                .thenAccept(jsonString ->{
                     Platform.runLater(() -> {
-                        try {
-                            JsonObject movieJson = JsonParser.parseString(jsonString).getAsJsonObject();
-                            currentContent = parseMovieData(movieJson);
-                            displayMovieContent();
-                        } catch (Exception e) {
-                            System.err.println("Error parsing movie data: " + e.getMessage());
-                            showErrorState();
-                        }
+
+                        JsonObject movieJson = JsonParser.parseString(jsonString).getAsJsonObject();
+                        currentContent = parseMovieData(movieJson);
+                        displayMovieContent();
+
+                        if(currentContent==null)
+                            System.err.println("Error parsing movie data in loadMovieData");
                     });
-                })
-                .exceptionally(ex -> {
-                    Platform.runLater(() -> {
-                        System.err.println("Error loading movie data: " + ex.getMessage());
-                        showErrorState();
-                    });
-                    return null;
                 });
     }
 
-    private void loadTVSeriesData(int seriesId) {
-        String seriesEndpoint = "/tv/" + seriesId + "?append_to_response=credits";
 
-        apiManager.makeRequestAsync(seriesEndpoint)
-                .thenAccept(seriesJsonString -> {
-                    Platform.runLater(() -> {
-                        try {
-                            JsonObject seriesJson = JsonParser.parseString(seriesJsonString).getAsJsonObject();
-                            currentContent = parseSeriesData(seriesJson);
-                            initializeAllSeasons();
-                            displaySeriesContent();
-                        } catch (Exception e) {
-                            System.err.println("Error parsing series data: " + e.getMessage());
-                            showErrorState();
-                        }
-                    });
-                })
-                .exceptionally(ex -> {
-                    Platform.runLater(() -> {
-                        System.err.println("Error loading series data: " + ex.getMessage());
-                        showErrorState();
-                    });
-                    return null;
-                });
-    }
+    //Function to store the movie data we parsed into a real FilmSeriesDetail object
+    private FilmSeriesDetails parseMovieData(JsonObject movieJsonInfo){
 
-    private FilmSeriesDetails parseMovieData(JsonObject movieJson) {
         FilmSeriesDetails movie = new FilmSeriesDetails();
 
-        movie.setId(getIntegerOrNull(movieJson, "id", 0));
-        movie.setTitle(getStringOrNull(movieJson, "title"));
-        movie.setPlot(getStringOrNull(movieJson, "overview"));
-        movie.setPosterUrl(apiManager.getImageUrl(getStringOrNull(movieJson, "poster_path"), "w500"));
-        movie.setBackdropUrl(apiManager.getImageUrl(getStringOrNull(movieJson, "backdrop_path"), "w1280"));
-        movie.setReleaseDate(getStringOrNull(movieJson, "release_date"));
-        movie.setMovieRuntime(getIntegerOrNull(movieJson, "runtime", 0));
-        movie.setVideoUrl(VIDEO_PLACEHOLDER);
-
-        if (movie.getReleaseDate() != null && movie.getReleaseDate().length() >= 4) {
-            try {
-                movie.setYear(Integer.parseInt(movie.getReleaseDate().substring(0, 4)));
-            } catch (NumberFormatException e) {
-                System.err.println("Could not parse year for movie.");
-            }
-        }
-
-        movie.setSeries(false);
-
         List<String> genreNames = new ArrayList<>();
-        if (movieJson.has("genres") && movieJson.get("genres").isJsonArray()) {
-            for (JsonElement genreEl : movieJson.getAsJsonArray("genres")) {
+        if(movieJsonInfo.has("genres") && movieJsonInfo.get("genres").isJsonArray()){
+            for(JsonElement genreEl : movieJsonInfo.getAsJsonArray("genres"))
                 genreNames.add(getStringOrNull(genreEl.getAsJsonObject(), "name"));
-            }
         }
         movie.setGenreNames(genreNames);
 
-        if (movieJson.has("production_companies") && movieJson.get("production_companies").isJsonArray()) {
-            JsonArray prodArray = movieJson.getAsJsonArray("production_companies");
-            if (!prodArray.isEmpty()) {
-                movie.setProductionName(getStringOrNull(prodArray.get(0).getAsJsonObject(), "name"));
-            }
-        }
 
-        if (movieJson.has("credits") && movieJson.getAsJsonObject("credits").has("cast")) {
-            JsonArray castArray = movieJson.getAsJsonObject("credits").getAsJsonArray("cast");
+        if (movieJsonInfo.has("credits") && movieJsonInfo.getAsJsonObject("credits").has("cast")) {
+            JsonArray castArray = movieJsonInfo.getAsJsonObject("credits").getAsJsonArray("cast");
             List<String> castNames = new ArrayList<>();
             for (int i = 0; i < castArray.size() && i < 5; i++) {
                 castNames.add(getStringOrNull(castArray.get(i).getAsJsonObject(), "name"));
             }
             movie.setCast(String.join(", ", castNames));
         }
+        movie.setContentId(getIntegerOrNull(movieJsonInfo, "id", 0));
+        movie.setContentTitle(getStringOrNull(movieJsonInfo, "title"));
+        movie.setPlot(getStringOrNull(movieJsonInfo, "overview"));
+
+        movie.setPosterUrl(apiManager.getImageUrl(getStringOrNull(movieJsonInfo, "poster_path"), "w500"));
+        movie.setBackdropUrl(apiManager.getImageUrl(getStringOrNull(movieJsonInfo, "backdrop_path"), "w1280"));
+
+        movie.setReleaseDate(getStringOrNull(movieJsonInfo, "release_date"));
+        if(movie.getReleaseDate() != null && movie.getReleaseDate().length() >= 4)
+            movie.setYear(Integer.parseInt(movie.getReleaseDate().substring(0, 4)));
+        movie.setMovieRuntime(getIntegerOrNull(movieJsonInfo, "runtime", 0));
+        movie.setVideoUrl(VIDEO_PLACEHOLDER);
+
+        /*Essential boolean setting so we can use a currentContent object and use this to see which obj
+         is being displayed*/
+        movie.setSeries(false);
+
         return movie;
     }
 
-    private FilmSeriesDetails parseSeriesData(JsonObject seriesJson) {
+
+    //This function stores the data gotten from the json file given by the api
+    private void loadTVSeriesData(int idSeries){
+
+        String seriesEndpoint = "/tv/" + idSeries + "?append_to_response=credits";
+        /*This point is crucial to get the actual information by the series id in the apiManager just like
+        we do for movies*/
+        apiManager.makeRequestAsync(seriesEndpoint)
+                .thenAccept(seriesJsonString -> {
+                    Platform.runLater(() -> {
+                        JsonObject seriesJson = JsonParser.parseString(seriesJsonString).getAsJsonObject();
+                        currentContent = parseSeriesData(seriesJson);
+                        initializeAllSeasons();
+                        displaySeriesContent();
+                        if(currentContent==null)
+                            System.err.println("Error parsing series data in loadSeriesData");
+                    });
+                });
+    }
+
+
+    //Function to store the movie data we parsed into a real FilmSeriesDetail object
+    private FilmSeriesDetails parseSeriesData(JsonObject seriesJsonInfo){
         FilmSeriesDetails series = new FilmSeriesDetails();
-
-        series.setId(getIntegerOrNull(seriesJson, "id", 0));
-        series.setTitle(getStringOrNull(seriesJson, "name"));
-        series.setPlot(getStringOrNull(seriesJson, "overview"));
-        series.setPosterUrl(apiManager.getImageUrl(getStringOrNull(seriesJson, "poster_path"), "w500"));
-        series.setBackdropUrl(apiManager.getImageUrl(getStringOrNull(seriesJson, "backdrop_path"), "w1280"));
-        series.setReleaseDate(getStringOrNull(seriesJson, "first_air_date"));
-        series.setVideoUrl(VIDEO_PLACEHOLDER);
-        if (series.getReleaseDate() != null && series.getReleaseDate().length() >= 4) {
-            try {
-                series.setYear(Integer.parseInt(series.getReleaseDate().substring(0, 4)));
-            } catch (NumberFormatException e) {
-                System.err.println("Could not parse year for series.");
-            }
-        }
-
-        series.setSeries(true);
-        series.setNumberOfSeasons(getIntegerOrNull(seriesJson, "number_of_seasons", 0));
-
         List<String> genreNames = new ArrayList<>();
-        if (seriesJson.has("genres") && seriesJson.get("genres").isJsonArray()) {
-            for (JsonElement genreEl : seriesJson.getAsJsonArray("genres")) {
+        if (seriesJsonInfo.has("genres") && seriesJsonInfo.get("genres").isJsonArray()) {
+            for (JsonElement genreEl : seriesJsonInfo.getAsJsonArray("genres")) {
                 genreNames.add(getStringOrNull(genreEl.getAsJsonObject(), "name"));
             }
         }
         series.setGenreNames(genreNames);
 
-        if (seriesJson.has("production_companies") && seriesJson.get("production_companies").isJsonArray()) {
-            JsonArray prodArray = seriesJson.getAsJsonArray("production_companies");
-            if (!prodArray.isEmpty()) {
-                series.setProductionName(getStringOrNull(prodArray.get(0).getAsJsonObject(), "name"));
-            }
-        }
 
-        if (seriesJson.has("credits") && seriesJson.getAsJsonObject("credits").has("cast")) {
-            JsonArray castArray = seriesJson.getAsJsonObject("credits").getAsJsonArray("cast");
+        if (seriesJsonInfo.has("credits") && seriesJsonInfo.getAsJsonObject("credits").has("cast")) {
+            JsonArray castArray = seriesJsonInfo.getAsJsonObject("credits").getAsJsonArray("cast");
             List<String> castNames = new ArrayList<>();
             for (int i = 0; i < castArray.size() && i < 5; i++) {
                 castNames.add(getStringOrNull(castArray.get(i).getAsJsonObject(), "name"));
             }
             series.setCast(String.join(", ", castNames));
         }
+        series.setContentId(getIntegerOrNull(seriesJsonInfo, "id", 0));
+        series.setContentTitle(getStringOrNull(seriesJsonInfo, "name"));
+        series.setPlot(getStringOrNull(seriesJsonInfo, "overview"));
+        series.setPosterUrl(apiManager.getImageUrl(getStringOrNull(seriesJsonInfo, "poster_path"), "w500"));
+        series.setBackdropUrl(apiManager.getImageUrl(getStringOrNull(seriesJsonInfo, "backdrop_path"), "w1280"));
+        series.setReleaseDate(getStringOrNull(seriesJsonInfo, "first_air_date"));
+        if (series.getReleaseDate() != null && series.getReleaseDate().length() >= 4)
+            series.setYear(Integer.parseInt(series.getReleaseDate().substring(0, 4)));
+        series.setVideoUrl(VIDEO_PLACEHOLDER);
+
+
+        series.setSeries(true);
+        series.setNumberOfSeasons(getIntegerOrNull(seriesJsonInfo, "number_of_seasons", 0));
+
         return series;
     }
 
-    private FilmSeriesDetails.SeasonDetails parseSeasonData(JsonObject seasonJson) {
+    private FilmSeriesDetails.SeasonDetails parseSeasonData(JsonObject seasonJson){
+
         FilmSeriesDetails.SeasonDetails season = new FilmSeriesDetails.SeasonDetails();
 
-        season.setSeasonNumber(getIntegerOrNull(seasonJson, "season_number", 0));
-        season.setName(getStringOrNull(seasonJson, "name"));
-        season.setOverview(getStringOrNull(seasonJson, "overview"));
-        season.setPosterUrl(apiManager.getImageUrl(getStringOrNull(seasonJson, "poster_path"), "w300"));
-        season.setAirDate(getStringOrNull(seasonJson, "air_date"));
+
         if (seasonJson.has("episodes") && seasonJson.get("episodes").isJsonArray()) {
             for (JsonElement epEl : seasonJson.getAsJsonArray("episodes")) {
                 JsonObject epJson = epEl.getAsJsonObject();
@@ -321,76 +292,110 @@ public class FilmSceneController {
                 season.addEpisode(episode);
             }
         }
+        season.setSeasonNumber(getIntegerOrNull(seasonJson, "season_number", 0));
+
+        season.setAirDate(getStringOrNull(seasonJson, "air_date"));
+        season.setName(getStringOrNull(seasonJson, "name"));
+        season.setOverview(getStringOrNull(seasonJson, "overview"));
+
+        season.setPosterUrl(apiManager.getImageUrl(getStringOrNull(seasonJson, "poster_path"), "w300"));
+
         return season;
     }
 
-    private String truncateText(String text) {
-        if (text == null || text.isEmpty()) {
-            return text;
-        }
-        // If "..." is already present, assume it's suitably truncated or meant to be displayed as is.
-        if (text.contains("...")) {
-            return text;
-        }
+    //Some descriptions of episodes and general movie/series are too long so we need to truncate them properly
+    private String truncateText(String text){
+        if (text == null || text.isEmpty())return text;
+        //Sometimes we hae multiple "..." basically this method truncates on the second "."
+        if (text.contains("..."))return text;
 
         int firstPeriod = text.indexOf('.');
-        if (firstPeriod == -1) {
-            return text; // No periods, return original
-        }
-
+        if (firstPeriod == -1)return text;
         int secondPeriod = text.indexOf('.', firstPeriod + 1);
-        if (secondPeriod == -1) {
-            return text; // Only one period, return original
-        }
-        // Return the substring up to and including the second period
-        return text.substring(0, secondPeriod + 1);
+        if (secondPeriod == -1)return text;
+        String subDescription = text.substring(0, secondPeriod + 1);
+
+        return subDescription;
     }
 
-    private void displayMovieContent() {
-        if (currentContent == null) return;
+    //Load initial content data depending on it's type
+    public void loadContent(int idContent, boolean isMovie){
+        if(!isMovie){
+            currentSeriesId = idContent;
+            loadTVSeriesData(idContent);
 
-        setTitle(currentContent.getTitle());
+            System.out.println("TV Series content was loaded");
+        }
+        else
+        {
+            loadMovieData(idContent);
+            System.out.println("Movie content was loaded");
+        }
+        showLoadingState();
+
+        checkFavouriteAndWatchList(user, idContent);
+
+    }
+
+    private void setMovieContentUI(){
+        setTitle(currentContent.getContentTitle());
         setYear(String.valueOf(currentContent.getYear()));
         setMovieRuntime(currentContent.getMovieRuntime());
-        setDescription(truncateText(currentContent.getPlot()));
+
         setCast(currentContent.getCast());
+        setDescription(truncateText(currentContent.getPlot()));
         setGenres(String.join(", ", currentContent.getGenreNames()));
 
-        if (showTypeLabel != null) showTypeLabel.setText("MOVIE");
-        hideSeriesSpecificUI();
-        loadBackdrop(currentContent.getBackdropUrl());
-        System.out.println("Movie content displayed: " + currentContent.getTitle());
     }
 
-    private void displaySeriesContent() {
-        if (currentContent == null) return;
-
-        setTitle(currentContent.getTitle());
+    public void setSeriesContentUI(){
+        seriesTitleLabel.setText(currentContent.getContentTitle());
+        seriesTitleLabel.setVisible(true);
+        seriesTitleLabel.setManaged(true);
+        setTitle(currentContent.getContentTitle());
         setYear(String.valueOf(currentContent.getYear()));
         setDescription(truncateText(currentContent.getPlot()));
         setCast(currentContent.getCast());
         setGenres(String.join(", ", currentContent.getGenreNames()));
         setSeasonsNumber(currentContent.getNumberOfSeasons());
 
+    }
 
-        if (showTypeLabel != null) showTypeLabel.setText("TV SERIES");
-        if (seriesTitleLabel != null) {
-            seriesTitleLabel.setText(currentContent.getTitle());
-            seriesTitleLabel.setVisible(true);
-            seriesTitleLabel.setManaged(true);
+    private void displayMovieContent() {
+        if (currentContent == null) {
+            System.err.println("Current content is null, cannot display movie content in (displayMovieContent)");
+            return;
         }
+        setMovieContentUI();
+
+        showTypeLabel.setText("MOVIE");
+        hideSeriesSpecificUI();
+        loadBackdrop(currentContent.getBackdropUrl());
+        System.out.println("Movie content displayed");
+    }
+
+
+
+    private void displaySeriesContent() {
+        if (currentContent == null){
+            System.err.println("Current content is null, cannot display series content in (displaySeriesContent)");
+            return;
+        }
+        setSeriesContentUI();
+        showTypeLabel.setText("TV SERIES");
 
         showSeriesSpecificUI();
         loadBackdrop(currentContent.getBackdropUrl());
-        System.out.println("Series content displayed: " + currentContent.getTitle());
+        System.out.println("Series content displayed");
     }
 
-    private void showSeriesSpecificUI() {
-        if (episodesSectionVBox != null) {
-            episodesSectionVBox.setVisible(true);
-            episodesSectionVBox.setManaged(true);
-        }
-        createSeasonsSelector();
+    //Specific section for series it adds the bottom vbox by showing its seasons and episodes
+    private void showSeriesSpecificUI(){
+        episodesSectionVBox.setManaged(true);
+        episodesSectionVBox.setVisible(true);
+
+        createSeasonsSwitch();
+
         updateEpisodesDisplay();
     }
 
@@ -417,47 +422,67 @@ public class FilmSceneController {
         }
     }
 
-    private void createSeasonsSelector(){
-        if (episodesList == null ||  !(episodesList.getParent() instanceof VBox)) {
-            System.err.println("Cannot create seasons selector: episodesList is null or its parent is not a VBox.");
+    private void updateSeasonDropdownButtonText() {
+        if (currentContent == null || !currentContent.isSeries()){
+            System.err.println("Cannot update season dropdown button text");
             return;
         }
+        String buttonText = "Season " + (currentSeasonIndex + 1);
+        List<FilmSeriesDetails.SeasonDetails> seasons = currentContent.getSeasons();
+        if (seasons != null && currentSeasonIndex >= 0 && currentSeasonIndex < seasons.size()) {
+            FilmSeriesDetails.SeasonDetails season = seasons.get(currentSeasonIndex);
+            if (season != null && season.getName() != null && !season.getName().isEmpty()) buttonText = season.getName();
+        }
 
-        VBox episodesSectionParent = episodesSectionVBox;
-        if (episodesSectionParent == null) {
-            System.err.println("Cannot create seasons selector: episodesSectionVBox is null.");
+        seasonsListButton.setText(buttonText);
+    }
+
+    //Basic setting season objects
+    private void setSeasonsContainer(){
+        seasonsContainer.setAlignment(Pos.CENTER_LEFT);
+        seasonsContainer.setSpacing(10);
+        seasonsContainer.setStyle("-fx-padding: 0 0 15 0;");
+    }
+    private void setSeasonsListButton(){
+        seasonsListButton.getStyleClass().addAll("seasons-dropdown-button","small-item","on-primary","primary-border");
+        seasonsListButton.setPrefHeight(35);
+        seasonsListButton.setOnAction(e -> popUpSeasonContainer());
+    }
+    private void setSeasonsListMenu(){
+        seasonsListMenu.getStyleClass().addAll("seasons-dropdown-menu","small-item","on-primary");
+        seasonsListMenu.setVisible(false);
+        seasonsListMenu.setManaged(false);
+        seasonsListMenu.setSpacing(2);
+        seasonsListMenu.setMaxHeight(200);
+    }
+
+    private void createSeasonsSwitch() {
+
+        VBox episodesSection = episodesSectionVBox;
+        if(episodesSection == null){
+            System.err.println("Cannot create seasons selector due to null section-vbox");
             return;
         }
-        if (seasonsContainer == null){
-            seasonsContainer = new HBox();
-            seasonsContainer.setAlignment(Pos.CENTER_LEFT);
-            seasonsContainer.setSpacing(10 );
-            seasonsContainer.setStyle( "-fx-padding: 0 0 15 0;");
+        seasonsContainer = new HBox();
+        setSeasonsContainer();
 
-            seasonsDropdownButton = new Button();
-            seasonsDropdownButton.getStyleClass().addAll("seasons-dropdown-button", "small-item", "on-primary","primary-border");
-            seasonsDropdownButton.setPrefHeight(35);
-            seasonsDropdownButton.setOnAction(e -> popUpSeasonContainer());
+        seasonsListButton = new Button();
+        setSeasonsListButton();
+
+        seasonsListMenu = new VBox();
+        setSeasonsListMenu();
+
+        StackPane dropdownWrapper = new StackPane(seasonsListButton, seasonsListMenu);
+        StackPane.setAlignment(seasonsListMenu, Pos.TOP_LEFT);
+        seasonsListMenu.setTranslateY(37);
+
+        seasonsContainer.getChildren().add(dropdownWrapper);
 
 
-            seasonsDropdownMenu = new VBox();
-            seasonsDropdownMenu.getStyleClass().addAll( "seasons-dropdown-menu","small-item","on-primary");
-            seasonsDropdownMenu.setVisible(false);
-            seasonsDropdownMenu.setManaged(false);
-            seasonsDropdownMenu.setSpacing( 2);
-            seasonsDropdownMenu.setMaxHeight(200);
-
-            StackPane dropdownWrapper = new StackPane( seasonsDropdownButton, seasonsDropdownMenu);
-            StackPane.setAlignment(seasonsDropdownMenu, Pos.TOP_LEFT);
-            seasonsDropdownMenu.setTranslateY(37);
-
-            seasonsContainer.getChildren().add( dropdownWrapper);
-        }
-
-        if (!episodesSectionParent.getChildren().contains(seasonsContainer)) {
-            int insertIndex = episodesSectionParent.getChildren().indexOf( episodesList);
+        if (!episodesSection.getChildren().contains(seasonsContainer)) {
+            int insertIndex = episodesSection.getChildren().indexOf(episodesList);
             if (insertIndex == -1) insertIndex = 0;
-            episodesSectionParent.getChildren().add(insertIndex, seasonsContainer );
+            episodesSection.getChildren().add(insertIndex, seasonsContainer);
         }
 
         seasonsContainer.setVisible(true);
@@ -468,9 +493,9 @@ public class FilmSceneController {
     private void popUpSeasonContainer(){
         Popup popup = new Popup();
         StackPane stackPane = new StackPane();
-        stackPane.getStylesheets().add(getClass().getResource( "/com/esa/moviestar/styles/general.css").toExternalForm());
-        stackPane.setPadding(new Insets( 8));
-        stackPane.getStyleClass().addAll( "medium-item","surface-dim","primary-border");
+        stackPane.getStylesheets().add(getClass().getResource("/com/esa/moviestar/styles/general.css").toExternalForm());
+        stackPane.setPadding(new Insets(8));
+        stackPane.getStyleClass().addAll("medium-item","surface-dim","primary-border");
         ScrollPane scroll = new ScrollPane();
         scroll.setFitToWidth(true);
         scroll.setMaxHeight(200);
@@ -488,7 +513,7 @@ public class FilmSceneController {
             }
 
             Button seasonOptionButton = new Button(seasonName);
-            seasonOptionButton.getStyleClass().addAll("season-option-button","small-item","on-primary");
+            seasonOptionButton.getStyleClass().addAll("season-option-button","small-item","on-primary","surface-transparent","on-primary-border");
             seasonOptionButton.setPrefWidth(256);
             seasonOptionButton.setPrefHeight(50);
             final int seasonIdx = i;
@@ -512,21 +537,51 @@ public class FilmSceneController {
 
 
 
-
     private void selectSeason(int seasonIndex) {
-        if (currentContent == null || seasonIndex < 0 || seasonIndex >= currentContent.getNumberOfSeasons()) {
+        if (currentContent == null || seasonIndex < 0 || seasonIndex >= currentContent.getNumberOfSeasons()){
+            System.err.println("Cannot select season");
             return;
         }
         currentSeasonIndex = seasonIndex;
+
         updateSeasonDropdownButtonText();
         updateEpisodesDisplay();
+
+    }
+
+    private void checkAddingEpisode() {
+        FilmSeriesDetails.SeasonDetails currentSeason = currentContent.getSeasons().get(currentSeasonIndex);
+        List<FilmSeriesDetails.EpisodeDetails> episodes = currentSeason.getEpisodes();
+
+        if (episodes != null && !episodes.isEmpty()) {
+            for (FilmSeriesDetails.EpisodeDetails episode : episodes) {
+                HBox episodeItem = createEpisodeItem(episode);
+                episodesList.getChildren().add(episodeItem);
+            }
+            if (episodesLabel != null) {
+                episodesLabel.setText(episodes.size() + (episodes.size() == 1 ? " episode" : " episodes"));
+
+                episodesLabel.setVisible(true);
+                episodesLabel.setManaged(true);
+            }
+        }
+        else {
+            if (episodesLabel != null) {
+
+                episodesLabel.setText("No episodes in this season.");
+                episodesLabel.setVisible(true);
+                episodesLabel.setManaged(true);
+            }
+        }
     }
 
     private void updateEpisodesDisplay() {
-        if (episodesList == null) {
-            System.err.println("FilmSceneController: EpisodesList is null, cannot update display.");
+
+        if (episodesList == null){
+            System.err.println("episodesList is null, cannot update display.");
             return;
         }
+
         episodesList.getChildren().clear();
 
         if (currentContent == null || !currentContent.isSeries()) {
@@ -541,26 +596,7 @@ public class FilmSceneController {
             return;
         }
 
-        FilmSeriesDetails.SeasonDetails currentSeason = currentContent.getSeasons().get(currentSeasonIndex);
-        List<FilmSeriesDetails.EpisodeDetails> episodes = currentSeason.getEpisodes();
-
-        if (episodes != null && !episodes.isEmpty()) {
-            for (FilmSeriesDetails.EpisodeDetails episode : episodes) {
-                HBox episodeItem = createEpisodeItem(episode);
-                episodesList.getChildren().add(episodeItem);
-            }
-            if (episodesLabel != null) {
-                episodesLabel.setText(episodes.size() + (episodes.size() == 1 ? " episode" : " episodes"));
-                episodesLabel.setVisible(true);
-                episodesLabel.setManaged(true);
-            }
-        } else {
-            if (episodesLabel != null) {
-                episodesLabel.setText("No episodes in this season.");
-                episodesLabel.setVisible(true);
-                episodesLabel.setManaged(true);
-            }
-        }
+        checkAddingEpisode();
     }
 
 
@@ -638,54 +674,33 @@ public class FilmSceneController {
             // Keep the "episode-thumbnail-missing" or "episode-thumbnail-error" class already set
         }
     }
-    private void updateSeasonDropdownButtonText() {
-        if (seasonsDropdownButton == null || currentContent == null || !currentContent.isSeries()) {
-            return;
-        }
-        String buttonText = "Season " + (currentSeasonIndex + 1);
-        List<FilmSeriesDetails.SeasonDetails> seasons = currentContent.getSeasons();
-        if (seasons != null && currentSeasonIndex >= 0 && currentSeasonIndex < seasons.size()) {
-            FilmSeriesDetails.SeasonDetails season = seasons.get(currentSeasonIndex);
-            if (season != null && season.getName() != null && !season.getName().isEmpty()) {
-                buttonText = season.getName();
-            }
-        }
-        seasonsDropdownButton.setText(buttonText);
-    }
-
-    private HBox createEpisodeItem(FilmSeriesDetails.EpisodeDetails episode) {
-        HBox episodeItem = new HBox();
-        episodeItem.setAlignment(Pos.CENTER_LEFT);
-        episodeItem.setSpacing(15);
-        episodeItem.getStyleClass().addAll("episode-item","small-item");
 
 
-        Label episodeNumber = new Label(String.valueOf(episode.getEpisodeNumber()));
-        episodeNumber.getStyleClass().addAll("episode-number","on-primary");
-        episodeNumber.setTextOverrun(OverrunStyle.CLIP);
-
-
-        ImageView episodeThumbnail = new ImageView();
-        episodeThumbnail.setFitWidth(120);
-        episodeThumbnail.setFitHeight(70);
-        episodeThumbnail.setPreserveRatio(true);
-        episodeThumbnail.getStyleClass().add("episode-thumbnail-image");
-        Rectangle clip = new Rectangle();
-        clip.widthProperty().bind(episodeItem.widthProperty());
-        clip.heightProperty().bind(episodeItem.heightProperty());
-        clip.setArcWidth(32);
-        clip.setArcHeight(32);
-        episodeItem.setClip(clip);
-        // Use the updated loadEpisodeThumbnail which includes fallback logic
-        loadEpisodeThumbnail(episode.getStillUrl(), episodeThumbnail);
-
+    private HBox createEpisodeItem(FilmSeriesDetails.EpisodeDetails episode){
         VBox episodeDetails = new VBox(5);
-        HBox.setHgrow(episodeDetails, Priority.ALWAYS);
 
         HBox titleRow = new HBox();
         titleRow.setAlignment(Pos.CENTER_LEFT);
 
+        HBox episodeItem = new HBox();
+        setEpisodeItem(episodeItem);
+
+        HBox.setHgrow(episodeDetails, Priority.ALWAYS);
+
+        Label episodeNumber = new Label(String.valueOf(episode.getEpisodeNumber()));
         Label episodeTitle = new Label(episode.getName() != null ? episode.getName() : "Title not available");
+        ImageView episodeThumbnail = new ImageView();
+        setEpisodeThumbnail(episodeThumbnail);
+
+
+        episodeNumber.getStyleClass().addAll("episode-number","on-primary");
+        episodeNumber.setTextOverrun(OverrunStyle.CLIP);
+
+
+        // Use the updated loadEpisodeThumbnail which includes fallback logic
+        loadEpisodeThumbnail(episode.getStillUrl(), episodeThumbnail);
+
+
         episodeTitle.getStyleClass().addAll("section-title","on-primary");
         episodeTitle.setMaxWidth(Double.MAX_VALUE);
 
@@ -700,49 +715,72 @@ public class FilmSceneController {
 
         String overview = episode.getOverview();
         String displayOverview = (overview != null && !overview.isEmpty()) ? truncateText(overview) : "";
+
         Label episodeDescription = new Label(displayOverview);
-        episodeDescription.getStyleClass().addAll("episode-description","on-primary");
-        episodeDescription.setWrapText(true);
-        episodeDescription.setMaxHeight(40); // Keep existing max height
+        setEpisodeDescription(episodeDescription);
 
         episodeDetails.getChildren().addAll(titleRow, episodeDescription);
-        episodeItem.setOnMouseClicked(e -> playEpisode(episode));
+        episodeItem.setOnMouseClicked(e -> playEpisode());
 
         episodeItem.getChildren().addAll(episodeNumber, episodeThumbnail, episodeDetails);
 
         return episodeItem;
     }
 
-    private void playEpisode(FilmSeriesDetails.EpisodeDetails episode) {
+    private void setEpisodeDescription(Label episodeDescription) {
+        episodeDescription.getStyleClass().addAll("episode-description","on-primary");
+        episodeDescription.setWrapText(true);
+        episodeDescription.setMaxHeight(40);
+    }
+
+    private void setEpisodeThumbnail(ImageView episodeThumbnail) {
+        episodeThumbnail.setFitWidth(120);
+        episodeThumbnail.setFitHeight(70);
+        episodeThumbnail.setPreserveRatio(true);
+        episodeThumbnail.getStyleClass().add("episode-thumbnail-image");
+    }
+
+    private void setEpisodeItem(HBox episodeItem) {
+        episodeItem.setAlignment(Pos.CENTER_LEFT);
+        episodeItem.setSpacing(15);
+        episodeItem.getStyleClass().addAll("episode-item","small-item");
+    }
+
+    private void playEpisode() {
         openPlayerScene();
     }
 
     private void loadBackdrop(String backdropUrl) {
-        if (backdropUrl != null && !backdropUrl.isEmpty() && !backdropUrl.endsWith("null")) {
-            try {
+        if (backdropUrl != null && !backdropUrl.isEmpty() && !backdropUrl.endsWith("null")){
+            try{
                 // Background loading (true) is good for UI responsiveness
                 Image image = new Image(backdropUrl, true);
-                heroImageView.setImage(image);
-                heroImageView.setPreserveRatio(false);
-                heroImageView.setFitWidth(backgroundVBox.getWidth());
-                heroImageView.setFitHeight(backgroundVBox.getPrefHeight());
+                settingBackdropImage(image);
 
-                // The following lines are no longer needed due to FXML bindings:
-                // heroImageView.setFitWidth(backgroundVBox.getWidth());
-                // heroImageView.setFitHeight(backgroundVBox.getPrefHeight());
 
-            } catch (IllegalArgumentException e) {
+            }
+            catch(IllegalArgumentException e){
+                // This can happen if the URL string is malformed
                 System.err.println("Invalid image URL format for backdrop: " + backdropUrl + " - " + e.getMessage());
-            } catch (Exception e) {
+            }
+            catch(Exception e){
                 System.err.println("Failed to load backdrop image: " + backdropUrl + " - " + e.getMessage());
             }
-        } else {
+        }
+        else{
             System.err.println("Backdrop URL is null, empty, or invalid: " + backdropUrl);
         }
     }
 
-    private void showLoadingState() {
+    private void settingBackdropImage(Image image) {
+        heroImageView.setImage(image);
+        heroImageView.setPreserveRatio(false);
 
+        heroImageView.setFitWidth(backgroundVBox.getWidth());
+        heroImageView.setFitHeight(backgroundVBox.getPrefHeight());
+    }
+
+    private void showLoadingState() {
         if (episodesList != null) episodesList.getChildren().clear();
         hideSeriesSpecificUI();
     }
@@ -751,7 +789,7 @@ public class FilmSceneController {
         if (episodesList != null) episodesList.getChildren().clear();
         hideSeriesSpecificUI();
     }
-
+    //Setting background behind the film scene
     public void setProperties(ImageView newBackgroundImageView, MainPagesController mainPagesController) {
         if (newBackgroundImageView == null || background == null) {
             System.err.println("Error: Background ImageView or StackPane is null for setProperties.");
@@ -796,29 +834,31 @@ public class FilmSceneController {
 
     @FXML
     private void playContent() {
-        System.out.println("Play button clicked");
         UserDao dao = new UserDao();
-        dao.insertHistoryContent(user.getID(), currentContent.getId());
-        if (currentContent != null) {
-            if (currentContent.isSeries()) {
-                if (currentContent.getSeasons() != null &&
+        dao.insertHistoryContent(user.getID(), currentContent.getContentId());
+        if(currentContent != null){
+            if(currentContent.isSeries()){
+                if(currentContent.getSeasons() != null &&
                         currentSeasonIndex < currentContent.getSeasons().size() &&
                         currentContent.getSeasons().get(currentSeasonIndex) != null) {
                     FilmSeriesDetails.SeasonDetails currentSeason = currentContent.getSeasons().get(currentSeasonIndex);
-                    if (currentSeason.getEpisodes() != null && !currentSeason.getEpisodes().isEmpty()) {
-                        playEpisode(currentSeason.getEpisodes().getFirst());
-                    } else {
+                    if(currentSeason.getEpisodes() != null && !currentSeason.getEpisodes().isEmpty()) {
+                        playEpisode();
+                    }
+                    else{
                         System.out.println("No episodes found for the current season.");
                     }
-                } else {
+                }
+                else{
                     System.out.println("Current season data not loaded yet.");
                 }
-            } else {
+            }
+            else{
                 openPlayerScene();
             }
         }
     }
-
+    //Open player scene when button play is clicked
     private void openPlayerScene() {
         Platform.runLater(() -> {
             try {
@@ -835,31 +875,22 @@ public class FilmSceneController {
 
             } catch (IOException e) {
                 System.err.println("\"FilmSceneController: Error to load player, message: " + e.getMessage());
-
             }
         });
     }
 
     @FXML
     private void addToWatchlist() {
+        System.out.println("Add to watchlist button clicked");
+        UserDao dao = new UserDao();
+        dao.insertWatchlistContent(user.getID(), currentContent.getContentId());
+    }
 
-        UserDao dao = new UserDao();
-        dao.insertWatchlistContent(user.getID(), currentContent.getId());
-    }
-    @FXML
-    private void deleteFromWatchlist() {
-        UserDao dao = new UserDao();
-        dao.deleteWatchlist(user.getID(), currentContent.getId());
-    }
     @FXML
     private void addToFavourites() {
+        System.out.println("add to favourites button clicked");
         UserDao dao = new UserDao();
-        dao.insertFavouriteContent(user.getID(),currentContent.getId());
-    }
-    @FXML
-    private void deleteFromFavourites() {
-        UserDao dao = new UserDao();
-        dao.deleteFavourite(user.getID(),currentContent.getId());
+        dao.insertFavouriteContent(user.getID(),currentContent.getContentId());
     }
 
     public void setTitle(String title) {
@@ -961,7 +992,8 @@ public class FilmSceneController {
                                 currentContent.setSeasonAtIndex(seasonNumber - 1, seasonDetails);
                                 System.out.println("Season " + seasonNumber + " ('" + seasonDetails.getName() + "') loaded.");
 
-                                if (currentSeasonIndex == seasonNumber - 1 || isDropdownOpen) {
+                                if (currentSeasonIndex == seasonNumber - 1) { // Note: Original code had `|| isDropdownOpen` here, this version doesn't
+                                    updateSeasonDropdownButtonText();
                                     updateEpisodesDisplay();
                                 }
                             } catch (Exception e) {
@@ -972,11 +1004,11 @@ public class FilmSceneController {
                     .exceptionally(ex -> {
                         System.err.println("Error loading season " + seasonNumber + ": " + ex.getMessage());
                         if (currentSeasonIndex == seasonNumber - 1) {
-                            Platform.runLater(this::updateEpisodesDisplay);
-                            Platform.runLater(() -> {
+                            Platform.runLater(() -> { // Note: Original code had `this::updateEpisodesDisplay` and another Platform.runLater, this version is simpler
                                 updateSeasonDropdownButtonText();
                                 updateEpisodesDisplay();
-                            });                        }
+                            });
+                        }
                         return null;
                     });
         }
@@ -988,44 +1020,36 @@ public class FilmSceneController {
         }
     }
 
-    private boolean isNodeInside(Node node, Region container) {
-        if (node == null || container == null) return false;
-        Node current = node;
-        while (current != null) {
-            if (current.equals(container)) return true;
-            current = current.getParent();
-        }
-        return false;
+    public void setMainPagesController(MainPagesController controller) {this.mainPagesController = controller;}
+    @FXML
+    private void deleteFromFavourites() {
+        UserDao dao = new UserDao();
+        dao.deleteFavourite(user.getID(),currentContent.getContentId());
+    }
+    @FXML
+    private void deleteFromWatchlist() {
+        UserDao dao = new UserDao();
+        dao.deleteWatchlist(user.getID(), currentContent.getContentId());
     }
 
-    public void setMainPagesController(MainPagesController controller) {
-        this.mainPagesController = controller;
-    }
+    public FilmSeriesDetails getCurrentContent() {return currentContent;}
 
-    public FilmSeriesDetails getCurrentContent() {
-        return currentContent;
-    }
+    public boolean isLoading() {return titleLabel != null && "Loading...".equals(titleLabel.getText());}
 
-    public boolean isLoading() {
-        return titleLabel != null && "Loading...".equals(titleLabel.getText());
-    }
 
-    public void setUserAndAccount(User user,Account account){
-        this.user=user;
-        this.account=account;
+    public void setUserAndAccount(User user,Account account){this.user=user;this.account=account;}
 
-    }
     // Check  if the content is in the favourites or in the watchList
     private void checkFavouriteAndWatchList(User user,int contentId) {
         UserDao userDao = new UserDao();
         List<Boolean> list= userDao.checkIfIsInFavouritesOrWatchList(user.getID(),contentId);
-        if(list.get(0) ) {
+        if(list.get(0) ){
             styleFavouriteButton.getStyleClass().remove( "surface-transparent");
             styleFavouriteButton.getStyleClass().add("favourite-active");
             isInFavourite = true;
         }
         if(list.get(1)){
-            styleFavouriteButton.getStyleClass().remove( "surface-transparent");
+            styleWatchListButton.getStyleClass().remove( "surface-transparent");
             styleWatchListButton.getStyleClass().add( "watchlist-active");
             isInWatchList = true;
         }

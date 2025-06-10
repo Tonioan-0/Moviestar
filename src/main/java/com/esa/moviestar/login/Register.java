@@ -79,7 +79,7 @@ public class Register {
         setupActionButtons();
         setupPasswordRequirements();
         Node[] formElements = {togglePasswordButton, welcomeText, emailField, passwordField, warning1, warningSpecial, warningSpecial2, warning2, register, backToLogin};
-        AnimationUtils.animateSimultaneously(formElements, 1);
+        AnimationUtils.animateSimultaneously(formElements);
 
         setupResponsiveLayout();
     }

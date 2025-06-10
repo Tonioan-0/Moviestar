@@ -70,7 +70,7 @@ public class Access {
         setupBasicButtons();
 
         Node[] formElements = { togglePasswordButton,welcomeText,  emailField, passwordField, access, register};
-        AnimationUtils.animateSimultaneously(formElements, 1);
+        AnimationUtils.animateSimultaneously(formElements);
 
         setupResponsiveLayout();
         setupKeyboardNavigation();
@@ -334,22 +334,9 @@ public class Access {
 
             String verificationCode = sb.toString();
 
-            String subject = "Your MovieStar Password Reset Code";
-            String body = String.format("""
-                Hello,
-                
-                We received a request to reset your MovieStar account password.
-                
-                Your verification code is: %s
-                
-                If you did not request this, please ignore this message.
-                
-                Thank you,
-                The MovieStar Team
-                """, verificationCode);
 
             try{
-                emailService.sendEmail(email, subject, body  );
+                emailService.sendEmail(email, verificationCode);
                 warningText.setText("Verification code sent to your email");
                 AnimationUtils.pulse(warningText );
             }
@@ -362,7 +349,7 @@ public class Access {
             FXMLLoader loader =  new FXMLLoader(getClass().getResource("/com/esa/moviestar/login/reset-password-view.fxml"), Main.resourceBundle);
             Parent resetContent = loader.load();
             Node currentContent = mainContainer.getChildren().getFirst();
-            AnimationUtils.fadeOut(currentContent, 100);
+            AnimationUtils.fadeOut(currentContent);
 
             Scene currentScene = mainContainer.getScene();
             Scene newScene = new Scene(resetContent, currentScene.getWidth(),  currentScene.getHeight());
