@@ -500,7 +500,7 @@ public class FilmSceneController {
         scroll.setFitToWidth(true);
         scroll.setMaxHeight(200);
         VBox vbox = new VBox();
-
+        vbox.setSpacing(2.0);
         for (int i = 0; i < currentContent.getNumberOfSeasons(); i++) {
             String seasonName = "Season " + (i + 1);
             if (currentContent.getSeasons() != null && i < currentContent.getSeasons().size() && currentContent.getSeasons().get(i) != null) {
@@ -513,7 +513,7 @@ public class FilmSceneController {
             }
 
             Button seasonOptionButton = new Button(seasonName);
-            seasonOptionButton.getStyleClass().addAll("season-option-button","small-item","on-primary","surface-transparent","on-primary-border");
+            seasonOptionButton.getStyleClass().addAll("surface-transparent","season-option-button","small-item","on-primary","transparent-border");
             seasonOptionButton.setPrefWidth(256);
             seasonOptionButton.setPrefHeight(50);
             final int seasonIdx = i;

@@ -34,7 +34,9 @@
 .on-primary-border {
     -fx-border-color: #F0ECFD;
 }
-
+.transparent-border{
+    -fx-border-color: rgba(255,255,255,0.3);
+}
 .texture-gold{
     -fx-fill: linear-gradient(
         to bottom right,

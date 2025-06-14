@@ -1,14 +1,47 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import java.lang.*?>
-<?import java.net.*?>
-<?import javafx.geometry.*?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
-<?import javafx.scene.shape.*?>
-<?import javafx.scene.text.*?>
+<?import java.lang.String?>
+<?import java.net.URL?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.ProgressBar?>
+<?import javafx.scene.control.Slider?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.shape.SVGPath?>
+<?import javafx.scene.text.Font?>
+<?import javafx.scene.text.Text?>
 
+<?import javafx.scene.shape.Rectangle?>
 <AnchorPane fx:id="root" prefHeight="718.0" prefWidth="1118.0" styleClass="surface-solid" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.esa.moviestar.movie_view.FilmPlayer">
+   <StackPane prefHeight="150.0" prefWidth="200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+      <children>
+         <VBox fx:id="errorContainer" alignment="CENTER" prefHeight="200.0" prefWidth="100.0" spacing="24.0" visible="false">
+            <children>
+               <Text strokeType="OUTSIDE" strokeWidth="0.0" text="(;-;)">
+                  <font>
+                     <Font size="96.0" />
+                  </font>
+                  <styleClass>
+                     <String fx:value="on-primary" />
+                     <String fx:value="bold-text" />
+                  </styleClass>
+               </Text>
+               <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Video unavailable. We apologize for the inconvenience.">
+                  <styleClass>
+                     <String fx:value="on-primary" />
+                     <String fx:value="large-text" />
+                  </styleClass>
+               </Text>
+            </children>
+         </VBox>
+      </children>
+   </StackPane>
    <StackPane fx:id="playerContainer" layoutX="157.0" prefHeight="150.0" prefWidth="200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
       <StackPane fx:id="closeButton" alignment="TOP_RIGHT" maxHeight="48.0" maxWidth="48.0" minHeight="48.0" minWidth="48.0" prefHeight="48.0" prefWidth="48.0" style="-fx-view-order: -5;" StackPane.alignment="TOP_RIGHT">
          <styleClass>
@@ -129,6 +162,9 @@
                      </styleClass>
                      <ProgressBar fx:id="pbrVolume" progress="0.28" styleClass="audio-progress-bar" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
                      <Slider fx:id="sliderVolume" styleClass="volume-slider" value="100.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+                     <clip>
+                        <Rectangle arcHeight="32.0" arcWidth="32.0" height="${volumeSliderContainer.height}" width="${volumeSliderContainer.width}"/>
+                     </clip>
                   </AnchorPane>
                </StackPane>
                <StackPane fx:id="volumeIconContainer" AnchorPane.bottomAnchor="32.0" AnchorPane.leftAnchor="24.0" AnchorPane.topAnchor="32.0">

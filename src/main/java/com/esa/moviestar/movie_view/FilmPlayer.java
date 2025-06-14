@@ -26,6 +26,7 @@ import javafx.scene.media.Media;
 import javafx.scene.media.MediaView;
 
 import java.io.IOException;
+import java.net.URI;
 import java.net.URL;
 
 //To facilitate understanding, I've organized this class in a manner that allows information to be collapsed, making it more easily understandable ⁓Antonio D'Ambrosio
@@ -66,6 +67,7 @@ public class FilmPlayer{
 
     public AnchorPane root;
     public VBox bottomBar;
+    public VBox errorContainer;
 
     protected MediaPlayer mediaPlayer;
     protected MediaView mediaView;
@@ -229,8 +231,10 @@ public class FilmPlayer{
 
             setupMediaPlayerListeners();
 
-            mediaPlayer.setOnError(() ->
-                    System.err.println("FilmPlayer: Video playback error: " + mediaPlayer.getError()));
+            mediaPlayer.setOnError(() ->{
+                System.err.println("FilmPlayer: Video playback error: " + mediaPlayer.getError());
+                errorContainer.setVisible(true);
+                });
 
             mediaPlayer.setVolume(sliderVolume.getValue() / 100.0);
 
