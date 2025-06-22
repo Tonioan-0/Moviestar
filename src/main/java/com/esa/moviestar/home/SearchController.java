@@ -218,7 +218,7 @@ public class SearchController {
                                 else
                                     response = searchText;
 
-                                Label label = new Label("No icons found for ‘" + response + "’") {{
+                                Label label = new Label("No films found for ‘" + response + "’") {{
                                     getStyleClass().addAll("on-primary", "very-large-text");
                                 }};
                                 VBox nothingFound = new VBox(path,label);
@@ -247,6 +247,12 @@ public class SearchController {
                                         seen.put(titleKey, true);
                                     }
                                 }
+                            }
+                            if(forLabelLikeDisplay.isEmpty() && forRichDisplay.size()>=6){
+                                forLabelLikeDisplay.add(forRichDisplay.getLast());
+                                forLabelLikeDisplay.add(forRichDisplay.get(forRichDisplay.size()-2));
+                                forRichDisplay.removeLast();
+                                forRichDisplay.remove(forRichDisplay.size()-2);
                             }
                         }
                         if (forLabelLikeDisplay.size() > MAX_LABEL_LIKE_COUNT)
