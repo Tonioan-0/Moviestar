@@ -992,7 +992,7 @@ public class FilmSceneController {
                                 currentContent.setSeasonAtIndex(seasonNumber - 1, seasonDetails);
                                 System.out.println("Season " + seasonNumber + " ('" + seasonDetails.getName() + "') loaded.");
 
-                                if (currentSeasonIndex == seasonNumber - 1) { // Note: Original code had `|| isDropdownOpen` here, this version doesn't
+                                if (currentSeasonIndex == seasonNumber - 1) {
                                     updateSeasonDropdownButtonText();
                                     updateEpisodesDisplay();
                                 }
@@ -1004,7 +1004,7 @@ public class FilmSceneController {
                     .exceptionally(ex -> {
                         System.err.println("Error loading season " + seasonNumber + ": " + ex.getMessage());
                         if (currentSeasonIndex == seasonNumber - 1) {
-                            Platform.runLater(() -> { // Note: Original code had `this::updateEpisodesDisplay` and another Platform.runLater, this version is simpler
+                            Platform.runLater(() -> {
                                 updateSeasonDropdownButtonText();
                                 updateEpisodesDisplay();
                             });

@@ -24,7 +24,6 @@
         <Label fx:id="welcomeText" alignment="CENTER" styleClass="welcome-text" />
         <TextField fx:id="emailField" styleClass="small-item" />
 
-        <!-- Container per il campo password con bottone toggle -->
         <StackPane fx:id="passwordContainer" alignment="CENTER_RIGHT">
             <PasswordField fx:id="passwordField"  />
             <TextField fx:id="passwordTextField" managed="false" visible="false" />
