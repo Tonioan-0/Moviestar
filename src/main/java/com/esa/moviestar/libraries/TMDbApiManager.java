@@ -39,7 +39,7 @@ public class TMDbApiManager {
 
     // Constants
     private static final String BASE_URL = "https://api.themoviedb.org/3";
-    private static final String API_KEY = "";
+    private static final String API_KEY = Config.getApiKey();
     private static final String LANGUAGE = "en-US";
     private static final String IMAGE_BASE_URL = "https://image.tmdb.org/t/p/";
     private static final String DEFAULT_IMAGE_SIZE = "w500";
